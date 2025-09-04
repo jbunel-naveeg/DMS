@@ -13,7 +13,8 @@ import {
   WebsiteCard,
   DomainCard,
   UpgradeCTA,
-  UsageUpgradeCTA
+  UsageUpgradeCTA,
+  FeatureGate
 } from '@naveeg/ui'
 import { PLANS } from '@naveeg/lib'
 import { useRouter } from 'next/navigation'
@@ -375,33 +376,37 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Connect Domain</CardTitle>
-              <CardDescription>
-                Add a custom domain to your website
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <Button variant="outline" className="w-full" size="sm" onClick={handleConnectDomain}>
-                Connect Domain
-              </Button>
-            </CardContent>
-          </Card>
+          <FeatureGate feature="custom_domains">
+            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium">Connect Domain</CardTitle>
+                <CardDescription>
+                  Add a custom domain to your website
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <Button variant="outline" className="w-full" size="sm" onClick={handleConnectDomain}>
+                  Connect Domain
+                </Button>
+              </CardContent>
+            </Card>
+          </FeatureGate>
 
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">View Analytics</CardTitle>
-              <CardDescription>
-                Check your website performance and traffic
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <Button variant="outline" className="w-full" size="sm" onClick={handleViewAnalytics}>
-                View Analytics
-              </Button>
-            </CardContent>
-          </Card>
+          <FeatureGate feature="basic_analytics">
+            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium">View Analytics</CardTitle>
+                <CardDescription>
+                  Check your website performance and traffic
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <Button variant="outline" className="w-full" size="sm" onClick={handleViewAnalytics}>
+                  View Analytics
+                </Button>
+              </CardContent>
+            </Card>
+          </FeatureGate>
 
           <Card className="hover:shadow-md transition-shadow cursor-pointer">
             <CardHeader className="pb-3">

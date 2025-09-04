@@ -41,6 +41,11 @@ __export(src_exports, {
   CardTitle: () => CardTitle,
   DomainCard: () => DomainCard,
   DomainForm: () => DomainForm,
+  EntitlementCard: () => EntitlementCard,
+  FeatureBadge: () => FeatureBadge,
+  FeatureComparison: () => FeatureComparison,
+  FeatureGate: () => FeatureGate,
+  FeatureTooltip: () => FeatureTooltip,
   Input: () => Input,
   InvoiceList: () => InvoiceList,
   Label: () => Label,
@@ -1882,6 +1887,162 @@ function InvoiceList({
     )) }) })
   ] });
 }
+
+// src/components/feature-gate.tsx
+var import_jsx_runtime23 = require("react/jsx-runtime");
+function useFeatureGate(feature) {
+  return {
+    isAllowed: true,
+    // Default to allowed for now
+    needsUpgrade: false
+  };
+}
+function FeatureGate({
+  feature,
+  fallback,
+  children,
+  showUpgrade = true,
+  className
+}) {
+  const { isAllowed, needsUpgrade, reason, currentUsage, limit } = useFeatureGate(feature);
+  if (isAllowed) {
+    return /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(import_jsx_runtime23.Fragment, { children });
+  }
+  if (fallback) {
+    return /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(import_jsx_runtime23.Fragment, { children: fallback });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: cn("relative", className), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "blur-sm pointer-events-none select-none", children }),
+    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(Card, { className: "w-full max-w-md mx-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(CardHeader, { className: "text-center", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(CardTitle, { className: "text-lg", children: "Feature Not Available" }),
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(CardDescription, { children: reason || "This feature is not available in your current plan" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(CardContent, { className: "space-y-4", children: [
+        currentUsage !== void 0 && limit !== void 0 && /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "text-center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "text-sm text-gray-600 mb-2", children: [
+            "Usage: ",
+            currentUsage,
+            " / ",
+            limit === -1 ? "\u221E" : limit
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "w-full bg-gray-200 rounded-full h-2", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+            "div",
+            {
+              className: "bg-red-500 h-2 rounded-full",
+              style: { width: `${Math.min(currentUsage / limit * 100, 100)}%` }
+            }
+          ) })
+        ] }),
+        showUpgrade && /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+          Button,
+          {
+            className: "w-full",
+            onClick: () => {
+              window.location.href = "/dashboard/billing";
+            },
+            children: "Upgrade Plan"
+          }
+        )
+      ] })
+    ] }) })
+  ] });
+}
+function FeatureBadge({ feature, className }) {
+  const { isAllowed, needsUpgrade, reason } = useFeatureGate(feature);
+  if (isAllowed) {
+    return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("span", { className: cn(
+      "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800",
+      className
+    ), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("svg", { className: "w-3 h-3 mr-1", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z", clipRule: "evenodd" }) }),
+      "Available"
+    ] });
+  }
+  if (needsUpgrade) {
+    return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("span", { className: cn(
+      "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800",
+      className
+    ), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("svg", { className: "w-3 h-3 mr-1", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("path", { fillRule: "evenodd", d: "M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z", clipRule: "evenodd" }) }),
+      "Upgrade Required"
+    ] });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("span", { className: cn(
+    "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800",
+    className
+  ), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("svg", { className: "w-3 h-3 mr-1", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("path", { fillRule: "evenodd", d: "M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z", clipRule: "evenodd" }) }),
+    "Not Available"
+  ] });
+}
+function FeatureTooltip({ feature, children, className }) {
+  const { isAllowed, reason } = useFeatureGate(feature);
+  if (isAllowed) {
+    return /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(import_jsx_runtime23.Fragment, { children });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: cn("relative group", className), children: [
+    children,
+    /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)("div", { className: "absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10", children: [
+      reason || "Feature not available in your current plan",
+      /* @__PURE__ */ (0, import_jsx_runtime23.jsx)("div", { className: "absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900" })
+    ] })
+  ] });
+}
+
+// src/components/entitlement-card.tsx
+var import_jsx_runtime24 = require("react/jsx-runtime");
+function EntitlementCard({
+  title,
+  description,
+  features,
+  onUpgrade,
+  className
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)(Card, { className: cn("w-full", className), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)(CardHeader, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(CardTitle, { className: "text-xl", children: title }),
+      /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(CardDescription, { children: description })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)(CardContent, { className: "space-y-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "space-y-3", children: features.map((feature, index) => /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "flex items-start justify-between", children: /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)("div", { className: "flex-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)("div", { className: "flex items-center space-x-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("h4", { className: "font-medium text-gray-900", children: feature.name }),
+          /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(FeatureBadge, { feature: feature.feature })
+        ] }),
+        feature.description && /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("p", { className: "text-sm text-gray-600 mt-1", children: feature.description })
+      ] }) }, index)) }),
+      onUpgrade && /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "pt-4 border-t", children: /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+        Button,
+        {
+          onClick: onUpgrade,
+          className: "w-full",
+          children: "Upgrade Plan"
+        }
+      ) })
+    ] })
+  ] });
+}
+function FeatureComparison({
+  features,
+  onUpgrade,
+  className
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)("div", { className: cn("space-y-4", className), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)("div", { className: "text-center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("h3", { className: "text-lg font-medium text-gray-900 mb-2", children: "Feature Access" }),
+      /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("p", { className: "text-sm text-gray-600", children: "Check which features are available in your current plan" })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "grid gap-4", children: features.map((feature, index) => /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)("div", { className: "flex items-center justify-between p-4 border rounded-lg", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)("div", { className: "flex-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("h4", { className: "font-medium text-gray-900", children: feature.name }),
+        feature.description && /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("p", { className: "text-sm text-gray-600 mt-1", children: feature.description })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(FeatureBadge, { feature: feature.feature })
+    ] }, index)) }),
+    onUpgrade && /* @__PURE__ */ (0, import_jsx_runtime24.jsx)("div", { className: "text-center pt-4", children: /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(Button, { onClick: onUpgrade, children: "Upgrade to Access More Features" }) })
+  ] });
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AuthForm,
@@ -1895,6 +2056,11 @@ function InvoiceList({
   CardTitle,
   DomainCard,
   DomainForm,
+  EntitlementCard,
+  FeatureBadge,
+  FeatureComparison,
+  FeatureGate,
+  FeatureTooltip,
   Input,
   InvoiceList,
   Label,

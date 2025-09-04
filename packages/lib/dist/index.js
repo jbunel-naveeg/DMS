@@ -1547,7 +1547,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState4(initialState) {
+        function useState5(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1559,7 +1559,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect4(create, deps) {
+        function useEffect5(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -2342,7 +2342,7 @@ var require_react_development = __commonJS({
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect4;
+        exports.useEffect = useEffect5;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
@@ -2350,7 +2350,7 @@ var require_react_development = __commonJS({
         exports.useMemo = useMemo;
         exports.useReducer = useReducer;
         exports.useRef = useRef;
-        exports.useState = useState4;
+        exports.useState = useState5;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -2379,6 +2379,7 @@ var src_exports = {};
 __export(src_exports, {
   AppError: () => AppError,
   AuthService: () => AuthService,
+  EntitlementService: () => EntitlementService,
   PLANS: () => PLANS,
   STRIPE_WEBHOOK_SECRET: () => STRIPE_WEBHOOK_SECRET,
   StripeCheckoutService: () => StripeCheckoutService,
@@ -2392,6 +2393,7 @@ __export(src_exports, {
   createBrowserClient: () => createBrowserClient2,
   createServerClient: () => createServerClient,
   designSchema: () => designSchema,
+  entitlementService: () => entitlementService,
   formatBandwidthSize: () => formatBandwidthSize,
   formatCurrency: () => formatCurrency,
   formatDate: () => formatDate,
@@ -2411,6 +2413,8 @@ __export(src_exports, {
   stripeWebhookService: () => stripeWebhookService,
   tenWebAPI: () => tenWebAPI,
   useAuth: () => useAuth,
+  useEntitlements: () => useEntitlements,
+  useFeatureGate: () => useFeatureGate,
   useIsAuthenticated: () => useIsAuthenticated,
   useOnboardingStatus: () => useOnboardingStatus,
   useRequireAuth: () => useRequireAuth,
@@ -4133,10 +4137,239 @@ function useUserData() {
   }, [supabase]);
   return data;
 }
+
+// src/entitlements/entitlements.ts
+var EntitlementService = class {
+  constructor() {
+    this.planLimits = /* @__PURE__ */ new Map();
+    this.featureDefinitions = /* @__PURE__ */ new Map();
+    this.initializeFeatureDefinitions();
+  }
+  initializeFeatureDefinitions() {
+    this.featureDefinitions.set("trial", [
+      "basic_websites",
+      "basic_domains",
+      "basic_analytics",
+      "basic_support"
+    ]);
+    this.featureDefinitions.set("starter", [
+      "basic_websites",
+      "basic_domains",
+      "basic_analytics",
+      "basic_support",
+      "custom_domains",
+      "ssl_certificates",
+      "priority_support",
+      "basic_team_collaboration"
+    ]);
+    this.featureDefinitions.set("pro", [
+      "basic_websites",
+      "basic_domains",
+      "basic_analytics",
+      "basic_support",
+      "custom_domains",
+      "ssl_certificates",
+      "priority_support",
+      "basic_team_collaboration",
+      "advanced_analytics",
+      "api_access",
+      "advanced_team_collaboration",
+      "custom_integrations"
+    ]);
+    this.featureDefinitions.set("enterprise", [
+      "basic_websites",
+      "basic_domains",
+      "basic_analytics",
+      "basic_support",
+      "custom_domains",
+      "ssl_certificates",
+      "priority_support",
+      "basic_team_collaboration",
+      "advanced_analytics",
+      "api_access",
+      "advanced_team_collaboration",
+      "custom_integrations",
+      "unlimited_websites",
+      "unlimited_domains",
+      "dedicated_support",
+      "custom_contracts",
+      "sla_guarantee"
+    ]);
+  }
+  checkFeatureEntitlement(check) {
+    const { feature, planId, usage, limits } = check;
+    const planFeatures = this.featureDefinitions.get(planId) || [];
+    if (!planFeatures.includes(feature)) {
+      return {
+        feature,
+        allowed: false,
+        reason: "Feature not available in your current plan",
+        upgradeRequired: true
+      };
+    }
+    const usageCheck = this.checkUsageLimits(feature, usage, limits);
+    if (!usageCheck.allowed) {
+      return {
+        feature,
+        allowed: false,
+        reason: usageCheck.reason,
+        upgradeRequired: usageCheck.upgradeRequired,
+        currentUsage: usageCheck.currentUsage,
+        limit: usageCheck.limit
+      };
+    }
+    return {
+      feature,
+      allowed: true
+    };
+  }
+  checkUsageLimits(feature, usage, limits) {
+    switch (feature) {
+      case "basic_websites":
+      case "unlimited_websites":
+        return this.checkLimit("websites", usage.websites, limits.websites);
+      case "basic_domains":
+      case "custom_domains":
+      case "unlimited_domains":
+        return this.checkLimit("domains", usage.domains, limits.domains);
+      case "basic_team_collaboration":
+      case "advanced_team_collaboration":
+        return this.checkLimit("team_members", usage.team_members, limits.team_members);
+      case "storage":
+        return this.checkLimit("storage", usage.storage, limits.storage);
+      case "bandwidth":
+        return this.checkLimit("bandwidth", usage.bandwidth, limits.bandwidth);
+      default:
+        return { allowed: true };
+    }
+  }
+  checkLimit(resource, currentUsage, limit) {
+    if (limit === -1) {
+      return { allowed: true };
+    }
+    if (currentUsage.used >= limit) {
+      return {
+        allowed: false,
+        reason: `You have reached your ${resource} limit`,
+        upgradeRequired: true,
+        currentUsage: currentUsage.used,
+        limit
+      };
+    }
+    if (currentUsage.used >= limit * 0.8) {
+      return {
+        allowed: true,
+        reason: `You are approaching your ${resource} limit`,
+        currentUsage: currentUsage.used,
+        limit
+      };
+    }
+    return { allowed: true };
+  }
+  getAvailableFeatures(planId) {
+    return this.featureDefinitions.get(planId) || [];
+  }
+  getFeatureTier(feature) {
+    for (const [planId, features] of this.featureDefinitions.entries()) {
+      if (features.includes(feature)) {
+        return planId;
+      }
+    }
+    return "enterprise";
+  }
+  canUpgrade(currentPlanId, targetPlanId) {
+    const planHierarchy = ["trial", "starter", "pro", "enterprise"];
+    const currentIndex = planHierarchy.indexOf(currentPlanId);
+    const targetIndex = planHierarchy.indexOf(targetPlanId);
+    return targetIndex > currentIndex;
+  }
+  getUpgradePath(currentPlanId) {
+    const planHierarchy = ["trial", "starter", "pro", "enterprise"];
+    const currentIndex = planHierarchy.indexOf(currentPlanId);
+    return planHierarchy.slice(currentIndex + 1);
+  }
+};
+var entitlementService = new EntitlementService();
+
+// src/entitlements/hooks.ts
+var import_react4 = __toESM(require_react());
+function useEntitlements() {
+  const { plan, planUsage, loading, error } = useUserData();
+  const [entitlements, setEntitlements] = (0, import_react4.useState)(/* @__PURE__ */ new Map());
+  (0, import_react4.useEffect)(() => {
+    if (!plan || !planUsage)
+      return;
+    const currentEntitlements = /* @__PURE__ */ new Map();
+    const availableFeatures = entitlementService.getAvailableFeatures(plan.plan.id);
+    availableFeatures.forEach((feature) => {
+      const check = {
+        feature,
+        planId: plan.plan.id,
+        usage: planUsage,
+        limits: plan.plan.limits
+      };
+      const entitlement = entitlementService.checkFeatureEntitlement(check);
+      currentEntitlements.set(feature, entitlement);
+    });
+    setEntitlements(currentEntitlements);
+  }, [plan, planUsage]);
+  const checkFeature = (feature) => {
+    if (entitlements.has(feature)) {
+      return entitlements.get(feature);
+    }
+    if (!plan || !planUsage) {
+      return {
+        feature,
+        allowed: false,
+        reason: "No plan information available"
+      };
+    }
+    const check = {
+      feature,
+      planId: plan.plan.id,
+      usage: planUsage,
+      limits: plan.plan.limits
+    };
+    return entitlementService.checkFeatureEntitlement(check);
+  };
+  const hasFeature = (feature) => {
+    return checkFeature(feature).allowed;
+  };
+  const canUseFeature = (feature) => {
+    const entitlement = checkFeature(feature);
+    return entitlement.allowed && !entitlement.upgradeRequired;
+  };
+  const getFeatureReason = (feature) => {
+    return checkFeature(feature).reason;
+  };
+  const requiresUpgrade = (feature) => {
+    return checkFeature(feature).upgradeRequired || false;
+  };
+  return {
+    checkFeature,
+    hasFeature,
+    canUseFeature,
+    getFeatureReason,
+    requiresUpgrade,
+    loading,
+    error
+  };
+}
+function useFeatureGate(feature) {
+  const entitlements = useEntitlements();
+  const entitlement = entitlements.checkFeature(feature);
+  return {
+    ...entitlement,
+    ...entitlements,
+    isAllowed: entitlement.allowed,
+    needsUpgrade: entitlement.upgradeRequired || false
+  };
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AppError,
   AuthService,
+  EntitlementService,
   PLANS,
   STRIPE_WEBHOOK_SECRET,
   StripeCheckoutService,
@@ -4150,6 +4383,7 @@ function useUserData() {
   createBrowserClient,
   createServerClient,
   designSchema,
+  entitlementService,
   formatBandwidthSize,
   formatCurrency,
   formatDate,
@@ -4169,6 +4403,8 @@ function useUserData() {
   stripeWebhookService,
   tenWebAPI,
   useAuth,
+  useEntitlements,
+  useFeatureGate,
   useIsAuthenticated,
   useOnboardingStatus,
   useRequireAuth,

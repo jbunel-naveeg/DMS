@@ -480,4 +480,67 @@ interface UserData {
 }
 declare function useUserData(): UserData;
 
-export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CancelSubscriptionRequest, CancelSubscriptionResponse, CheckoutSession, CreateCheckoutSessionRequest, CreateCheckoutSessionResponse, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, CreateSubscriptionRequest, CreateSubscriptionResponse, DesignInput, Domain, OnboardingStatus, PLANS, Plan, PlanLimits, PlanUsage, ProcessWebhookResponse, STRIPE_WEBHOOK_SECRET, StripeCheckoutService, StripeSubscriptionService, StripeWebhookService, Subscription, TenWebAPI, TenWebDomain, TenWebSite, UpdateSubscriptionRequest, UpdateSubscriptionResponse, UsageStats, UseAuthReturn, UserData, UserPlan, WebhookEvent, Website, authService, briefSchema, calculateUsagePercentage, createAuthClient, createBrowserClient, createServerClient, designSchema, formatBandwidthSize, formatCurrency, formatDate, formatStorageSize, generateSchema, generateSubdomain, getBrowserSupabaseClient, getPlanById, getPlanLimits, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, isFeatureAvailable, stripeCheckoutService, stripeSubscriptionService, stripeWebhookService, tenWebAPI, useAuth, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser, useUserData };
+interface FeatureEntitlement {
+    feature: string;
+    allowed: boolean;
+    reason?: string;
+    upgradeRequired?: boolean;
+    currentUsage?: number;
+    limit?: number;
+}
+interface EntitlementCheck {
+    feature: string;
+    planId: string;
+    usage: PlanUsage;
+    limits: PlanLimits;
+}
+declare class EntitlementService {
+    private planLimits;
+    private featureDefinitions;
+    constructor();
+    private initializeFeatureDefinitions;
+    checkFeatureEntitlement(check: EntitlementCheck): FeatureEntitlement;
+    private checkUsageLimits;
+    private checkLimit;
+    getAvailableFeatures(planId: string): string[];
+    getFeatureTier(feature: string): 'trial' | 'starter' | 'pro' | 'enterprise';
+    canUpgrade(currentPlanId: string, targetPlanId: string): boolean;
+    getUpgradePath(currentPlanId: string): string[];
+}
+declare const entitlementService: EntitlementService;
+
+interface UseEntitlementReturn {
+    checkFeature: (feature: string) => FeatureEntitlement;
+    hasFeature: (feature: string) => boolean;
+    canUseFeature: (feature: string) => boolean;
+    getFeatureReason: (feature: string) => string | undefined;
+    requiresUpgrade: (feature: string) => boolean;
+    loading: boolean;
+    error: string | null;
+}
+declare function useEntitlements(): UseEntitlementReturn;
+interface UseFeatureGateProps {
+    feature: string;
+    fallback?: React.ReactNode;
+    children: React.ReactNode;
+    showUpgrade?: boolean;
+}
+declare function useFeatureGate(feature: string): {
+    isAllowed: boolean;
+    needsUpgrade: boolean;
+    checkFeature: (feature: string) => FeatureEntitlement;
+    hasFeature: (feature: string) => boolean;
+    canUseFeature: (feature: string) => boolean;
+    getFeatureReason: (feature: string) => string | undefined;
+    requiresUpgrade: (feature: string) => boolean;
+    loading: boolean;
+    error: string | null;
+    feature: string;
+    allowed: boolean;
+    reason?: string;
+    upgradeRequired?: boolean;
+    currentUsage?: number;
+    limit?: number;
+};
+
+export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CancelSubscriptionRequest, CancelSubscriptionResponse, CheckoutSession, CreateCheckoutSessionRequest, CreateCheckoutSessionResponse, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, CreateSubscriptionRequest, CreateSubscriptionResponse, DesignInput, Domain, EntitlementCheck, EntitlementService, FeatureEntitlement, OnboardingStatus, PLANS, Plan, PlanLimits, PlanUsage, ProcessWebhookResponse, STRIPE_WEBHOOK_SECRET, StripeCheckoutService, StripeSubscriptionService, StripeWebhookService, Subscription, TenWebAPI, TenWebDomain, TenWebSite, UpdateSubscriptionRequest, UpdateSubscriptionResponse, UsageStats, UseAuthReturn, UseEntitlementReturn, UseFeatureGateProps, UserData, UserPlan, WebhookEvent, Website, authService, briefSchema, calculateUsagePercentage, createAuthClient, createBrowserClient, createServerClient, designSchema, entitlementService, formatBandwidthSize, formatCurrency, formatDate, formatStorageSize, generateSchema, generateSubdomain, getBrowserSupabaseClient, getPlanById, getPlanLimits, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, isFeatureAvailable, stripeCheckoutService, stripeSubscriptionService, stripeWebhookService, tenWebAPI, useAuth, useEntitlements, useFeatureGate, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser, useUserData };

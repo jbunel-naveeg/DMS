@@ -294,4 +294,47 @@ interface InvoiceListProps {
 }
 declare function InvoiceList({ invoices, onDownload, onView, loading, className }: InvoiceListProps): react_jsx_runtime.JSX.Element;
 
-export { AuthForm, AuthFormData, AuthFormProps, BillingInfo, BillingInfoProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, DomainCard, DomainCardProps, DomainForm, DomainFormData, DomainFormProps, Input, InputProps, Invoice, InvoiceList, InvoiceListProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, PlanBadge, PlanBadgeProps, PricingCard, PricingCardProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UpgradeCTA, UpgradeCTAProps, UsageBar, UsageBarProps, UsageUpgradeCTA, UsageUpgradeCTAProps, UserMenu, UserMenuProps, WebsiteCard, WebsiteCardProps, buttonVariants, cn };
+interface FeatureGateProps {
+    feature: string;
+    fallback?: React.ReactNode;
+    children: React.ReactNode;
+    showUpgrade?: boolean;
+    className?: string;
+}
+declare function FeatureGate({ feature, fallback, children, showUpgrade, className }: FeatureGateProps): react_jsx_runtime.JSX.Element;
+interface FeatureBadgeProps {
+    feature: string;
+    className?: string;
+}
+declare function FeatureBadge({ feature, className }: FeatureBadgeProps): react_jsx_runtime.JSX.Element;
+interface FeatureTooltipProps {
+    feature: string;
+    children: React.ReactNode;
+    className?: string;
+}
+declare function FeatureTooltip({ feature, children, className }: FeatureTooltipProps): react_jsx_runtime.JSX.Element;
+
+interface EntitlementCardProps {
+    title: string;
+    description: string;
+    features: Array<{
+        name: string;
+        feature: string;
+        description?: string;
+    }>;
+    onUpgrade?: () => void;
+    className?: string;
+}
+declare function EntitlementCard({ title, description, features, onUpgrade, className }: EntitlementCardProps): react_jsx_runtime.JSX.Element;
+interface FeatureComparisonProps {
+    features: Array<{
+        name: string;
+        feature: string;
+        description?: string;
+    }>;
+    onUpgrade?: () => void;
+    className?: string;
+}
+declare function FeatureComparison({ features, onUpgrade, className }: FeatureComparisonProps): react_jsx_runtime.JSX.Element;
+
+export { AuthForm, AuthFormData, AuthFormProps, BillingInfo, BillingInfoProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, DomainCard, DomainCardProps, DomainForm, DomainFormData, DomainFormProps, EntitlementCard, EntitlementCardProps, FeatureBadge, FeatureBadgeProps, FeatureComparison, FeatureComparisonProps, FeatureGate, FeatureGateProps, FeatureTooltip, FeatureTooltipProps, Input, InputProps, Invoice, InvoiceList, InvoiceListProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, PlanBadge, PlanBadgeProps, PricingCard, PricingCardProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UpgradeCTA, UpgradeCTAProps, UsageBar, UsageBarProps, UsageUpgradeCTA, UsageUpgradeCTAProps, UserMenu, UserMenuProps, WebsiteCard, WebsiteCardProps, buttonVariants, cn };
