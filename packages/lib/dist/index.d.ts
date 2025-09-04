@@ -70,14 +70,102 @@ declare class TenWebAPI {
 declare const tenWebAPI: TenWebAPI;
 declare function getTenWebAPI(): TenWebAPI;
 
-type Plan = "starter" | "pro" | "custom";
-declare function canAccess(feature: string, plan: Plan): boolean;
-declare const plans: {
+interface Plan {
     id: string;
+    name: string;
+    description: string;
     price: number;
-    currency: string;
+    interval: 'month' | 'year';
     features: string[];
-}[];
+    limits: {
+        websites: number;
+        domains: number;
+        storage: number;
+        bandwidth: number;
+        team_members: number;
+    };
+    stripe_price_id?: string;
+    is_popular?: boolean;
+    is_enterprise?: boolean;
+}
+interface UserPlan {
+    id: string;
+    user_id: string;
+    plan_id: string;
+    status: 'active' | 'canceled' | 'past_due' | 'unpaid';
+    current_period_start: string;
+    current_period_end: string;
+    cancel_at_period_end: boolean;
+    created_at: string;
+    updated_at: string;
+    plan: Plan;
+}
+interface Website {
+    id: string;
+    user_id: string;
+    name: string;
+    subdomain: string;
+    url: string;
+    status: 'active' | 'inactive' | 'pending' | 'suspended';
+    template: string;
+    description?: string;
+    created_at: string;
+    updated_at: string;
+    last_deployed_at?: string;
+}
+interface Domain {
+    id: string;
+    website_id: string;
+    domain: string;
+    status: 'active' | 'inactive' | 'pending' | 'failed';
+    ssl_enabled: boolean;
+    created_at: string;
+    updated_at: string;
+    website: Website;
+}
+interface UsageStats {
+    websites_count: number;
+    domains_count: number;
+    storage_used: number;
+    bandwidth_used: number;
+    team_members_count: number;
+}
+interface PlanLimits {
+    websites: number;
+    domains: number;
+    storage: number;
+    bandwidth: number;
+    team_members: number;
+}
+interface PlanUsage {
+    websites: {
+        used: number;
+        limit: number;
+    };
+    domains: {
+        used: number;
+        limit: number;
+    };
+    storage: {
+        used: number;
+        limit: number;
+    };
+    bandwidth: {
+        used: number;
+        limit: number;
+    };
+    team_members: {
+        used: number;
+        limit: number;
+    };
+}
+declare const PLANS: Plan[];
+declare function getPlanById(id: string): Plan | undefined;
+declare function getPlanLimits(planId: string): PlanLimits | null;
+declare function calculateUsagePercentage(usage: number, limit: number): number;
+declare function isFeatureAvailable(planId: string, feature: keyof PlanLimits, currentUsage: number): boolean;
+declare function formatStorageSize(gb: number): string;
+declare function formatBandwidthSize(gb: number): string;
 
 declare const briefSchema: z.ZodObject<{
     businessName: z.ZodString;
@@ -266,4 +354,15 @@ interface OnboardingStatus {
 }
 declare function useOnboardingStatus(): OnboardingStatus;
 
-export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, DesignInput, OnboardingStatus, Plan, STRIPE_WEBHOOK_SECRET, TenWebAPI, TenWebDomain, TenWebSite, UseAuthReturn, authService, briefSchema, canAccess, createAuthClient, createBrowserClient, createServerClient, designSchema, formatCurrency, formatDate, generateSchema, generateSubdomain, getBrowserSupabaseClient, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, plans, tenWebAPI, useAuth, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser };
+interface UserData {
+    plan: UserPlan | null;
+    websites: Website[];
+    domains: Domain[];
+    usage: UsageStats;
+    planUsage: PlanUsage;
+    loading: boolean;
+    error: string | null;
+}
+declare function useUserData(): UserData;
+
+export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, DesignInput, Domain, OnboardingStatus, PLANS, Plan, PlanLimits, PlanUsage, STRIPE_WEBHOOK_SECRET, TenWebAPI, TenWebDomain, TenWebSite, UsageStats, UseAuthReturn, UserData, UserPlan, Website, authService, briefSchema, calculateUsagePercentage, createAuthClient, createBrowserClient, createServerClient, designSchema, formatBandwidthSize, formatCurrency, formatDate, formatStorageSize, generateSchema, generateSubdomain, getBrowserSupabaseClient, getPlanById, getPlanLimits, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, isFeatureAvailable, tenWebAPI, useAuth, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser, useUserData };

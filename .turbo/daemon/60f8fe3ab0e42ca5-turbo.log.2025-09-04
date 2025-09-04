@@ -414,3 +414,35 @@
 2025-09-04T18:32:11.459613Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/lib"), path: AnchoredSystemPathBuf("packages/lib") }, WorkspacePackage { name: Other("@naveeg/ui"), path: AnchoredSystemPathBuf("packages/ui") }}))
 2025-09-04T18:32:11.492086Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
 2025-09-04T18:32:11.493873Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2025-09-04T18:33:33.372468Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/lib/src/types/plans.ts")}
+2025-09-04T18:33:33.372628Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/lib"), path: AnchoredSystemPathBuf("packages/lib") }}))
+2025-09-04T18:33:45.272644Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/ui/src/components/plan-badge.tsx")}
+2025-09-04T18:33:45.272653Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/ui"), path: AnchoredSystemPathBuf("packages/ui") }}))
+2025-09-04T18:33:54.273258Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/ui/src/components/usage-bar.tsx")}
+2025-09-04T18:33:54.273267Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/ui"), path: AnchoredSystemPathBuf("packages/ui") }}))
+2025-09-04T18:33:54.372494Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/ui/src/components/usage-bar.tsx")}
+2025-09-04T18:33:54.372504Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/ui"), path: AnchoredSystemPathBuf("packages/ui") }}))
+2025-09-04T18:34:15.972877Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/ui/src/components/website-card.tsx")}
+2025-09-04T18:34:15.972885Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/ui"), path: AnchoredSystemPathBuf("packages/ui") }}))
+2025-09-04T18:34:16.072984Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/ui/src/components/website-card.tsx")}
+2025-09-04T18:34:16.072993Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/ui"), path: AnchoredSystemPathBuf("packages/ui") }}))
+2025-09-04T18:34:42.273002Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/ui/src/components/domain-card.tsx")}
+2025-09-04T18:34:42.273009Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/ui"), path: AnchoredSystemPathBuf("packages/ui") }}))
+2025-09-04T18:34:42.372122Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/ui/src/components/domain-card.tsx")}
+2025-09-04T18:34:42.372133Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/ui"), path: AnchoredSystemPathBuf("packages/ui") }}))
+2025-09-04T18:35:02.372638Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/ui/src/components/upgrade-cta.tsx")}
+2025-09-04T18:35:02.372647Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/ui"), path: AnchoredSystemPathBuf("packages/ui") }}))
+2025-09-04T18:35:02.472339Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/ui/src/components/upgrade-cta.tsx")}
+2025-09-04T18:35:02.472348Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/ui"), path: AnchoredSystemPathBuf("packages/ui") }}))
+2025-09-04T18:35:10.672094Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/ui/src/index.ts")}
+2025-09-04T18:35:10.672104Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/ui"), path: AnchoredSystemPathBuf("packages/ui") }}))
+2025-09-04T18:35:26.473253Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/lib/src/hooks/use-user-data.ts"), AnchoredSystemPathBuf("packages/lib/src/hooks")}
+2025-09-04T18:35:26.473260Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/lib"), path: AnchoredSystemPathBuf("packages/lib") }}))
+2025-09-04T18:35:26.573253Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/lib/src/hooks/use-user-data.ts")}
+2025-09-04T18:35:26.573261Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/lib"), path: AnchoredSystemPathBuf("packages/lib") }}))
+2025-09-04T18:35:30.673212Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/lib/src/index.ts")}
+2025-09-04T18:35:30.673222Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/lib"), path: AnchoredSystemPathBuf("packages/lib") }}))
+2025-09-04T18:36:54.273551Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/dashboard/src/app/dashboard/page.tsx")}
+2025-09-04T18:36:54.273561Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/dashboard"), path: AnchoredSystemPathBuf("apps/dashboard") }}))
+2025-09-04T18:38:18.273409Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/lib/tsup.config.bundled_ylnquzb0vhp.mjs"), AnchoredSystemPathBuf("packages/ui/tsup.config.bundled_55qr0wku0w.mjs")}
+2025-09-04T18:38:18.273430Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/ui"), path: AnchoredSystemPathBuf("packages/ui") }, WorkspacePackage { name: Other("@naveeg/lib"), path: AnchoredSystemPathBuf("packages/lib") }}))

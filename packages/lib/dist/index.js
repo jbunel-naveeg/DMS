@@ -1547,7 +1547,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState3(initialState) {
+        function useState4(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1559,7 +1559,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect3(create, deps) {
+        function useEffect4(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -2342,7 +2342,7 @@ var require_react_development = __commonJS({
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect3;
+        exports.useEffect = useEffect4;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
@@ -2350,7 +2350,7 @@ var require_react_development = __commonJS({
         exports.useMemo = useMemo;
         exports.useReducer = useReducer;
         exports.useRef = useRef;
-        exports.useState = useState3;
+        exports.useState = useState4;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -2379,31 +2379,37 @@ var src_exports = {};
 __export(src_exports, {
   AppError: () => AppError,
   AuthService: () => AuthService,
+  PLANS: () => PLANS,
   STRIPE_WEBHOOK_SECRET: () => STRIPE_WEBHOOK_SECRET,
   TenWebAPI: () => TenWebAPI,
   authService: () => authService,
   briefSchema: () => briefSchema,
-  canAccess: () => canAccess,
+  calculateUsagePercentage: () => calculateUsagePercentage,
   createAuthClient: () => createAuthClient,
   createBrowserClient: () => createBrowserClient2,
   createServerClient: () => createServerClient,
   designSchema: () => designSchema,
+  formatBandwidthSize: () => formatBandwidthSize,
   formatCurrency: () => formatCurrency,
   formatDate: () => formatDate,
+  formatStorageSize: () => formatStorageSize,
   generateSchema: () => generateSchema,
   generateSubdomain: () => generateSubdomain,
   getBrowserSupabaseClient: () => getBrowserSupabaseClient,
+  getPlanById: () => getPlanById,
+  getPlanLimits: () => getPlanLimits,
   getServerSupabaseClient: () => getServerSupabaseClient,
   getServiceSupabaseClient: () => getServiceSupabaseClient,
   getStripe: () => getStripe,
   getTenWebAPI: () => getTenWebAPI,
-  plans: () => plans,
+  isFeatureAvailable: () => isFeatureAvailable,
   tenWebAPI: () => tenWebAPI,
   useAuth: () => useAuth,
   useIsAuthenticated: () => useIsAuthenticated,
   useOnboardingStatus: () => useOnboardingStatus,
   useRequireAuth: () => useRequireAuth,
-  useUser: () => useUser
+  useUser: () => useUser,
+  useUserData: () => useUserData
 });
 module.exports = __toCommonJS(src_exports);
 
@@ -3132,19 +3138,149 @@ function getTenWebAPI() {
 }
 
 // src/types/plans.ts
-var planFeatures = {
-  starter: ["basic-analytics", "domain-connect-ui"],
-  pro: ["advanced-analytics", "backups", "seo-tools"],
-  custom: ["priority-support", "sso"]
-};
-function canAccess(feature, plan) {
-  return planFeatures[plan]?.includes(feature) ?? false;
-}
-var plans = [
-  { id: "starter", price: 49, currency: "EUR", features: planFeatures.starter },
-  { id: "pro", price: 99, currency: "EUR", features: planFeatures.pro },
-  { id: "custom", price: 0, currency: "EUR", features: planFeatures.custom }
+var PLANS = [
+  {
+    id: "trial",
+    name: "Trial",
+    description: "Perfect for testing the platform",
+    price: 0,
+    interval: "month",
+    features: [
+      "1 Website",
+      "1 Subdomain",
+      "1GB Storage",
+      "10GB Bandwidth",
+      "Basic Support",
+      "WordPress Hosting"
+    ],
+    limits: {
+      websites: 1,
+      domains: 1,
+      storage: 1,
+      bandwidth: 10,
+      team_members: 1
+    }
+  },
+  {
+    id: "starter",
+    name: "Starter",
+    description: "Great for small businesses and freelancers",
+    price: 29,
+    interval: "month",
+    features: [
+      "3 Websites",
+      "3 Custom Domains",
+      "10GB Storage",
+      "100GB Bandwidth",
+      "Priority Support",
+      "WordPress Hosting",
+      "SSL Certificates",
+      "Basic Analytics"
+    ],
+    limits: {
+      websites: 3,
+      domains: 3,
+      storage: 10,
+      bandwidth: 100,
+      team_members: 2
+    },
+    stripe_price_id: "price_starter_monthly"
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    description: "Perfect for growing businesses",
+    price: 79,
+    interval: "month",
+    features: [
+      "10 Websites",
+      "10 Custom Domains",
+      "50GB Storage",
+      "500GB Bandwidth",
+      "Priority Support",
+      "WordPress Hosting",
+      "SSL Certificates",
+      "Advanced Analytics",
+      "Team Collaboration",
+      "API Access"
+    ],
+    limits: {
+      websites: 10,
+      domains: 10,
+      storage: 50,
+      bandwidth: 500,
+      team_members: 5
+    },
+    is_popular: true,
+    stripe_price_id: "price_pro_monthly"
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    description: "For large organizations with custom needs",
+    price: 199,
+    interval: "month",
+    features: [
+      "Unlimited Websites",
+      "Unlimited Domains",
+      "500GB Storage",
+      "2TB Bandwidth",
+      "24/7 Priority Support",
+      "WordPress Hosting",
+      "SSL Certificates",
+      "Advanced Analytics",
+      "Team Collaboration",
+      "API Access",
+      "Custom Integrations",
+      "Dedicated Support"
+    ],
+    limits: {
+      websites: -1,
+      // -1 means unlimited
+      domains: -1,
+      storage: 500,
+      bandwidth: 2e3,
+      team_members: -1
+    },
+    is_enterprise: true,
+    stripe_price_id: "price_enterprise_monthly"
+  }
 ];
+function getPlanById(id) {
+  return PLANS.find((plan) => plan.id === id);
+}
+function getPlanLimits(planId) {
+  const plan = getPlanById(planId);
+  return plan ? plan.limits : null;
+}
+function calculateUsagePercentage(usage, limit) {
+  if (limit === -1)
+    return 0;
+  if (limit === 0)
+    return 100;
+  return Math.min(usage / limit * 100, 100);
+}
+function isFeatureAvailable(planId, feature, currentUsage) {
+  const limits = getPlanLimits(planId);
+  if (!limits)
+    return false;
+  const limit = limits[feature];
+  if (limit === -1)
+    return true;
+  return currentUsage < limit;
+}
+function formatStorageSize(gb) {
+  if (gb >= 1e3) {
+    return `${(gb / 1e3).toFixed(1)}TB`;
+  }
+  return `${gb}GB`;
+}
+function formatBandwidthSize(gb) {
+  if (gb >= 1e3) {
+    return `${(gb / 1e3).toFixed(1)}TB`;
+  }
+  return `${gb}GB`;
+}
 
 // src/validations/validations.ts
 var import_zod = require("zod");
@@ -3448,35 +3584,128 @@ function useOnboardingStatus() {
   }, [supabase]);
   return status;
 }
+
+// src/hooks/use-user-data.ts
+var import_react3 = __toESM(require_react());
+function useUserData() {
+  const [data, setData] = (0, import_react3.useState)({
+    plan: null,
+    websites: [],
+    domains: [],
+    usage: {
+      websites_count: 0,
+      domains_count: 0,
+      storage_used: 0,
+      bandwidth_used: 0,
+      team_members_count: 0
+    },
+    planUsage: {
+      websites: { used: 0, limit: 0 },
+      domains: { used: 0, limit: 0 },
+      storage: { used: 0, limit: 0 },
+      bandwidth: { used: 0, limit: 0 },
+      team_members: { used: 0, limit: 0 }
+    },
+    loading: true,
+    error: null
+  });
+  const supabase = createBrowserClient2();
+  (0, import_react3.useEffect)(() => {
+    const fetchUserData = async () => {
+      try {
+        setData((prev) => ({ ...prev, loading: true, error: null }));
+        const { data: planData, error: planError } = await supabase.from("user_plans").select(`
+            *,
+            plan:plans(*)
+          `).eq("status", "active").single();
+        if (planError && planError.code !== "PGRST116") {
+          throw new Error(planError.message);
+        }
+        const { data: websitesData, error: websitesError } = await supabase.from("websites").select("*").order("created_at", { ascending: false });
+        if (websitesError) {
+          throw new Error(websitesError.message);
+        }
+        const { data: domainsData, error: domainsError } = await supabase.from("domains").select(`
+            *,
+            website:websites(*)
+          `).order("created_at", { ascending: false });
+        if (domainsError) {
+          throw new Error(domainsError.message);
+        }
+        const usage = {
+          websites_count: websitesData?.length || 0,
+          domains_count: domainsData?.length || 0,
+          storage_used: 0,
+          // This would be calculated from actual storage usage
+          bandwidth_used: 0,
+          // This would be calculated from actual bandwidth usage
+          team_members_count: 0
+          // This would be fetched from team_members table
+        };
+        const plan = planData?.plan || { limits: { websites: 1, domains: 1, storage: 1, bandwidth: 10, team_members: 1 } };
+        const planUsage = {
+          websites: { used: usage.websites_count, limit: plan.limits.websites },
+          domains: { used: usage.domains_count, limit: plan.limits.domains },
+          storage: { used: usage.storage_used, limit: plan.limits.storage },
+          bandwidth: { used: usage.bandwidth_used, limit: plan.limits.bandwidth },
+          team_members: { used: usage.team_members_count, limit: plan.limits.team_members }
+        };
+        setData({
+          plan: planData,
+          websites: websitesData || [],
+          domains: domainsData || [],
+          usage,
+          planUsage,
+          loading: false,
+          error: null
+        });
+      } catch (error) {
+        setData((prev) => ({
+          ...prev,
+          loading: false,
+          error: error instanceof Error ? error.message : "Failed to fetch user data"
+        }));
+      }
+    };
+    fetchUserData();
+  }, [supabase]);
+  return data;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AppError,
   AuthService,
+  PLANS,
   STRIPE_WEBHOOK_SECRET,
   TenWebAPI,
   authService,
   briefSchema,
-  canAccess,
+  calculateUsagePercentage,
   createAuthClient,
   createBrowserClient,
   createServerClient,
   designSchema,
+  formatBandwidthSize,
   formatCurrency,
   formatDate,
+  formatStorageSize,
   generateSchema,
   generateSubdomain,
   getBrowserSupabaseClient,
+  getPlanById,
+  getPlanLimits,
   getServerSupabaseClient,
   getServiceSupabaseClient,
   getStripe,
   getTenWebAPI,
-  plans,
+  isFeatureAvailable,
   tenWebAPI,
   useAuth,
   useIsAuthenticated,
   useOnboardingStatus,
   useRequireAuth,
-  useUser
+  useUser,
+  useUserData
 });
 /*! Bundled license information:
 

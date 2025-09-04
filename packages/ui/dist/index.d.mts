@@ -147,4 +147,91 @@ interface OnboardingProgressProps {
 }
 declare function OnboardingProgress({ currentStep, totalSteps, steps, className }: OnboardingProgressProps): react_jsx_runtime.JSX.Element;
 
-export { AuthForm, AuthFormData, AuthFormProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, DomainForm, DomainFormData, DomainFormProps, Input, InputProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UserMenu, UserMenuProps, buttonVariants, cn };
+interface PlanBadgeProps {
+    plan: {
+        id: string;
+        name: string;
+        is_popular?: boolean;
+        is_enterprise?: boolean;
+    };
+    className?: string;
+}
+declare function PlanBadge({ plan, className }: PlanBadgeProps): react_jsx_runtime.JSX.Element;
+
+interface UsageBarProps {
+    label: string;
+    used: number;
+    limit: number;
+    unit?: string;
+    className?: string;
+}
+declare function UsageBar({ label, used, limit, unit, className }: UsageBarProps): react_jsx_runtime.JSX.Element;
+
+interface WebsiteCardProps {
+    website: {
+        id: string;
+        name: string;
+        url: string;
+        status: 'active' | 'inactive' | 'pending' | 'suspended';
+        template: string;
+        last_deployed_at?: string;
+    };
+    onEdit?: () => void;
+    onView?: () => void;
+    onDelete?: () => void;
+    className?: string;
+}
+declare function WebsiteCard({ website, onEdit, onView, onDelete, className }: WebsiteCardProps): react_jsx_runtime.JSX.Element;
+
+interface DomainCardProps {
+    domain: {
+        id: string;
+        domain: string;
+        status: 'active' | 'inactive' | 'pending' | 'failed';
+        ssl_enabled: boolean;
+        website: {
+            id: string;
+            name: string;
+            url: string;
+        };
+    };
+    onEdit?: () => void;
+    onView?: () => void;
+    onDelete?: () => void;
+    className?: string;
+}
+declare function DomainCard({ domain, onEdit, onView, onDelete, className }: DomainCardProps): react_jsx_runtime.JSX.Element;
+
+interface UpgradeCTAProps {
+    currentPlan: {
+        id: string;
+        name: string;
+    };
+    suggestedPlan: {
+        id: string;
+        name: string;
+        price: number;
+        interval: string;
+        features: string[];
+    };
+    onUpgrade: () => void;
+    reason?: string;
+    className?: string;
+}
+declare function UpgradeCTA({ currentPlan, suggestedPlan, onUpgrade, reason, className }: UpgradeCTAProps): react_jsx_runtime.JSX.Element;
+interface UsageUpgradeCTAProps {
+    feature: string;
+    currentUsage: number;
+    limit: number;
+    suggestedPlan: {
+        id: string;
+        name: string;
+        price: number;
+        interval: string;
+    };
+    onUpgrade: () => void;
+    className?: string;
+}
+declare function UsageUpgradeCTA({ feature, currentUsage, limit, suggestedPlan, onUpgrade, className }: UsageUpgradeCTAProps): react_jsx_runtime.JSX.Element;
+
+export { AuthForm, AuthFormData, AuthFormProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, DomainCard, DomainCardProps, DomainForm, DomainFormData, DomainFormProps, Input, InputProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, PlanBadge, PlanBadgeProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UpgradeCTA, UpgradeCTAProps, UsageBar, UsageBarProps, UsageUpgradeCTA, UsageUpgradeCTAProps, UserMenu, UserMenuProps, WebsiteCard, WebsiteCardProps, buttonVariants, cn };

@@ -38,11 +38,13 @@ __export(src_exports, {
   CardFooter: () => CardFooter,
   CardHeader: () => CardHeader,
   CardTitle: () => CardTitle,
+  DomainCard: () => DomainCard,
   DomainForm: () => DomainForm,
   Input: () => Input,
   Label: () => Label,
   OnboardingProgress: () => OnboardingProgress,
   OnboardingStep: () => OnboardingStep,
+  PlanBadge: () => PlanBadge,
   ProtectedRoute: () => ProtectedRoute,
   Separator: () => Separator,
   SiteForm: () => SiteForm,
@@ -57,7 +59,11 @@ __export(src_exports, {
   TooltipContent: () => TooltipContent,
   TooltipProvider: () => TooltipProvider,
   TooltipTrigger: () => TooltipTrigger,
+  UpgradeCTA: () => UpgradeCTA,
+  UsageBar: () => UsageBar,
+  UsageUpgradeCTA: () => UsageUpgradeCTA,
   UserMenu: () => UserMenu,
+  WebsiteCard: () => WebsiteCard,
   buttonVariants: () => buttonVariants,
   cn: () => cn
 });
@@ -1094,6 +1100,440 @@ function OnboardingProgress({
     )) })
   ] });
 }
+
+// src/components/plan-badge.tsx
+var import_jsx_runtime15 = require("react/jsx-runtime");
+function PlanBadge({ plan, className }) {
+  const getBadgeVariant = () => {
+    if (plan.is_enterprise)
+      return "enterprise";
+    if (plan.is_popular)
+      return "popular";
+    if (plan.id === "trial")
+      return "trial";
+    return "default";
+  };
+  const variant = getBadgeVariant();
+  const getBadgeStyles = () => {
+    switch (variant) {
+      case "enterprise":
+        return "bg-gradient-to-r from-purple-500 to-purple-600 text-white border-purple-500";
+      case "popular":
+        return "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-500";
+      case "trial":
+        return "bg-gray-100 text-gray-700 border-gray-300";
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-300";
+    }
+  };
+  const getBadgeText = () => {
+    switch (variant) {
+      case "enterprise":
+        return "Enterprise";
+      case "popular":
+        return "Most Popular";
+      case "trial":
+        return "Trial";
+      default:
+        return plan.name;
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(
+    "div",
+    {
+      className: cn(
+        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border",
+        getBadgeStyles(),
+        className
+      ),
+      children: [
+        variant === "popular" && /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("svg", { className: "w-3 h-3 mr-1", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime15.jsx)("path", { d: "M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" }) }),
+        getBadgeText()
+      ]
+    }
+  );
+}
+
+// src/components/usage-bar.tsx
+var import_jsx_runtime16 = require("react/jsx-runtime");
+function UsageBar({ label, used, limit, unit = "", className }) {
+  const percentage = limit === -1 ? 0 : Math.min(used / limit * 100, 100);
+  const isUnlimited = limit === -1;
+  const isNearLimit = percentage > 80;
+  const isOverLimit = used > limit && limit !== -1;
+  const getBarColor = () => {
+    if (isOverLimit)
+      return "bg-red-500";
+    if (isNearLimit)
+      return "bg-yellow-500";
+    return "bg-blue-500";
+  };
+  const formatValue = (value) => {
+    if (value >= 1e3) {
+      return `${(value / 1e3).toFixed(1)}K`;
+    }
+    return value.toString();
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: cn("space-y-2", className), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsxs)("div", { className: "flex justify-between text-sm", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: "text-gray-600", children: label }),
+      /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("span", { className: cn(
+        "font-medium",
+        isOverLimit ? "text-red-600" : isNearLimit ? "text-yellow-600" : "text-gray-900"
+      ), children: isUnlimited ? `${formatValue(used)}${unit}` : `${formatValue(used)}${unit} / ${formatValue(limit)}${unit}` })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("div", { className: "w-full bg-gray-200 rounded-full h-2", children: /* @__PURE__ */ (0, import_jsx_runtime16.jsx)(
+      "div",
+      {
+        className: cn(
+          "h-2 rounded-full transition-all duration-300",
+          getBarColor()
+        ),
+        style: { width: `${percentage}%` }
+      }
+    ) }),
+    isUnlimited && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "text-xs text-gray-500", children: "Unlimited" }),
+    isOverLimit && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "text-xs text-red-600", children: "Over limit! Please upgrade your plan." }),
+    isNearLimit && !isOverLimit && /* @__PURE__ */ (0, import_jsx_runtime16.jsx)("p", { className: "text-xs text-yellow-600", children: "Approaching limit. Consider upgrading." })
+  ] });
+}
+
+// src/components/website-card.tsx
+var import_jsx_runtime17 = require("react/jsx-runtime");
+function WebsiteCard({
+  website,
+  onEdit,
+  onView,
+  onDelete,
+  className
+}) {
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "inactive":
+        return "bg-gray-100 text-gray-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "suspended":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "active":
+        return /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("svg", { className: "w-3 h-3", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z", clipRule: "evenodd" }) });
+      case "pending":
+        return /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("svg", { className: "w-3 h-3", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z", clipRule: "evenodd" }) });
+      case "suspended":
+        return /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("svg", { className: "w-3 h-3", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("path", { fillRule: "evenodd", d: "M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z", clipRule: "evenodd" }) });
+      default:
+        return /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("svg", { className: "w-3 h-3", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("path", { fillRule: "evenodd", d: "M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z", clipRule: "evenodd" }) });
+    }
+  };
+  const formatLastDeployed = (dateString) => {
+    if (!dateString)
+      return "Never deployed";
+    const date = new Date(dateString);
+    const now = /* @__PURE__ */ new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1e3 * 60 * 60));
+    if (diffInHours < 1)
+      return "Just now";
+    if (diffInHours < 24)
+      return `${diffInHours}h ago`;
+    if (diffInHours < 168)
+      return `${Math.floor(diffInHours / 24)}d ago`;
+    return date.toLocaleDateString();
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(Card, { className: cn("hover:shadow-md transition-shadow", className), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(CardHeader, { className: "pb-3", children: /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "flex items-start justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "space-y-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(CardTitle, { className: "text-lg", children: website.name }),
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(CardDescription, { className: "flex items-center space-x-2", children: /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(
+          "a",
+          {
+            href: website.url,
+            target: "_blank",
+            rel: "noopener noreferrer",
+            className: "text-blue-600 hover:text-blue-800 hover:underline",
+            children: website.url
+          }
+        ) })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: cn(
+        "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium",
+        getStatusColor(website.status)
+      ), children: [
+        getStatusIcon(website.status),
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "ml-1 capitalize", children: website.status })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)(CardContent, { className: "space-y-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "flex items-center justify-between text-sm", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "text-gray-600", children: "Template" }),
+          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "font-medium capitalize", children: website.template })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "flex items-center justify-between text-sm", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "text-gray-600", children: "Last Deployed" }),
+          /* @__PURE__ */ (0, import_jsx_runtime17.jsx)("span", { className: "font-medium", children: formatLastDeployed(website.last_deployed_at) })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime17.jsxs)("div", { className: "flex space-x-2", children: [
+        onView && /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(
+          Button,
+          {
+            variant: "outline",
+            size: "sm",
+            onClick: onView,
+            className: "flex-1",
+            children: "View Site"
+          }
+        ),
+        onEdit && /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(
+          Button,
+          {
+            variant: "outline",
+            size: "sm",
+            onClick: onEdit,
+            className: "flex-1",
+            children: "Edit"
+          }
+        ),
+        onDelete && /* @__PURE__ */ (0, import_jsx_runtime17.jsx)(
+          Button,
+          {
+            variant: "outline",
+            size: "sm",
+            onClick: onDelete,
+            className: "text-red-600 hover:text-red-700 hover:bg-red-50",
+            children: "Delete"
+          }
+        )
+      ] })
+    ] })
+  ] });
+}
+
+// src/components/domain-card.tsx
+var import_jsx_runtime18 = require("react/jsx-runtime");
+function DomainCard({
+  domain,
+  onEdit,
+  onView,
+  onDelete,
+  className
+}) {
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "inactive":
+        return "bg-gray-100 text-gray-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "failed":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "active":
+        return /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("svg", { className: "w-3 h-3", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z", clipRule: "evenodd" }) });
+      case "pending":
+        return /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("svg", { className: "w-3 h-3", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z", clipRule: "evenodd" }) });
+      case "failed":
+        return /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("svg", { className: "w-3 h-3", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("path", { fillRule: "evenodd", d: "M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z", clipRule: "evenodd" }) });
+      default:
+        return /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("svg", { className: "w-3 h-3", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("path", { fillRule: "evenodd", d: "M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z", clipRule: "evenodd" }) });
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(Card, { className: cn("hover:shadow-md transition-shadow", className), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(CardHeader, { className: "pb-3", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "flex items-start justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "space-y-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(CardTitle, { className: "text-lg", children: domain.domain }),
+        /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(CardDescription, { children: [
+          "Connected to ",
+          /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("span", { className: "font-medium", children: domain.website.name })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: cn(
+        "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium",
+        getStatusColor(domain.status)
+      ), children: [
+        getStatusIcon(domain.status),
+        /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("span", { className: "ml-1 capitalize", children: domain.status })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(CardContent, { className: "space-y-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "flex items-center justify-between text-sm", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("span", { className: "text-gray-600", children: "Website" }),
+          /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(
+            "a",
+            {
+              href: domain.website.url,
+              target: "_blank",
+              rel: "noopener noreferrer",
+              className: "font-medium text-blue-600 hover:text-blue-800 hover:underline",
+              children: domain.website.url
+            }
+          )
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "flex items-center justify-between text-sm", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("span", { className: "text-gray-600", children: "SSL Certificate" }),
+          /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("div", { className: "flex items-center space-x-1", children: domain.ssl_enabled ? /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(import_jsx_runtime18.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("svg", { className: "w-4 h-4 text-green-500", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("path", { fillRule: "evenodd", d: "M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z", clipRule: "evenodd" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("span", { className: "text-green-600 font-medium", children: "Enabled" })
+          ] }) : /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(import_jsx_runtime18.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("svg", { className: "w-4 h-4 text-gray-400", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("path", { fillRule: "evenodd", d: "M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z", clipRule: "evenodd" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime18.jsx)("span", { className: "text-gray-500", children: "Disabled" })
+          ] }) })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)("div", { className: "flex space-x-2", children: [
+        onView && /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(
+          Button,
+          {
+            variant: "outline",
+            size: "sm",
+            onClick: onView,
+            className: "flex-1",
+            children: "View Site"
+          }
+        ),
+        onEdit && /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(
+          Button,
+          {
+            variant: "outline",
+            size: "sm",
+            onClick: onEdit,
+            className: "flex-1",
+            children: "Edit"
+          }
+        ),
+        onDelete && /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(
+          Button,
+          {
+            variant: "outline",
+            size: "sm",
+            onClick: onDelete,
+            className: "text-red-600 hover:text-red-700 hover:bg-red-50",
+            children: "Delete"
+          }
+        )
+      ] })
+    ] })
+  ] });
+}
+
+// src/components/upgrade-cta.tsx
+var import_jsx_runtime19 = require("react/jsx-runtime");
+function UpgradeCTA({
+  currentPlan,
+  suggestedPlan,
+  onUpgrade,
+  reason,
+  className
+}) {
+  const formatPrice = (price, interval) => {
+    if (price === 0)
+      return "Free";
+    return `$${price}/${interval}`;
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(Card, { className: cn("border-blue-200 bg-blue-50", className), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(CardHeader, { className: "pb-3", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "flex items-start justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "space-y-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(CardTitle, { className: "text-lg text-blue-900", children: [
+          "Upgrade to ",
+          suggestedPlan.name
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(CardDescription, { className: "text-blue-700", children: reason || `You're currently on the ${currentPlan.name} plan.` })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "text-right", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("div", { className: "text-2xl font-bold text-blue-900", children: formatPrice(suggestedPlan.price, suggestedPlan.interval) }),
+        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "text-sm text-blue-600", children: [
+          "per ",
+          suggestedPlan.interval
+        ] })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(CardContent, { className: "space-y-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("h4", { className: "font-medium text-blue-900", children: "What you'll get:" }),
+        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("ul", { className: "space-y-1", children: [
+          suggestedPlan.features.slice(0, 3).map((feature, index) => /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("li", { className: "flex items-center text-sm text-blue-700", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("svg", { className: "w-4 h-4 mr-2 text-blue-500", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("path", { fillRule: "evenodd", d: "M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z", clipRule: "evenodd" }) }),
+            feature
+          ] }, index)),
+          suggestedPlan.features.length > 3 && /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("li", { className: "text-sm text-blue-600", children: [
+            "+",
+            suggestedPlan.features.length - 3,
+            " more features"
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        Button,
+        {
+          onClick: onUpgrade,
+          className: "w-full bg-blue-600 hover:bg-blue-700 text-white",
+          children: "Upgrade Now"
+        }
+      )
+    ] })
+  ] });
+}
+function UsageUpgradeCTA({
+  feature,
+  currentUsage,
+  limit,
+  suggestedPlan,
+  onUpgrade,
+  className
+}) {
+  const percentage = currentUsage / limit * 100;
+  const isOverLimit = currentUsage > limit;
+  return /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Card, { className: cn("border-yellow-200 bg-yellow-50", className), children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(CardContent, { className: "pt-6", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "flex items-start space-x-3", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("div", { className: "flex-shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("svg", { className: "w-6 h-6 text-yellow-600", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("path", { fillRule: "evenodd", d: "M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z", clipRule: "evenodd" }) }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "flex-1 min-w-0", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsx)("h3", { className: "text-sm font-medium text-yellow-800", children: isOverLimit ? "Limit Exceeded" : "Approaching Limit" }),
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("p", { className: "text-sm text-yellow-700 mt-1", children: [
+        "You've used ",
+        currentUsage,
+        " of ",
+        limit,
+        " ",
+        feature,
+        isOverLimit ? ". Please upgrade to continue." : ". Consider upgrading soon."
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "mt-3 flex space-x-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(
+          Button,
+          {
+            size: "sm",
+            onClick: onUpgrade,
+            className: "bg-yellow-600 hover:bg-yellow-700 text-white",
+            children: [
+              "Upgrade to ",
+              suggestedPlan.name
+            ]
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)("div", { className: "text-sm text-yellow-600 flex items-center", children: [
+          "$",
+          suggestedPlan.price,
+          "/",
+          suggestedPlan.interval
+        ] })
+      ] })
+    ] })
+  ] }) }) });
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AuthForm,
@@ -1104,11 +1544,13 @@ function OnboardingProgress({
   CardFooter,
   CardHeader,
   CardTitle,
+  DomainCard,
   DomainForm,
   Input,
   Label,
   OnboardingProgress,
   OnboardingStep,
+  PlanBadge,
   ProtectedRoute,
   Separator,
   SiteForm,
@@ -1123,7 +1565,11 @@ function OnboardingProgress({
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  UpgradeCTA,
+  UsageBar,
+  UsageUpgradeCTA,
   UserMenu,
+  WebsiteCard,
   buttonVariants,
   cn
 });
