@@ -459,4 +459,98 @@ interface FAQManagerProps {
 }
 declare function FAQManager({ faqs, onAddFAQ, onUpdateFAQ, onDeleteFAQ, onProcessFAQ, loading, className }: FAQManagerProps): react_jsx_runtime.JSX.Element;
 
-export { AuthForm, AuthFormData, AuthFormProps, BillingInfo, BillingInfoProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, ChatMessage, Chatbot, ChatbotProps, ChatbotWidget, ChatbotWidgetProps, DomainCard, DomainCardProps, DomainForm, DomainFormData, DomainFormProps, DomainManager, DomainManagerProps, DomainVerification, DomainVerificationProps, EntitlementCard, EntitlementCardProps, FAQDocument, FAQManager, FAQManagerProps, FeatureBadge, FeatureBadgeProps, FeatureComparison, FeatureComparisonProps, FeatureGate, FeatureGateProps, FeatureTooltip, FeatureTooltipProps, Input, InputProps, Invoice, InvoiceList, InvoiceListProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, PlanBadge, PlanBadgeProps, PricingCard, PricingCardProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UpgradeCTA, UpgradeCTAProps, UsageBar, UsageBarProps, UsageUpgradeCTA, UsageUpgradeCTAProps, UserMenu, UserMenuProps, WebsiteCard, WebsiteCardProps, buttonVariants, cn };
+interface GoogleIntegration {
+    id: string;
+    type: 'analytics' | 'search_console' | 'business_profile';
+    accountId: string;
+    accountName: string;
+    propertyId?: string;
+    siteUrl?: string;
+    locationId?: string;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+interface GoogleIntegrationCardProps {
+    integration: GoogleIntegration;
+    onDisconnect: (id: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onReconnect: (id: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    loading?: boolean;
+    className?: string;
+}
+declare function GoogleIntegrationCard({ integration, onDisconnect, onReconnect, loading, className }: GoogleIntegrationCardProps): react_jsx_runtime.JSX.Element;
+interface GoogleIntegrationManagerProps {
+    integrations: GoogleIntegration[];
+    onConnect: (type: 'analytics' | 'search_console' | 'business_profile') => Promise<void>;
+    onDisconnect: (id: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onReconnect: (id: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    loading?: boolean;
+    className?: string;
+}
+declare function GoogleIntegrationManager({ integrations, onConnect, onDisconnect, onReconnect, loading, className }: GoogleIntegrationManagerProps): react_jsx_runtime.JSX.Element;
+
+interface GoogleAnalyticsMetrics {
+    users: number;
+    sessions: number;
+    pageViews: number;
+    bounceRate: number;
+    avgSessionDuration: number;
+    newUsers: number;
+    returningUsers: number;
+    organicSearch: number;
+    directTraffic: number;
+    socialTraffic: number;
+    referralTraffic: number;
+    paidSearch: number;
+    emailTraffic: number;
+    topPages: Array<{
+        page: string;
+        pageViews: number;
+        uniquePageViews: number;
+        avgTimeOnPage: number;
+        bounceRate: number;
+    }>;
+    topSources: Array<{
+        source: string;
+        medium: string;
+        sessions: number;
+        users: number;
+        bounceRate: number;
+    }>;
+    topCountries: Array<{
+        country: string;
+        sessions: number;
+        users: number;
+    }>;
+    topDevices: Array<{
+        device: string;
+        sessions: number;
+        users: number;
+    }>;
+    topBrowsers: Array<{
+        browser: string;
+        sessions: number;
+        users: number;
+    }>;
+}
+interface GoogleAnalyticsDashboardProps {
+    metrics: GoogleAnalyticsMetrics;
+    loading?: boolean;
+    onRefresh?: () => void;
+    className?: string;
+}
+declare function GoogleAnalyticsDashboard({ metrics, loading, onRefresh, className }: GoogleAnalyticsDashboardProps): react_jsx_runtime.JSX.Element;
+
+export { AuthForm, AuthFormData, AuthFormProps, BillingInfo, BillingInfoProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, ChatMessage, Chatbot, ChatbotProps, ChatbotWidget, ChatbotWidgetProps, DomainCard, DomainCardProps, DomainForm, DomainFormData, DomainFormProps, DomainManager, DomainManagerProps, DomainVerification, DomainVerificationProps, EntitlementCard, EntitlementCardProps, FAQDocument, FAQManager, FAQManagerProps, FeatureBadge, FeatureBadgeProps, FeatureComparison, FeatureComparisonProps, FeatureGate, FeatureGateProps, FeatureTooltip, FeatureTooltipProps, GoogleAnalyticsDashboard, GoogleAnalyticsDashboardProps, GoogleAnalyticsMetrics, GoogleIntegration, GoogleIntegrationCard, GoogleIntegrationCardProps, GoogleIntegrationManager, GoogleIntegrationManagerProps, Input, InputProps, Invoice, InvoiceList, InvoiceListProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, PlanBadge, PlanBadgeProps, PricingCard, PricingCardProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UpgradeCTA, UpgradeCTAProps, UsageBar, UsageBarProps, UsageUpgradeCTA, UsageUpgradeCTAProps, UserMenu, UserMenuProps, WebsiteCard, WebsiteCardProps, buttonVariants, cn };

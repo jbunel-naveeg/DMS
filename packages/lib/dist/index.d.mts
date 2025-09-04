@@ -648,4 +648,515 @@ declare class OpenAIService {
 declare const openAIService: OpenAIService;
 declare function getOpenAIService(): OpenAIService;
 
-export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CancelSubscriptionRequest, CancelSubscriptionResponse, ChatCompletionResponse, ChatMessage, ChatbotResponse, CheckoutSession, CreateCheckoutSessionRequest, CreateCheckoutSessionResponse, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, CreateSubscriptionRequest, CreateSubscriptionResponse, DesignInput, Domain, EntitlementCheck, EntitlementService, FAQDocument, FeatureEntitlement, OnboardingStatus, OpenAIEmbedding, OpenAIEmbeddingResponse, OpenAIService, PLANS, Plan, PlanLimits, PlanUsage, ProcessWebhookResponse, STRIPE_WEBHOOK_SECRET, StripeCheckoutService, StripeSubscriptionService, StripeWebhookService, Subscription, TenWebAPI, TenWebDNSRecord, TenWebDomain, TenWebSite, UpdateSubscriptionRequest, UpdateSubscriptionResponse, UsageStats, UseAuthReturn, UseEntitlementReturn, UseFeatureGateProps, UserData, UserPlan, WebhookEvent, Website, authService, briefSchema, calculateUsagePercentage, createAuthClient, createBrowserClient, createServerClient, designSchema, entitlementService, formatBandwidthSize, formatCurrency, formatDate, formatStorageSize, generateSchema, generateSubdomain, getBrowserSupabaseClient, getOpenAIService, getPlanById, getPlanLimits, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, isFeatureAvailable, openAIService, stripeCheckoutService, stripeSubscriptionService, stripeWebhookService, tenWebAPI, useAuth, useEntitlements, useFeatureGate, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser, useUserData };
+interface GoogleAnalyticsAccount {
+    id: string;
+    name: string;
+    displayName: string;
+    websiteUrl: string;
+    type: string;
+    permissions: {
+        effective: string[];
+    };
+    createTime: string;
+    updateTime: string;
+}
+interface GoogleAnalyticsProperty {
+    id: string;
+    name: string;
+    displayName: string;
+    parent: string;
+    timeZone: string;
+    currencyCode: string;
+    createTime: string;
+    updateTime: string;
+}
+interface GoogleAnalyticsDataStream {
+    name: string;
+    type: 'WEB_DATA_STREAM' | 'ANDROID_APP_DATA_STREAM' | 'IOS_APP_DATA_STREAM';
+    displayName: string;
+    webStreamData?: {
+        measurementId: string;
+        defaultUri: string;
+        firebaseAppId?: string;
+    };
+    androidAppStreamData?: {
+        firebaseAppId: string;
+        packageName: string;
+    };
+    iosAppStreamData?: {
+        firebaseAppId: string;
+        bundleId: string;
+    };
+    createTime: string;
+    updateTime: string;
+}
+interface GoogleAnalyticsReport {
+    metricHeaders: Array<{
+        name: string;
+        type: string;
+    }>;
+    dimensionHeaders: Array<{
+        name: string;
+    }>;
+    rows: Array<{
+        dimensionValues: Array<{
+            value: string;
+        }>;
+        metricValues: Array<{
+            value: string;
+        }>;
+    }>;
+    rowCount: number;
+    metadata: {
+        currencyCode: string;
+        timeZone: string;
+    };
+}
+interface GoogleAnalyticsMetrics {
+    users: number;
+    sessions: number;
+    pageViews: number;
+    bounceRate: number;
+    avgSessionDuration: number;
+    newUsers: number;
+    returningUsers: number;
+    organicSearch: number;
+    directTraffic: number;
+    socialTraffic: number;
+    referralTraffic: number;
+    paidSearch: number;
+    emailTraffic: number;
+    topPages: Array<{
+        page: string;
+        pageViews: number;
+        uniquePageViews: number;
+        avgTimeOnPage: number;
+        bounceRate: number;
+    }>;
+    topSources: Array<{
+        source: string;
+        medium: string;
+        sessions: number;
+        users: number;
+        bounceRate: number;
+    }>;
+    topCountries: Array<{
+        country: string;
+        sessions: number;
+        users: number;
+    }>;
+    topDevices: Array<{
+        device: string;
+        sessions: number;
+        users: number;
+    }>;
+    topBrowsers: Array<{
+        browser: string;
+        sessions: number;
+        users: number;
+    }>;
+}
+declare class GoogleAnalyticsService {
+    private accessToken;
+    private baseUrl;
+    private managementUrl;
+    constructor(accessToken: string);
+    private makeRequest;
+    getAccounts(): Promise<GoogleAnalyticsAccount[]>;
+    getProperties(accountId: string): Promise<GoogleAnalyticsProperty[]>;
+    getDataStreams(propertyId: string): Promise<GoogleAnalyticsDataStream[]>;
+    getAnalyticsData(propertyId: string, startDate: string, endDate: string, metrics?: string[], dimensions?: string[]): Promise<GoogleAnalyticsReport>;
+    getMetrics(propertyId: string, startDate: string, endDate: string): Promise<GoogleAnalyticsMetrics>;
+    private extractMetricValue;
+    private extractTrafficSourceValue;
+    private processTopPagesData;
+    private processTrafficSourceData;
+    private processGeoData;
+    private processDeviceData;
+    private processBrowserData;
+}
+
+interface GoogleSearchConsoleSite {
+    siteUrl: string;
+    permissionLevel: 'SITE_FULL' | 'SITE_READ_ONLY' | 'SITE_RESTRICTED' | 'SITE_UNVERIFIED';
+}
+interface GoogleSearchConsoleSearchAnalyticsData {
+    rows: Array<{
+        keys: string[];
+        clicks: number;
+        impressions: number;
+        ctr: number;
+        position: number;
+    }>;
+    responseAggregationType: string;
+}
+interface GoogleSearchConsoleSearchAnalyticsQuery {
+    startDate: string;
+    endDate: string;
+    dimensions?: string[];
+    dimensionFilterGroups?: Array<{
+        groupType: 'AND' | 'OR';
+        filters: Array<{
+            dimension: string;
+            operator: 'EQUALS' | 'NOT_EQUALS' | 'CONTAINS' | 'NOT_CONTAINS';
+            expression: string;
+        }>;
+    }>;
+    rowLimit?: number;
+    startRow?: number;
+    searchType?: 'WEB' | 'IMAGE' | 'VIDEO' | 'NEWS' | 'DISCOVER' | 'GOOGLE_NEWS';
+}
+interface GoogleSearchConsoleSitemap {
+    path: string;
+    lastSubmitted: string;
+    isPending: boolean;
+    isSitemapsIndex: boolean;
+    type: 'WEB' | 'IMAGE' | 'VIDEO' | 'NEWS' | 'DISCOVER' | 'GOOGLE_NEWS';
+    contents: Array<{
+        type: 'URL' | 'SITEMAP' | 'FEED';
+        submitted: number;
+        indexed: number;
+    }>;
+    warnings: string[];
+    errors: string[];
+}
+interface GoogleSearchConsoleUrlInspectionResult {
+    inspectionResult: {
+        indexStatusResult: {
+            verdict: 'PASS' | 'PARTIAL' | 'FAIL' | 'NEUTRAL' | 'VERDICT_UNSPECIFIED';
+            coverageState: 'COVERED' | 'NOT_COVERED' | 'COVERAGE_STATE_UNSPECIFIED';
+            crawledAs: 'MOBILE' | 'DESKTOP' | 'CRAWLED_AS_UNSPECIFIED';
+            lastCrawlTime: string;
+            pageFetchState: 'SUCCESSFUL' | 'SOFT_404' | 'BLOCKED_ROBOTS_TXT' | 'NOT_FOUND' | 'ACCESS_DENIED' | 'SERVER_ERROR' | 'REDIRECT_ERROR' | 'ACCESS_FORBIDDEN' | 'BLOCKED_4XX' | 'INTERNAL_CRAWL_ERROR' | 'INVALID_URL' | 'PAGE_FETCH_STATE_UNSPECIFIED';
+            indexingState: 'INDEXING_ALLOWED' | 'INDEXING_FORBIDDEN' | 'INDEXING_STATE_UNSPECIFIED';
+            robotsTxtState: 'ALLOWED' | 'DISALLOWED' | 'ROBOTS_TXT_STATE_UNSPECIFIED';
+            userAgent: string;
+        };
+        richResultsResult: {
+            verdict: 'PASS' | 'PARTIAL' | 'FAIL' | 'NEUTRAL' | 'VERDICT_UNSPECIFIED';
+            detectedItems: Array<{
+                invalidArgumentNames: string[];
+                invalidArgumentValues: string[];
+                richResultType: string;
+                issues: Array<{
+                    severity: 'ERROR' | 'WARNING' | 'INFO' | 'SEVERITY_UNSPECIFIED';
+                    message: string;
+                }>;
+            }>;
+        };
+        mobileUsabilityResult: {
+            verdict: 'PASS' | 'PARTIAL' | 'FAIL' | 'NEUTRAL' | 'VERDICT_UNSPECIFIED';
+            issues: Array<{
+                severity: 'ERROR' | 'WARNING' | 'INFO' | 'SEVERITY_UNSPECIFIED';
+                message: string;
+            }>;
+        };
+    };
+}
+interface GoogleSearchConsoleMetrics {
+    totalClicks: number;
+    totalImpressions: number;
+    averageCtr: number;
+    averagePosition: number;
+    topQueries: Array<{
+        query: string;
+        clicks: number;
+        impressions: number;
+        ctr: number;
+        position: number;
+    }>;
+    topPages: Array<{
+        page: string;
+        clicks: number;
+        impressions: number;
+        ctr: number;
+        position: number;
+    }>;
+    topCountries: Array<{
+        country: string;
+        clicks: number;
+        impressions: number;
+        ctr: number;
+        position: number;
+    }>;
+    topDevices: Array<{
+        device: string;
+        clicks: number;
+        impressions: number;
+        ctr: number;
+        position: number;
+    }>;
+    searchAppearance: Array<{
+        type: string;
+        clicks: number;
+        impressions: number;
+        ctr: number;
+        position: number;
+    }>;
+}
+declare class GoogleSearchConsoleService {
+    private accessToken;
+    private baseUrl;
+    constructor(accessToken: string);
+    private makeRequest;
+    getSites(): Promise<GoogleSearchConsoleSite[]>;
+    getSearchAnalytics(siteUrl: string, query: GoogleSearchConsoleSearchAnalyticsQuery): Promise<GoogleSearchConsoleSearchAnalyticsData>;
+    getSitemaps(siteUrl: string): Promise<GoogleSearchConsoleSitemap[]>;
+    inspectUrl(siteUrl: string, url: string): Promise<GoogleSearchConsoleUrlInspectionResult>;
+    getMetrics(siteUrl: string, startDate: string, endDate: string): Promise<GoogleSearchConsoleMetrics>;
+    private calculateTotalClicks;
+    private calculateTotalImpressions;
+    private calculateAverageCtr;
+    private calculateAveragePosition;
+    private processQueriesData;
+    private processPagesData;
+    private processCountriesData;
+    private processDevicesData;
+    private processSearchAppearanceData;
+}
+
+interface GoogleBusinessProfileAccount {
+    name: string;
+    accountName: string;
+    type: 'PERSONAL' | 'BUSINESS';
+    role: 'OWNER' | 'MANAGER' | 'COMMUNITY_MANAGER' | 'ADMIN';
+    state: 'ACCOUNT_STATE_UNSPECIFIED' | 'VERIFIED' | 'UNVERIFIED' | 'VERIFICATION_REQUIRED';
+    vettedState: 'VETTED_STATE_UNSPECIFIED' | 'VETTED' | 'NOT_VETTED';
+    permissionLevel: 'PERMISSION_LEVEL_UNSPECIFIED' | 'OWNER_LEVEL' | 'MANAGER_LEVEL' | 'COMMUNITY_LEVEL';
+}
+interface GoogleBusinessProfileLocation {
+    name: string;
+    title: string;
+    storefrontAddress: {
+        addressLines: string[];
+        locality: string;
+        administrativeArea: string;
+        postalCode: string;
+        regionCode: string;
+    };
+    primaryPhone: string;
+    primaryCategory: {
+        name: string;
+        categoryId: string;
+    };
+    additionalCategories: Array<{
+        name: string;
+        categoryId: string;
+    }>;
+    websiteUri: string;
+    regularHours: {
+        weekdayDescriptions: string[];
+    };
+    specialHours: Array<{
+        startDate: {
+            year: number;
+            month: number;
+            day: number;
+        };
+        endDate: {
+            year: number;
+            month: number;
+            day: number;
+        };
+        hourType: 'HOUR_TYPE_UNSPECIFIED' | 'OPEN' | 'CLOSED' | 'HOLIDAY';
+    }>;
+    profile: {
+        description: string;
+        attributes: Array<{
+            name: string;
+            values: string[];
+        }>;
+    };
+    metrics: {
+        totalReviewCount: number;
+        averageRating: number;
+        totalPhotoCount: number;
+    };
+    state: 'LOCATION_STATE_UNSPECIFIED' | 'VERIFIED' | 'UNVERIFIED' | 'VERIFICATION_REQUIRED';
+    metadata: {
+        hasGoogleUpdated: boolean;
+        hasPendingEdits: boolean;
+        canDelete: boolean;
+        canOperateLocalPost: boolean;
+        canOperateLodgingData: boolean;
+        canOperateFoodMenu: boolean;
+        canOperateFoodReservation: boolean;
+        canOperateLodgingReservation: boolean;
+        canDuplicate: boolean;
+        canHaveBusinessCalls: boolean;
+        canHaveBusinessMessages: boolean;
+        canModifyServiceList: boolean;
+        canOperateHealthData: boolean;
+        canOperateInsuranceData: boolean;
+    };
+}
+interface GoogleBusinessProfileInsight {
+    metric: {
+        metric: string;
+        displayName: string;
+    };
+    metricValue: {
+        stringValue?: string;
+        intValue?: number;
+        doubleValue?: number;
+        moneyValue?: {
+            currencyCode: string;
+            units: string;
+            nanos: number;
+        };
+    };
+    dimensionalValues: Array<{
+        metric: {
+            metric: string;
+            displayName: string;
+        };
+        value: {
+            stringValue?: string;
+            intValue?: number;
+            doubleValue?: number;
+        };
+    }>;
+}
+interface GoogleBusinessProfileMetrics {
+    totalViews: number;
+    totalCalls: number;
+    totalDirectionRequests: number;
+    totalWebsiteClicks: number;
+    totalPhotoViews: number;
+    totalPosts: number;
+    totalReviews: number;
+    averageRating: number;
+    topSearchQueries: Array<{
+        query: string;
+        views: number;
+    }>;
+    topPhotoViews: Array<{
+        photoUrl: string;
+        views: number;
+    }>;
+    customerActions: Array<{
+        action: string;
+        count: number;
+    }>;
+    hourlyViews: Array<{
+        hour: number;
+        views: number;
+    }>;
+    dailyViews: Array<{
+        date: string;
+        views: number;
+    }>;
+    monthlyViews: Array<{
+        month: string;
+        views: number;
+    }>;
+}
+interface GoogleBusinessProfilePost {
+    name: string;
+    languageCode: string;
+    summary: string;
+    callToAction: {
+        actionType: 'ACTION_TYPE_UNSPECIFIED' | 'BOOK' | 'ORDER_ONLINE' | 'SHOP' | 'LEARN_MORE' | 'SIGN_UP' | 'GET_OFFER' | 'CALL';
+        url?: string;
+    };
+    offer?: {
+        couponCode?: string;
+        redeemOnlineUrl?: string;
+        termsConditions?: string;
+    };
+    event?: {
+        title: string;
+        startTime: string;
+        endTime: string;
+    };
+    media: Array<{
+        mediaFormat: 'MEDIA_FORMAT_UNSPECIFIED' | 'PHOTO' | 'VIDEO';
+        sourceUrl: string;
+        thumbnailUrl?: string;
+    }>;
+    state: 'POST_STATE_UNSPECIFIED' | 'LIVE' | 'REJECTED' | 'PENDING_REVIEW';
+    createTime: string;
+    updateTime: string;
+}
+declare class GoogleBusinessProfileService {
+    private accessToken;
+    private baseUrl;
+    private businessUrl;
+    private insightsUrl;
+    constructor(accessToken: string);
+    private makeRequest;
+    getAccounts(): Promise<GoogleBusinessProfileAccount[]>;
+    getLocations(accountId: string): Promise<GoogleBusinessProfileLocation[]>;
+    getInsights(locationId: string, startDate: string, endDate: string, metricRequests: Array<{
+        metric: string;
+        options: string[];
+    }>): Promise<GoogleBusinessProfileInsight[]>;
+    getPosts(locationId: string): Promise<GoogleBusinessProfilePost[]>;
+    getMetrics(locationId: string, startDate: string, endDate: string): Promise<GoogleBusinessProfileMetrics>;
+    private extractMetricValue;
+    private processSearchQueries;
+    private processPhotoViews;
+    private processCustomerActions;
+    private processHourlyViews;
+    private processDailyViews;
+    private processMonthlyViews;
+}
+
+interface GoogleOAuthConfig {
+    clientId: string;
+    clientSecret: string;
+    redirectUri: string;
+    scopes: string[];
+}
+interface GoogleIntegration {
+    id: string;
+    type: 'analytics' | 'search_console' | 'business_profile';
+    accountId: string;
+    accountName: string;
+    propertyId?: string;
+    siteUrl?: string;
+    locationId?: string;
+    accessToken: string;
+    refreshToken?: string;
+    expiresAt: number;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+interface GoogleMetricsSummary {
+    analytics?: GoogleAnalyticsMetrics;
+    searchConsole?: GoogleSearchConsoleMetrics;
+    businessProfile?: GoogleBusinessProfileMetrics;
+    lastUpdated: string;
+}
+declare class GoogleService {
+    private analyticsService?;
+    private searchConsoleService?;
+    private businessProfileService?;
+    constructor(integrations: GoogleIntegration[]);
+    static getAuthorizationUrl(config: GoogleOAuthConfig): string;
+    static exchangeCodeForTokens(code: string, config: GoogleOAuthConfig): Promise<{
+        accessToken: string;
+        refreshToken: string;
+        expiresIn: number;
+    }>;
+    static refreshAccessToken(refreshToken: string, config: GoogleOAuthConfig): Promise<{
+        accessToken: string;
+        expiresIn: number;
+    }>;
+    getMetricsSummary(startDate: string, endDate: string, propertyId?: string, siteUrl?: string, locationId?: string): Promise<GoogleMetricsSummary>;
+    getAnalyticsService(): GoogleAnalyticsService | undefined;
+    getSearchConsoleService(): GoogleSearchConsoleService | undefined;
+    getBusinessProfileService(): GoogleBusinessProfileService | undefined;
+    isServiceAvailable(type: 'analytics' | 'search_console' | 'business_profile'): boolean;
+    getAvailableServices(): Array<'analytics' | 'search_console' | 'business_profile'>;
+}
+declare const GOOGLE_OAUTH_SCOPES: {
+    analytics: string[];
+    search_console: string[];
+    business_profile: string[];
+};
+declare function getAllGoogleScopes(): string[];
+declare function getScopesForServices(services: Array<'analytics' | 'search_console' | 'business_profile'>): string[];
+
+export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CancelSubscriptionRequest, CancelSubscriptionResponse, ChatCompletionResponse, ChatMessage, ChatbotResponse, CheckoutSession, CreateCheckoutSessionRequest, CreateCheckoutSessionResponse, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, CreateSubscriptionRequest, CreateSubscriptionResponse, DesignInput, Domain, EntitlementCheck, EntitlementService, FAQDocument, FeatureEntitlement, GOOGLE_OAUTH_SCOPES, GoogleAnalyticsAccount, GoogleAnalyticsDataStream, GoogleAnalyticsMetrics, GoogleAnalyticsProperty, GoogleAnalyticsReport, GoogleAnalyticsService, GoogleBusinessProfileAccount, GoogleBusinessProfileInsight, GoogleBusinessProfileLocation, GoogleBusinessProfileMetrics, GoogleBusinessProfilePost, GoogleBusinessProfileService, GoogleIntegration, GoogleMetricsSummary, GoogleOAuthConfig, GoogleSearchConsoleMetrics, GoogleSearchConsoleSearchAnalyticsData, GoogleSearchConsoleSearchAnalyticsQuery, GoogleSearchConsoleService, GoogleSearchConsoleSite, GoogleSearchConsoleSitemap, GoogleSearchConsoleUrlInspectionResult, GoogleService, OnboardingStatus, OpenAIEmbedding, OpenAIEmbeddingResponse, OpenAIService, PLANS, Plan, PlanLimits, PlanUsage, ProcessWebhookResponse, STRIPE_WEBHOOK_SECRET, StripeCheckoutService, StripeSubscriptionService, StripeWebhookService, Subscription, TenWebAPI, TenWebDNSRecord, TenWebDomain, TenWebSite, UpdateSubscriptionRequest, UpdateSubscriptionResponse, UsageStats, UseAuthReturn, UseEntitlementReturn, UseFeatureGateProps, UserData, UserPlan, WebhookEvent, Website, authService, briefSchema, calculateUsagePercentage, createAuthClient, createBrowserClient, createServerClient, designSchema, entitlementService, formatBandwidthSize, formatCurrency, formatDate, formatStorageSize, generateSchema, generateSubdomain, getAllGoogleScopes, getBrowserSupabaseClient, getOpenAIService, getPlanById, getPlanLimits, getScopesForServices, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, isFeatureAvailable, openAIService, stripeCheckoutService, stripeSubscriptionService, stripeWebhookService, tenWebAPI, useAuth, useEntitlements, useFeatureGate, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser, useUserData };

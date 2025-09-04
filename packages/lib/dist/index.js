@@ -2380,6 +2380,11 @@ __export(src_exports, {
   AppError: () => AppError,
   AuthService: () => AuthService,
   EntitlementService: () => EntitlementService,
+  GOOGLE_OAUTH_SCOPES: () => GOOGLE_OAUTH_SCOPES,
+  GoogleAnalyticsService: () => GoogleAnalyticsService,
+  GoogleBusinessProfileService: () => GoogleBusinessProfileService,
+  GoogleSearchConsoleService: () => GoogleSearchConsoleService,
+  GoogleService: () => GoogleService,
   OpenAIService: () => OpenAIService,
   PLANS: () => PLANS,
   STRIPE_WEBHOOK_SECRET: () => STRIPE_WEBHOOK_SECRET,
@@ -2401,10 +2406,12 @@ __export(src_exports, {
   formatStorageSize: () => formatStorageSize,
   generateSchema: () => generateSchema,
   generateSubdomain: () => generateSubdomain,
+  getAllGoogleScopes: () => getAllGoogleScopes,
   getBrowserSupabaseClient: () => getBrowserSupabaseClient,
   getOpenAIService: () => getOpenAIService,
   getPlanById: () => getPlanById,
   getPlanLimits: () => getPlanLimits,
+  getScopesForServices: () => getScopesForServices,
   getServerSupabaseClient: () => getServerSupabaseClient,
   getServiceSupabaseClient: () => getServiceSupabaseClient,
   getStripe: () => getStripe,
@@ -4631,11 +4638,791 @@ function getOpenAIService() {
   }
   return new OpenAIService(apiKey);
 }
+
+// src/google/google-analytics.ts
+var GoogleAnalyticsService = class {
+  constructor(accessToken) {
+    this.baseUrl = "https://analyticsdata.googleapis.com/v1beta";
+    this.managementUrl = "https://analyticsadmin.googleapis.com/v1beta";
+    this.accessToken = accessToken;
+  }
+  async makeRequest(url, method = "GET", body) {
+    const response = await fetch(url, {
+      method,
+      headers: {
+        "Authorization": `Bearer ${this.accessToken}`,
+        "Content-Type": "application/json"
+      },
+      body: body ? JSON.stringify(body) : void 0
+    });
+    if (!response.ok) {
+      throw new Error(`Google Analytics API error: ${response.status} ${response.statusText}`);
+    }
+    return response.json();
+  }
+  // Get all accounts accessible to the user
+  async getAccounts() {
+    try {
+      const response = await this.makeRequest(
+        `${this.managementUrl}/accounts`
+      );
+      return response.accounts || [];
+    } catch (error) {
+      console.error("Error fetching accounts:", error);
+      throw error;
+    }
+  }
+  // Get properties for an account
+  async getProperties(accountId) {
+    try {
+      const response = await this.makeRequest(
+        `${this.managementUrl}/accounts/${accountId}/properties`
+      );
+      return response.properties || [];
+    } catch (error) {
+      console.error("Error fetching properties:", error);
+      throw error;
+    }
+  }
+  // Get data streams for a property
+  async getDataStreams(propertyId) {
+    try {
+      const response = await this.makeRequest(
+        `${this.managementUrl}/properties/${propertyId}/dataStreams`
+      );
+      return response.dataStreams || [];
+    } catch (error) {
+      console.error("Error fetching data streams:", error);
+      throw error;
+    }
+  }
+  // Get analytics data for a property
+  async getAnalyticsData(propertyId, startDate, endDate, metrics = ["activeUsers", "sessions", "screenPageViews"], dimensions = ["date"]) {
+    try {
+      const requestBody = {
+        requests: [{
+          property: `properties/${propertyId}`,
+          dateRanges: [{
+            startDate,
+            endDate
+          }],
+          metrics: metrics.map((metric) => ({ name: metric })),
+          dimensions: dimensions.map((dimension) => ({ name: dimension })),
+          keepEmptyRows: false
+        }]
+      };
+      const response = await this.makeRequest(
+        `${this.baseUrl}/properties/${propertyId}:runReport`,
+        "POST",
+        requestBody
+      );
+      return response.reports[0];
+    } catch (error) {
+      console.error("Error fetching analytics data:", error);
+      throw error;
+    }
+  }
+  // Get comprehensive metrics for a property
+  async getMetrics(propertyId, startDate, endDate) {
+    try {
+      const basicMetrics = await this.getAnalyticsData(
+        propertyId,
+        startDate,
+        endDate,
+        ["activeUsers", "sessions", "screenPageViews", "bounceRate", "averageSessionDuration", "newUsers"]
+      );
+      const trafficSourceData = await this.getAnalyticsData(
+        propertyId,
+        startDate,
+        endDate,
+        ["sessions", "activeUsers", "bounceRate"],
+        ["sessionDefaultChannelGrouping"]
+      );
+      const topPagesData = await this.getAnalyticsData(
+        propertyId,
+        startDate,
+        endDate,
+        ["screenPageViews", "uniquePageviews", "averageSessionDuration", "bounceRate"],
+        ["pagePath"]
+      );
+      const geoData = await this.getAnalyticsData(
+        propertyId,
+        startDate,
+        endDate,
+        ["sessions", "activeUsers"],
+        ["country"]
+      );
+      const deviceData = await this.getAnalyticsData(
+        propertyId,
+        startDate,
+        endDate,
+        ["sessions", "activeUsers"],
+        ["deviceCategory"]
+      );
+      const browserData = await this.getAnalyticsData(
+        propertyId,
+        startDate,
+        endDate,
+        ["sessions", "activeUsers"],
+        ["browser"]
+      );
+      const metrics = {
+        users: this.extractMetricValue(basicMetrics, "activeUsers") || 0,
+        sessions: this.extractMetricValue(basicMetrics, "sessions") || 0,
+        pageViews: this.extractMetricValue(basicMetrics, "screenPageViews") || 0,
+        bounceRate: this.extractMetricValue(basicMetrics, "bounceRate") || 0,
+        avgSessionDuration: this.extractMetricValue(basicMetrics, "averageSessionDuration") || 0,
+        newUsers: this.extractMetricValue(basicMetrics, "newUsers") || 0,
+        returningUsers: 0,
+        // Calculate as users - newUsers
+        organicSearch: this.extractTrafficSourceValue(trafficSourceData, "Organic Search") || 0,
+        directTraffic: this.extractTrafficSourceValue(trafficSourceData, "Direct") || 0,
+        socialTraffic: this.extractTrafficSourceValue(trafficSourceData, "Social") || 0,
+        referralTraffic: this.extractTrafficSourceValue(trafficSourceData, "Referral") || 0,
+        paidSearch: this.extractTrafficSourceValue(trafficSourceData, "Paid Search") || 0,
+        emailTraffic: this.extractTrafficSourceValue(trafficSourceData, "Email") || 0,
+        topPages: this.processTopPagesData(topPagesData),
+        topSources: this.processTrafficSourceData(trafficSourceData),
+        topCountries: this.processGeoData(geoData),
+        topDevices: this.processDeviceData(deviceData),
+        topBrowsers: this.processBrowserData(browserData)
+      };
+      metrics.returningUsers = Math.max(0, metrics.users - metrics.newUsers);
+      return metrics;
+    } catch (error) {
+      console.error("Error fetching comprehensive metrics:", error);
+      throw error;
+    }
+  }
+  // Helper method to extract metric values
+  extractMetricValue(report, metricName) {
+    const metricIndex = report.metricHeaders.findIndex((header) => header.name === metricName);
+    if (metricIndex === -1)
+      return 0;
+    const totalValue = report.rows.reduce((sum, row) => {
+      const value = parseFloat(row.metricValues[metricIndex]?.value || "0");
+      return sum + value;
+    }, 0);
+    return totalValue;
+  }
+  // Helper method to extract traffic source values
+  extractTrafficSourceValue(report, sourceName) {
+    const sourceIndex = report.dimensionHeaders.findIndex((header) => header.name === "sessionDefaultChannelGrouping");
+    if (sourceIndex === -1)
+      return 0;
+    const sessionsIndex = report.metricHeaders.findIndex((header) => header.name === "sessions");
+    if (sessionsIndex === -1)
+      return 0;
+    const row = report.rows.find(
+      (row2) => row2.dimensionValues[sourceIndex]?.value === sourceName
+    );
+    return row ? parseFloat(row.metricValues[sessionsIndex]?.value || "0") : 0;
+  }
+  // Process top pages data
+  processTopPagesData(report) {
+    const pageIndex = report.dimensionHeaders.findIndex((header) => header.name === "pagePath");
+    const pageViewsIndex = report.metricHeaders.findIndex((header) => header.name === "screenPageViews");
+    const uniquePageViewsIndex = report.metricHeaders.findIndex((header) => header.name === "uniquePageviews");
+    const avgTimeIndex = report.metricHeaders.findIndex((header) => header.name === "averageSessionDuration");
+    const bounceRateIndex = report.metricHeaders.findIndex((header) => header.name === "bounceRate");
+    return report.rows.map((row) => ({
+      page: row.dimensionValues[pageIndex]?.value || "",
+      pageViews: parseFloat(row.metricValues[pageViewsIndex]?.value || "0"),
+      uniquePageViews: parseFloat(row.metricValues[uniquePageViewsIndex]?.value || "0"),
+      avgTimeOnPage: parseFloat(row.metricValues[avgTimeIndex]?.value || "0"),
+      bounceRate: parseFloat(row.metricValues[bounceRateIndex]?.value || "0")
+    })).sort((a, b) => b.pageViews - a.pageViews).slice(0, 10);
+  }
+  // Process traffic source data
+  processTrafficSourceData(report) {
+    const sourceIndex = report.dimensionHeaders.findIndex((header) => header.name === "sessionDefaultChannelGrouping");
+    const sessionsIndex = report.metricHeaders.findIndex((header) => header.name === "sessions");
+    const usersIndex = report.metricHeaders.findIndex((header) => header.name === "activeUsers");
+    const bounceRateIndex = report.metricHeaders.findIndex((header) => header.name === "bounceRate");
+    return report.rows.map((row) => ({
+      source: row.dimensionValues[sourceIndex]?.value || "",
+      medium: "Unknown",
+      // This would need additional dimension
+      sessions: parseFloat(row.metricValues[sessionsIndex]?.value || "0"),
+      users: parseFloat(row.metricValues[usersIndex]?.value || "0"),
+      bounceRate: parseFloat(row.metricValues[bounceRateIndex]?.value || "0")
+    })).sort((a, b) => b.sessions - a.sessions).slice(0, 10);
+  }
+  // Process geographic data
+  processGeoData(report) {
+    const countryIndex = report.dimensionHeaders.findIndex((header) => header.name === "country");
+    const sessionsIndex = report.metricHeaders.findIndex((header) => header.name === "sessions");
+    const usersIndex = report.metricHeaders.findIndex((header) => header.name === "activeUsers");
+    return report.rows.map((row) => ({
+      country: row.dimensionValues[countryIndex]?.value || "",
+      sessions: parseFloat(row.metricValues[sessionsIndex]?.value || "0"),
+      users: parseFloat(row.metricValues[usersIndex]?.value || "0")
+    })).sort((a, b) => b.sessions - a.sessions).slice(0, 10);
+  }
+  // Process device data
+  processDeviceData(report) {
+    const deviceIndex = report.dimensionHeaders.findIndex((header) => header.name === "deviceCategory");
+    const sessionsIndex = report.metricHeaders.findIndex((header) => header.name === "sessions");
+    const usersIndex = report.metricHeaders.findIndex((header) => header.name === "activeUsers");
+    return report.rows.map((row) => ({
+      device: row.dimensionValues[deviceIndex]?.value || "",
+      sessions: parseFloat(row.metricValues[sessionsIndex]?.value || "0"),
+      users: parseFloat(row.metricValues[usersIndex]?.value || "0")
+    })).sort((a, b) => b.sessions - a.sessions).slice(0, 5);
+  }
+  // Process browser data
+  processBrowserData(report) {
+    const browserIndex = report.dimensionHeaders.findIndex((header) => header.name === "browser");
+    const sessionsIndex = report.metricHeaders.findIndex((header) => header.name === "sessions");
+    const usersIndex = report.metricHeaders.findIndex((header) => header.name === "activeUsers");
+    return report.rows.map((row) => ({
+      browser: row.dimensionValues[browserIndex]?.value || "",
+      sessions: parseFloat(row.metricValues[sessionsIndex]?.value || "0"),
+      users: parseFloat(row.metricValues[usersIndex]?.value || "0")
+    })).sort((a, b) => b.sessions - a.sessions).slice(0, 5);
+  }
+};
+
+// src/google/google-search-console.ts
+var GoogleSearchConsoleService = class {
+  constructor(accessToken) {
+    this.baseUrl = "https://www.googleapis.com/webmasters/v3";
+    this.accessToken = accessToken;
+  }
+  async makeRequest(url, method = "GET", body) {
+    const response = await fetch(url, {
+      method,
+      headers: {
+        "Authorization": `Bearer ${this.accessToken}`,
+        "Content-Type": "application/json"
+      },
+      body: body ? JSON.stringify(body) : void 0
+    });
+    if (!response.ok) {
+      throw new Error(`Google Search Console API error: ${response.status} ${response.statusText}`);
+    }
+    return response.json();
+  }
+  // Get all sites accessible to the user
+  async getSites() {
+    try {
+      const response = await this.makeRequest(
+        `${this.baseUrl}/sites`
+      );
+      return response.siteEntry || [];
+    } catch (error) {
+      console.error("Error fetching sites:", error);
+      throw error;
+    }
+  }
+  // Get search analytics data
+  async getSearchAnalytics(siteUrl, query) {
+    try {
+      const response = await this.makeRequest(
+        `${this.baseUrl}/sites/${encodeURIComponent(siteUrl)}/searchAnalytics/query`,
+        "POST",
+        query
+      );
+      return response;
+    } catch (error) {
+      console.error("Error fetching search analytics:", error);
+      throw error;
+    }
+  }
+  // Get sitemaps for a site
+  async getSitemaps(siteUrl) {
+    try {
+      const response = await this.makeRequest(
+        `${this.baseUrl}/sites/${encodeURIComponent(siteUrl)}/sitemaps`
+      );
+      return response.sitemap || [];
+    } catch (error) {
+      console.error("Error fetching sitemaps:", error);
+      throw error;
+    }
+  }
+  // Inspect a URL
+  async inspectUrl(siteUrl, url) {
+    try {
+      const response = await this.makeRequest(
+        `${this.baseUrl}/sites/${encodeURIComponent(siteUrl)}/urlInspection/index:inspect`,
+        "POST",
+        { inspectionUrl: url }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error inspecting URL:", error);
+      throw error;
+    }
+  }
+  // Get comprehensive metrics for a site
+  async getMetrics(siteUrl, startDate, endDate) {
+    try {
+      const overallData = await this.getSearchAnalytics(siteUrl, {
+        startDate,
+        endDate,
+        rowLimit: 1
+      });
+      const queriesData = await this.getSearchAnalytics(siteUrl, {
+        startDate,
+        endDate,
+        dimensions: ["query"],
+        rowLimit: 100
+      });
+      const pagesData = await this.getSearchAnalytics(siteUrl, {
+        startDate,
+        endDate,
+        dimensions: ["page"],
+        rowLimit: 100
+      });
+      const countriesData = await this.getSearchAnalytics(siteUrl, {
+        startDate,
+        endDate,
+        dimensions: ["country"],
+        rowLimit: 100
+      });
+      const devicesData = await this.getSearchAnalytics(siteUrl, {
+        startDate,
+        endDate,
+        dimensions: ["device"],
+        rowLimit: 100
+      });
+      const searchAppearanceData = await this.getSearchAnalytics(siteUrl, {
+        startDate,
+        endDate,
+        dimensions: ["searchAppearance"],
+        rowLimit: 100
+      });
+      const metrics = {
+        totalClicks: this.calculateTotalClicks(overallData),
+        totalImpressions: this.calculateTotalImpressions(overallData),
+        averageCtr: this.calculateAverageCtr(overallData),
+        averagePosition: this.calculateAveragePosition(overallData),
+        topQueries: this.processQueriesData(queriesData),
+        topPages: this.processPagesData(pagesData),
+        topCountries: this.processCountriesData(countriesData),
+        topDevices: this.processDevicesData(devicesData),
+        searchAppearance: this.processSearchAppearanceData(searchAppearanceData)
+      };
+      return metrics;
+    } catch (error) {
+      console.error("Error fetching comprehensive metrics:", error);
+      throw error;
+    }
+  }
+  // Helper methods for data processing
+  calculateTotalClicks(data) {
+    return data.rows.reduce((sum, row) => sum + row.clicks, 0);
+  }
+  calculateTotalImpressions(data) {
+    return data.rows.reduce((sum, row) => sum + row.impressions, 0);
+  }
+  calculateAverageCtr(data) {
+    if (data.rows.length === 0)
+      return 0;
+    const totalCtr = data.rows.reduce((sum, row) => sum + row.ctr, 0);
+    return totalCtr / data.rows.length;
+  }
+  calculateAveragePosition(data) {
+    if (data.rows.length === 0)
+      return 0;
+    const totalPosition = data.rows.reduce((sum, row) => sum + row.position, 0);
+    return totalPosition / data.rows.length;
+  }
+  processQueriesData(data) {
+    return data.rows.map((row) => ({
+      query: row.keys[0] || "",
+      clicks: row.clicks,
+      impressions: row.impressions,
+      ctr: row.ctr,
+      position: row.position
+    })).sort((a, b) => b.clicks - a.clicks).slice(0, 20);
+  }
+  processPagesData(data) {
+    return data.rows.map((row) => ({
+      page: row.keys[0] || "",
+      clicks: row.clicks,
+      impressions: row.impressions,
+      ctr: row.ctr,
+      position: row.position
+    })).sort((a, b) => b.clicks - a.clicks).slice(0, 20);
+  }
+  processCountriesData(data) {
+    return data.rows.map((row) => ({
+      country: row.keys[0] || "",
+      clicks: row.clicks,
+      impressions: row.impressions,
+      ctr: row.ctr,
+      position: row.position
+    })).sort((a, b) => b.clicks - a.clicks).slice(0, 10);
+  }
+  processDevicesData(data) {
+    return data.rows.map((row) => ({
+      device: row.keys[0] || "",
+      clicks: row.clicks,
+      impressions: row.impressions,
+      ctr: row.ctr,
+      position: row.position
+    })).sort((a, b) => b.clicks - a.clicks).slice(0, 5);
+  }
+  processSearchAppearanceData(data) {
+    return data.rows.map((row) => ({
+      type: row.keys[0] || "",
+      clicks: row.clicks,
+      impressions: row.impressions,
+      ctr: row.ctr,
+      position: row.position
+    })).sort((a, b) => b.clicks - a.clicks).slice(0, 10);
+  }
+};
+
+// src/google/google-business-profile.ts
+var GoogleBusinessProfileService = class {
+  constructor(accessToken) {
+    this.baseUrl = "https://mybusinessaccountmanagement.googleapis.com/v1";
+    this.businessUrl = "https://mybusinessbusinessinformation.googleapis.com/v1";
+    this.insightsUrl = "https://mybusinessinsights.googleapis.com/v1";
+    this.accessToken = accessToken;
+  }
+  async makeRequest(url, method = "GET", body) {
+    const response = await fetch(url, {
+      method,
+      headers: {
+        "Authorization": `Bearer ${this.accessToken}`,
+        "Content-Type": "application/json"
+      },
+      body: body ? JSON.stringify(body) : void 0
+    });
+    if (!response.ok) {
+      throw new Error(`Google Business Profile API error: ${response.status} ${response.statusText}`);
+    }
+    return response.json();
+  }
+  // Get all accounts accessible to the user
+  async getAccounts() {
+    try {
+      const response = await this.makeRequest(
+        `${this.baseUrl}/accounts`
+      );
+      return response.accounts || [];
+    } catch (error) {
+      console.error("Error fetching accounts:", error);
+      throw error;
+    }
+  }
+  // Get locations for an account
+  async getLocations(accountId) {
+    try {
+      const response = await this.makeRequest(
+        `${this.businessUrl}/accounts/${accountId}/locations`
+      );
+      return response.locations || [];
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+      throw error;
+    }
+  }
+  // Get insights for a location
+  async getInsights(locationId, startDate, endDate, metricRequests) {
+    try {
+      const requestBody = {
+        locationNames: [`locations/${locationId}`],
+        basicRequest: {
+          metricRequests,
+          startDate: {
+            year: parseInt(startDate.split("-")[0]),
+            month: parseInt(startDate.split("-")[1]),
+            day: parseInt(startDate.split("-")[2])
+          },
+          endDate: {
+            year: parseInt(endDate.split("-")[0]),
+            month: parseInt(endDate.split("-")[1]),
+            day: parseInt(endDate.split("-")[2])
+          }
+        }
+      };
+      const response = await this.makeRequest(
+        `${this.insightsUrl}/locations/${locationId}:reportInsights`,
+        "POST",
+        requestBody
+      );
+      return response.locationMetrics[0]?.metricValues || [];
+    } catch (error) {
+      console.error("Error fetching insights:", error);
+      throw error;
+    }
+  }
+  // Get posts for a location
+  async getPosts(locationId) {
+    try {
+      const response = await this.makeRequest(
+        `${this.businessUrl}/locations/${locationId}/localPosts`
+      );
+      return response.posts || [];
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      throw error;
+    }
+  }
+  // Get comprehensive metrics for a location
+  async getMetrics(locationId, startDate, endDate) {
+    try {
+      const basicInsights = await this.getInsights(locationId, startDate, endDate, [
+        { metric: "QUERIES_DIRECT", options: [] },
+        { metric: "QUERIES_INDIRECT", options: [] },
+        { metric: "QUERIES_CHAIN", options: [] },
+        { metric: "VIEWS_MAPS", options: [] },
+        { metric: "VIEWS_SEARCH", options: [] },
+        { metric: "ACTIONS_PHONE", options: [] },
+        { metric: "ACTIONS_WEBSITE", options: [] },
+        { metric: "ACTIONS_DRIVING_DIRECTIONS", options: [] },
+        { metric: "PHOTOS_VIEWS_MERCHANT", options: [] },
+        { metric: "PHOTOS_VIEWS_CUSTOMERS", options: [] },
+        { metric: "PHOTOS_COUNT_MERCHANT", options: [] },
+        { metric: "PHOTOS_COUNT_CUSTOMERS", options: [] },
+        { metric: "POSTS_VIEWS", options: [] },
+        { metric: "REVIEWS", options: [] }
+      ]);
+      const hourlyInsights = await this.getInsights(locationId, startDate, endDate, [
+        { metric: "QUERIES_DIRECT", options: ["HOUR"] }
+      ]);
+      const dailyInsights = await this.getInsights(locationId, startDate, endDate, [
+        { metric: "QUERIES_DIRECT", options: ["DAY"] }
+      ]);
+      const monthlyInsights = await this.getInsights(locationId, startDate, endDate, [
+        { metric: "QUERIES_DIRECT", options: ["MONTH"] }
+      ]);
+      const metrics = {
+        totalViews: this.extractMetricValue(basicInsights, "QUERIES_DIRECT") + this.extractMetricValue(basicInsights, "QUERIES_INDIRECT") + this.extractMetricValue(basicInsights, "QUERIES_CHAIN"),
+        totalCalls: this.extractMetricValue(basicInsights, "ACTIONS_PHONE"),
+        totalDirectionRequests: this.extractMetricValue(basicInsights, "ACTIONS_DRIVING_DIRECTIONS"),
+        totalWebsiteClicks: this.extractMetricValue(basicInsights, "ACTIONS_WEBSITE"),
+        totalPhotoViews: this.extractMetricValue(basicInsights, "PHOTOS_VIEWS_MERCHANT") + this.extractMetricValue(basicInsights, "PHOTOS_VIEWS_CUSTOMERS"),
+        totalPosts: this.extractMetricValue(basicInsights, "POSTS_VIEWS"),
+        totalReviews: this.extractMetricValue(basicInsights, "REVIEWS"),
+        averageRating: 0,
+        // This would need to be calculated from review data
+        topSearchQueries: this.processSearchQueries(basicInsights),
+        topPhotoViews: this.processPhotoViews(basicInsights),
+        customerActions: this.processCustomerActions(basicInsights),
+        hourlyViews: this.processHourlyViews(hourlyInsights),
+        dailyViews: this.processDailyViews(dailyInsights),
+        monthlyViews: this.processMonthlyViews(monthlyInsights)
+      };
+      return metrics;
+    } catch (error) {
+      console.error("Error fetching comprehensive metrics:", error);
+      throw error;
+    }
+  }
+  // Helper methods for data processing
+  extractMetricValue(insights, metric) {
+    const insight = insights.find((i) => i.metric.metric === metric);
+    if (!insight)
+      return 0;
+    if (insight.metricValue.intValue !== void 0) {
+      return insight.metricValue.intValue;
+    }
+    if (insight.metricValue.doubleValue !== void 0) {
+      return insight.metricValue.doubleValue;
+    }
+    return 0;
+  }
+  processSearchQueries(insights) {
+    return [];
+  }
+  processPhotoViews(insights) {
+    return [];
+  }
+  processCustomerActions(insights) {
+    const actions = [
+      { action: "Phone Calls", count: this.extractMetricValue(insights, "ACTIONS_PHONE") },
+      { action: "Website Clicks", count: this.extractMetricValue(insights, "ACTIONS_WEBSITE") },
+      { action: "Directions", count: this.extractMetricValue(insights, "ACTIONS_DRIVING_DIRECTIONS") }
+    ];
+    return actions.filter((action) => action.count > 0);
+  }
+  processHourlyViews(insights) {
+    return [];
+  }
+  processDailyViews(insights) {
+    return [];
+  }
+  processMonthlyViews(insights) {
+    return [];
+  }
+};
+
+// src/google/google.ts
+var GoogleService = class {
+  constructor(integrations) {
+    const analyticsIntegration = integrations.find((i) => i.type === "analytics" && i.isActive);
+    if (analyticsIntegration) {
+      this.analyticsService = new GoogleAnalyticsService(analyticsIntegration.accessToken);
+    }
+    const searchConsoleIntegration = integrations.find((i) => i.type === "search_console" && i.isActive);
+    if (searchConsoleIntegration) {
+      this.searchConsoleService = new GoogleSearchConsoleService(searchConsoleIntegration.accessToken);
+    }
+    const businessProfileIntegration = integrations.find((i) => i.type === "business_profile" && i.isActive);
+    if (businessProfileIntegration) {
+      this.businessProfileService = new GoogleBusinessProfileService(businessProfileIntegration.accessToken);
+    }
+  }
+  // Get OAuth authorization URL
+  static getAuthorizationUrl(config) {
+    const params = new URLSearchParams({
+      client_id: config.clientId,
+      redirect_uri: config.redirectUri,
+      scope: config.scopes.join(" "),
+      response_type: "code",
+      access_type: "offline",
+      prompt: "consent"
+    });
+    return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  }
+  // Exchange authorization code for tokens
+  static async exchangeCodeForTokens(code, config) {
+    const response = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({
+        client_id: config.clientId,
+        client_secret: config.clientSecret,
+        code,
+        grant_type: "authorization_code",
+        redirect_uri: config.redirectUri
+      })
+    });
+    if (!response.ok) {
+      throw new Error(`OAuth token exchange failed: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    return {
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expiresIn: data.expires_in
+    };
+  }
+  // Refresh access token
+  static async refreshAccessToken(refreshToken, config) {
+    const response = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({
+        client_id: config.clientId,
+        client_secret: config.clientSecret,
+        refresh_token: refreshToken,
+        grant_type: "refresh_token"
+      })
+    });
+    if (!response.ok) {
+      throw new Error(`Token refresh failed: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    return {
+      accessToken: data.access_token,
+      expiresIn: data.expires_in
+    };
+  }
+  // Get comprehensive metrics from all connected services
+  async getMetricsSummary(startDate, endDate, propertyId, siteUrl, locationId) {
+    const summary = {
+      lastUpdated: (/* @__PURE__ */ new Date()).toISOString()
+    };
+    try {
+      if (this.analyticsService && propertyId) {
+        summary.analytics = await this.analyticsService.getMetrics(propertyId, startDate, endDate);
+      }
+      if (this.searchConsoleService && siteUrl) {
+        summary.searchConsole = await this.searchConsoleService.getMetrics(siteUrl, startDate, endDate);
+      }
+      if (this.businessProfileService && locationId) {
+        summary.businessProfile = await this.businessProfileService.getMetrics(locationId, startDate, endDate);
+      }
+    } catch (error) {
+      console.error("Error fetching metrics summary:", error);
+      throw error;
+    }
+    return summary;
+  }
+  // Get Analytics service
+  getAnalyticsService() {
+    return this.analyticsService;
+  }
+  // Get Search Console service
+  getSearchConsoleService() {
+    return this.searchConsoleService;
+  }
+  // Get Business Profile service
+  getBusinessProfileService() {
+    return this.businessProfileService;
+  }
+  // Check if service is available
+  isServiceAvailable(type) {
+    switch (type) {
+      case "analytics":
+        return this.analyticsService !== void 0;
+      case "search_console":
+        return this.searchConsoleService !== void 0;
+      case "business_profile":
+        return this.businessProfileService !== void 0;
+      default:
+        return false;
+    }
+  }
+  // Get available services
+  getAvailableServices() {
+    const services = [];
+    if (this.analyticsService)
+      services.push("analytics");
+    if (this.searchConsoleService)
+      services.push("search_console");
+    if (this.businessProfileService)
+      services.push("business_profile");
+    return services;
+  }
+};
+var GOOGLE_OAUTH_SCOPES = {
+  analytics: [
+    "https://www.googleapis.com/auth/analytics.readonly",
+    "https://www.googleapis.com/auth/analytics.manage.users.readonly"
+  ],
+  search_console: [
+    "https://www.googleapis.com/auth/webmasters.readonly"
+  ],
+  business_profile: [
+    "https://www.googleapis.com/auth/business.manage"
+  ]
+};
+function getAllGoogleScopes() {
+  return [
+    ...GOOGLE_OAUTH_SCOPES.analytics,
+    ...GOOGLE_OAUTH_SCOPES.search_console,
+    ...GOOGLE_OAUTH_SCOPES.business_profile
+  ];
+}
+function getScopesForServices(services) {
+  const scopes = [];
+  services.forEach((service) => {
+    scopes.push(...GOOGLE_OAUTH_SCOPES[service]);
+  });
+  return [...new Set(scopes)];
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AppError,
   AuthService,
   EntitlementService,
+  GOOGLE_OAUTH_SCOPES,
+  GoogleAnalyticsService,
+  GoogleBusinessProfileService,
+  GoogleSearchConsoleService,
+  GoogleService,
   OpenAIService,
   PLANS,
   STRIPE_WEBHOOK_SECRET,
@@ -4657,10 +5444,12 @@ function getOpenAIService() {
   formatStorageSize,
   generateSchema,
   generateSubdomain,
+  getAllGoogleScopes,
   getBrowserSupabaseClient,
   getOpenAIService,
   getPlanById,
   getPlanLimits,
+  getScopesForServices,
   getServerSupabaseClient,
   getServiceSupabaseClient,
   getStripe,

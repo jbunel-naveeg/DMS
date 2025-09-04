@@ -7,21 +7,21 @@
 
  [37m[1m [22m[39m Creating an optimized production build ...
  [32m[1m✓[22m[39m Compiled successfully
-[?25l [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G[?25h [37m[1m [22m[39m Linting and checking validity of types     [32m[1m✓[22m[39m Linting and checking validity of types 
+[?25l [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G[?25h [37m[1m [22m[39m Linting and checking validity of types     [32m[1m✓[22m[39m Linting and checking validity of types 
 [?25l [37m[1m [22m[39m Collecting page data  [36m.[39m[2K[1G [37m[1m [22m[39m Collecting page data  [36m..[39mError: supabaseUrl is required.
-    at new ax (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/6981.js:21:81659)
-    at aI (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/6981.js:21:85973)
-    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/4582.js:1:16034)
-    at 4582 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/4582.js:1:15934)
+    at new ax (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/6981.js:21:81667)
+    at aI (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/6981.js:21:85981)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/4582.js:1:16073)
+    at 24582 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/4582.js:1:15973)
     at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
-    at 2587 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/api/domains/[id]/verify/route.js:1:864)
+    at 6568 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/api/domains/[id]/ssl/route.js:1:882)
     at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
-    at s (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/api/domains/[id]/verify/route.js:8:1439)
-    at /Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/api/domains/[id]/verify/route.js:8:1492
+    at s (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/api/domains/[id]/ssl/route.js:8:1310)
+    at /Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/api/domains/[id]/ssl/route.js:8:1363
     at t.X (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:1206)
 [2K[1G[?25h
 [?25l [37m[1m [22m[39m Collecting page data  [36m.[39m[2K[1G[?25h> Build error occurred
-[?25l [37m[1m [22m[39m Collecting page data  [36m.[39m[2K[1G[?25hError: Failed to collect page data for /api/domains/[id]/verify
+[?25l [37m[1m [22m[39m Collecting page data  [36m.[39m[2K[1G[?25hError: Failed to collect page data for /api/domains/[id]/ssl
     at /Users/jonathanbunel/DMS/node_modules/[4mnext[24m/dist/build/utils.js:1269:15
 [90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m {
   type: [32m'Error'[39m
