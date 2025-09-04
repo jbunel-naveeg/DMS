@@ -4420,10 +4420,164 @@ function useFeatureGate(feature) {
     needsUpgrade: entitlement.upgradeRequired || false
   };
 }
+
+// src/openai/openai.ts
+var OpenAIService = class {
+  constructor(apiKey) {
+    this.baseUrl = "https://api.openai.com/v1";
+    this.apiKey = apiKey;
+  }
+  async makeRequest(endpoint, method = "POST", body) {
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      method,
+      headers: {
+        "Authorization": `Bearer ${this.apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: body ? JSON.stringify(body) : void 0
+    });
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+    }
+    return response.json();
+  }
+  // Generate embeddings for text
+  async generateEmbedding(text) {
+    try {
+      const response = await this.makeRequest("/embeddings", "POST", {
+        input: text,
+        model: "text-embedding-ada-002"
+      });
+      return response.data[0].embedding;
+    } catch (error) {
+      console.error("Error generating embedding:", error);
+      throw error;
+    }
+  }
+  // Generate embeddings for multiple texts
+  async generateEmbeddings(texts) {
+    try {
+      const response = await this.makeRequest("/embeddings", "POST", {
+        input: texts,
+        model: "text-embedding-ada-002"
+      });
+      return response.data.map((item) => item.embedding);
+    } catch (error) {
+      console.error("Error generating embeddings:", error);
+      throw error;
+    }
+  }
+  // Generate chat completion
+  async generateChatCompletion(messages, model = "gpt-3.5-turbo", maxTokens = 1e3, temperature = 0.7) {
+    try {
+      const response = await this.makeRequest("/chat/completions", "POST", {
+        model,
+        messages,
+        max_tokens: maxTokens,
+        temperature,
+        stream: false
+      });
+      return response;
+    } catch (error) {
+      console.error("Error generating chat completion:", error);
+      throw error;
+    }
+  }
+  // Process FAQ document and generate embedding
+  async processFAQDocument(document2) {
+    try {
+      const combinedText = `${document2.title}
+
+${document2.content}`;
+      const embedding = await this.generateEmbedding(combinedText);
+      const processedContent = this.cleanText(document2.content);
+      return {
+        embedding,
+        processed_content: processedContent
+      };
+    } catch (error) {
+      console.error("Error processing FAQ document:", error);
+      throw error;
+    }
+  }
+  // Clean and normalize text for better embedding
+  cleanText(text) {
+    return text.replace(/\s+/g, " ").replace(/\n+/g, " ").trim().toLowerCase();
+  }
+  // Generate chatbot response with context
+  async generateChatbotResponse(question, context, conversationHistory = []) {
+    try {
+      const contextText = context.map((doc) => `Title: ${doc.title}
+Content: ${doc.content}`).join("\n\n");
+      const systemMessage = {
+        role: "system",
+        content: `You are a helpful AI assistant for Naveeg, a website management platform. 
+        
+Use the following FAQ context to answer user questions. If the question is not covered in the context, 
+provide a helpful response based on your general knowledge about website management and hosting.
+
+FAQ Context:
+${contextText}
+
+Instructions:
+- Answer questions based on the provided FAQ context when possible
+- Be helpful, accurate, and concise
+- If you're unsure about something, say so
+- Provide step-by-step instructions when appropriate
+- Be friendly and professional in tone`
+      };
+      const userMessage = {
+        role: "user",
+        content: question
+      };
+      const messages = [systemMessage, ...conversationHistory, userMessage];
+      const response = await this.generateChatCompletion(messages, "gpt-3.5-turbo", 1e3, 0.7);
+      const confidence = this.calculateConfidence(question, context);
+      return {
+        answer: response.choices[0].message.content,
+        sources: context,
+        confidence,
+        tokens_used: response.usage.total_tokens
+      };
+    } catch (error) {
+      console.error("Error generating chatbot response:", error);
+      throw error;
+    }
+  }
+  // Calculate confidence score based on context relevance
+  calculateConfidence(question, context) {
+    if (context.length === 0)
+      return 0.3;
+    const questionWords = question.toLowerCase().split(/\s+/);
+    const contextText = context.map((doc) => `${doc.title} ${doc.content}`).join(" ").toLowerCase();
+    let matches = 0;
+    questionWords.forEach((word) => {
+      if (contextText.includes(word)) {
+        matches++;
+      }
+    });
+    const confidence = Math.min(0.9, 0.3 + matches / questionWords.length * 0.6);
+    return Math.round(confidence * 100) / 100;
+  }
+  // Generate search query from user question
+  generateSearchQuery(question) {
+    const words = question.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter((word) => word.length > 2).slice(0, 10);
+    return words.join(" ");
+  }
+};
+var openAIService = new OpenAIService(process.env.OPENAI_API_KEY || "");
+function getOpenAIService() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY environment variable is required");
+  }
+  return new OpenAIService(apiKey);
+}
 export {
   AppError,
   AuthService,
   EntitlementService,
+  OpenAIService,
   PLANS,
   STRIPE_WEBHOOK_SECRET,
   StripeCheckoutService,
@@ -4445,6 +4599,7 @@ export {
   generateSchema,
   generateSubdomain,
   getBrowserSupabaseClient,
+  getOpenAIService,
   getPlanById,
   getPlanLimits,
   getServerSupabaseClient,
@@ -4452,6 +4607,7 @@ export {
   getStripe,
   getTenWebAPI,
   isFeatureAvailable,
+  openAIService,
   stripeCheckoutService,
   stripeSubscriptionService,
   stripeWebhookService,

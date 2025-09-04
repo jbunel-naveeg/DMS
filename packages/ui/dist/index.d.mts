@@ -398,4 +398,65 @@ interface DomainVerificationProps {
 }
 declare function DomainVerification({ domain, verificationMethod, verificationData, onVerify, onRefresh, loading, className }: DomainVerificationProps): react_jsx_runtime.JSX.Element;
 
-export { AuthForm, AuthFormData, AuthFormProps, BillingInfo, BillingInfoProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, DomainCard, DomainCardProps, DomainForm, DomainFormData, DomainFormProps, DomainManager, DomainManagerProps, DomainVerification, DomainVerificationProps, EntitlementCard, EntitlementCardProps, FeatureBadge, FeatureBadgeProps, FeatureComparison, FeatureComparisonProps, FeatureGate, FeatureGateProps, FeatureTooltip, FeatureTooltipProps, Input, InputProps, Invoice, InvoiceList, InvoiceListProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, PlanBadge, PlanBadgeProps, PricingCard, PricingCardProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UpgradeCTA, UpgradeCTAProps, UsageBar, UsageBarProps, UsageUpgradeCTA, UsageUpgradeCTAProps, UserMenu, UserMenuProps, WebsiteCard, WebsiteCardProps, buttonVariants, cn };
+interface ChatMessage {
+    id: string;
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp: Date;
+    sources?: Array<{
+        title: string;
+        content: string;
+        category: string;
+    }>;
+    confidence?: number;
+}
+interface ChatbotProps {
+    messages: ChatMessage[];
+    onSendMessage: (message: string) => Promise<void>;
+    onClearHistory: () => void;
+    loading?: boolean;
+    disabled?: boolean;
+    placeholder?: string;
+    className?: string;
+}
+declare function Chatbot({ messages, onSendMessage, onClearHistory, loading, disabled, placeholder, className }: ChatbotProps): react_jsx_runtime.JSX.Element;
+interface ChatbotWidgetProps {
+    onSendMessage: (message: string) => Promise<void>;
+    loading?: boolean;
+    disabled?: boolean;
+    className?: string;
+}
+declare function ChatbotWidget({ onSendMessage, loading, disabled, className }: ChatbotWidgetProps): react_jsx_runtime.JSX.Element;
+
+interface FAQDocument {
+    id: string;
+    title: string;
+    content: string;
+    category: string;
+    created_at: string;
+    updated_at: string;
+}
+interface FAQManagerProps {
+    faqs: FAQDocument[];
+    onAddFAQ: (faq: Omit<FAQDocument, 'id' | 'created_at' | 'updated_at'>) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onUpdateFAQ: (id: string, faq: Partial<FAQDocument>) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onDeleteFAQ: (id: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onProcessFAQ: (id: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    loading?: boolean;
+    className?: string;
+}
+declare function FAQManager({ faqs, onAddFAQ, onUpdateFAQ, onDeleteFAQ, onProcessFAQ, loading, className }: FAQManagerProps): react_jsx_runtime.JSX.Element;
+
+export { AuthForm, AuthFormData, AuthFormProps, BillingInfo, BillingInfoProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, ChatMessage, Chatbot, ChatbotProps, ChatbotWidget, ChatbotWidgetProps, DomainCard, DomainCardProps, DomainForm, DomainFormData, DomainFormProps, DomainManager, DomainManagerProps, DomainVerification, DomainVerificationProps, EntitlementCard, EntitlementCardProps, FAQDocument, FAQManager, FAQManagerProps, FeatureBadge, FeatureBadgeProps, FeatureComparison, FeatureComparisonProps, FeatureGate, FeatureGateProps, FeatureTooltip, FeatureTooltipProps, Input, InputProps, Invoice, InvoiceList, InvoiceListProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, PlanBadge, PlanBadgeProps, PricingCard, PricingCardProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UpgradeCTA, UpgradeCTAProps, UsageBar, UsageBarProps, UsageUpgradeCTA, UsageUpgradeCTAProps, UserMenu, UserMenuProps, WebsiteCard, WebsiteCardProps, buttonVariants, cn };

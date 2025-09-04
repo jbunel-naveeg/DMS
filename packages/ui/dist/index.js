@@ -39,11 +39,14 @@ __export(src_exports, {
   CardFooter: () => CardFooter,
   CardHeader: () => CardHeader,
   CardTitle: () => CardTitle,
+  Chatbot: () => Chatbot,
+  ChatbotWidget: () => ChatbotWidget,
   DomainCard: () => DomainCard,
   DomainForm: () => DomainForm,
   DomainManager: () => DomainManager,
   DomainVerification: () => DomainVerification,
   EntitlementCard: () => EntitlementCard,
+  FAQManager: () => FAQManager,
   FeatureBadge: () => FeatureBadge,
   FeatureComparison: () => FeatureComparison,
   FeatureGate: () => FeatureGate,
@@ -2398,6 +2401,550 @@ function DomainVerification({
     ] })
   ] });
 }
+
+// src/components/chatbot.tsx
+var React10 = __toESM(require("react"));
+var import_jsx_runtime27 = require("react/jsx-runtime");
+function Chatbot({
+  messages,
+  onSendMessage,
+  onClearHistory,
+  loading = false,
+  disabled = false,
+  placeholder = "Ask me anything about Naveeg...",
+  className
+}) {
+  const [inputValue, setInputValue] = React10.useState("");
+  const [isSending, setIsSending] = React10.useState(false);
+  const messagesEndRef = React10.useRef(null);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+  React10.useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!inputValue.trim() || isSending || disabled)
+      return;
+    const message = inputValue.trim();
+    setInputValue("");
+    setIsSending(true);
+    try {
+      await onSendMessage(message);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    } finally {
+      setIsSending(false);
+    }
+  };
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("div", { className: cn("flex flex-col h-full", className), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(CardHeader, { className: "flex-shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("div", { className: "flex items-center justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(CardTitle, { className: "text-lg", children: "AI Assistant" }),
+        /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(CardDescription, { children: "Ask me anything about Naveeg and website management" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+        Button,
+        {
+          variant: "outline",
+          size: "sm",
+          onClick: onClearHistory,
+          disabled: messages.length === 0 || loading,
+          children: "Clear"
+        }
+      )
+    ] }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)(CardContent, { className: "flex-1 overflow-y-auto space-y-4 min-h-0", children: [
+      messages.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("div", { className: "text-center py-8", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+          "svg",
+          {
+            className: "w-8 h-8 text-blue-600",
+            fill: "none",
+            stroke: "currentColor",
+            viewBox: "0 0 24 24",
+            children: /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+              "path",
+              {
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                strokeWidth: 2,
+                d: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              }
+            )
+          }
+        ) }),
+        /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("h3", { className: "text-lg font-medium text-gray-900 mb-2", children: "Welcome to Naveeg AI" }),
+        /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("p", { className: "text-gray-500", children: "I'm here to help you with questions about website management, hosting, domains, and more. What would you like to know?" })
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("div", { className: "space-y-4", children: [
+        messages.map((message) => /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+          "div",
+          {
+            className: cn(
+              "flex",
+              message.role === "user" ? "justify-end" : "justify-start"
+            ),
+            children: /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)(
+              "div",
+              {
+                className: cn(
+                  "max-w-[80%] rounded-lg px-4 py-2",
+                  message.role === "user" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-900"
+                ),
+                children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "whitespace-pre-wrap", children: message.content }),
+                  message.role === "assistant" && message.confidence && /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("div", { className: "mt-2 text-xs opacity-70", children: [
+                    "Confidence: ",
+                    Math.round(message.confidence * 100),
+                    "%"
+                  ] }),
+                  message.role === "assistant" && message.sources && message.sources.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("div", { className: "mt-2 text-xs opacity-70", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "font-medium mb-1", children: "Sources:" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "space-y-1", children: message.sources.map((source, index) => /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "truncate", children: source.title }, index)) })
+                  ] }),
+                  /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "mt-1 text-xs opacity-70", children: message.timestamp.toLocaleTimeString() })
+                ]
+              }
+            )
+          },
+          message.id
+        )),
+        loading && /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "flex justify-start", children: /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "bg-gray-100 rounded-lg px-4 py-2", children: /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("div", { className: "flex items-center space-x-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("div", { className: "flex space-x-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "w-2 h-2 bg-gray-400 rounded-full animate-bounce" }),
+            /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "w-2 h-2 bg-gray-400 rounded-full animate-bounce", style: { animationDelay: "0.1s" } }),
+            /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "w-2 h-2 bg-gray-400 rounded-full animate-bounce", style: { animationDelay: "0.2s" } })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("span", { className: "text-sm text-gray-500", children: "Thinking..." })
+        ] }) }) })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { ref: messagesEndRef })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: "flex-shrink-0 p-4 border-t", children: /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)("form", { onSubmit: handleSubmit, className: "flex space-x-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+        Input,
+        {
+          value: inputValue,
+          onChange: (e) => setInputValue(e.target.value),
+          onKeyPress: handleKeyPress,
+          placeholder,
+          disabled: disabled || isSending,
+          className: "flex-1"
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+        Button,
+        {
+          type: "submit",
+          disabled: !inputValue.trim() || disabled || isSending,
+          className: "px-6",
+          children: isSending ? "Sending..." : "Send"
+        }
+      )
+    ] }) })
+  ] });
+}
+function ChatbotWidget({
+  onSendMessage,
+  loading = false,
+  disabled = false,
+  className
+}) {
+  const [isOpen, setIsOpen] = React10.useState(false);
+  const [messages, setMessages] = React10.useState([]);
+  const handleSendMessage = async (message) => {
+    const userMessage = {
+      id: `user-${Date.now()}`,
+      role: "user",
+      content: message,
+      timestamp: /* @__PURE__ */ new Date()
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    try {
+      await onSendMessage(message);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+  const handleClearHistory = () => {
+    setMessages([]);
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime27.jsx)("div", { className: cn("fixed bottom-4 right-4 z-50", className), children: isOpen ? /* @__PURE__ */ (0, import_jsx_runtime27.jsxs)(Card, { className: "w-96 h-[500px] shadow-lg", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+      Chatbot,
+      {
+        messages,
+        onSendMessage: handleSendMessage,
+        onClearHistory: handleClearHistory,
+        loading,
+        disabled
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+      Button,
+      {
+        variant: "outline",
+        size: "sm",
+        className: "absolute top-2 right-2",
+        onClick: () => setIsOpen(false),
+        children: "\xD7"
+      }
+    )
+  ] }) : /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+    Button,
+    {
+      onClick: () => setIsOpen(true),
+      className: "w-14 h-14 rounded-full shadow-lg",
+      size: "lg",
+      children: /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+        "svg",
+        {
+          className: "w-6 h-6",
+          fill: "none",
+          stroke: "currentColor",
+          viewBox: "0 0 24 24",
+          children: /* @__PURE__ */ (0, import_jsx_runtime27.jsx)(
+            "path",
+            {
+              strokeLinecap: "round",
+              strokeLinejoin: "round",
+              strokeWidth: 2,
+              d: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            }
+          )
+        }
+      )
+    }
+  ) });
+}
+
+// src/components/faq-manager.tsx
+var React11 = __toESM(require("react"));
+var import_jsx_runtime28 = require("react/jsx-runtime");
+function FAQManager({
+  faqs,
+  onAddFAQ,
+  onUpdateFAQ,
+  onDeleteFAQ,
+  onProcessFAQ,
+  loading = false,
+  className
+}) {
+  const [isAdding, setIsAdding] = React11.useState(false);
+  const [editingId, setEditingId] = React11.useState(null);
+  const [newFAQ, setNewFAQ] = React11.useState({
+    title: "",
+    content: "",
+    category: ""
+  });
+  const [editFAQ, setEditFAQ] = React11.useState({
+    title: "",
+    content: "",
+    category: ""
+  });
+  const [error, setError] = React11.useState(null);
+  const [searchTerm, setSearchTerm] = React11.useState("");
+  const [selectedCategory, setSelectedCategory] = React11.useState("");
+  const categories = Array.from(new Set(faqs.map((faq) => faq.category))).sort();
+  const filteredFAQs = faqs.filter((faq) => {
+    const matchesSearch = faq.title.toLowerCase().includes(searchTerm.toLowerCase()) || faq.content.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = !selectedCategory || faq.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+  const handleAddFAQ = async (e) => {
+    e.preventDefault();
+    if (!newFAQ.title.trim() || !newFAQ.content.trim() || !newFAQ.category.trim())
+      return;
+    setIsAdding(true);
+    setError(null);
+    try {
+      const result = await onAddFAQ(newFAQ);
+      if (result.success) {
+        setNewFAQ({ title: "", content: "", category: "" });
+        setIsAdding(false);
+      } else {
+        setError(result.error || "Failed to add FAQ");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add FAQ");
+    } finally {
+      setIsAdding(false);
+    }
+  };
+  const handleEditFAQ = (faq) => {
+    setEditingId(faq.id);
+    setEditFAQ({
+      title: faq.title,
+      content: faq.content,
+      category: faq.category
+    });
+  };
+  const handleUpdateFAQ = async (e) => {
+    e.preventDefault();
+    if (!editingId || !editFAQ.title.trim() || !editFAQ.content.trim() || !editFAQ.category.trim())
+      return;
+    setError(null);
+    try {
+      const result = await onUpdateFAQ(editingId, editFAQ);
+      if (result.success) {
+        setEditingId(null);
+        setEditFAQ({ title: "", content: "", category: "" });
+      } else {
+        setError(result.error || "Failed to update FAQ");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update FAQ");
+    }
+  };
+  const handleDeleteFAQ = async (id) => {
+    if (!confirm("Are you sure you want to delete this FAQ?"))
+      return;
+    setError(null);
+    try {
+      const result = await onDeleteFAQ(id);
+      if (!result.success) {
+        setError(result.error || "Failed to delete FAQ");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete FAQ");
+    }
+  };
+  const handleProcessFAQ = async (id) => {
+    setError(null);
+    try {
+      const result = await onProcessFAQ(id);
+      if (!result.success) {
+        setError(result.error || "Failed to process FAQ");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to process FAQ");
+    }
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: cn("space-y-6", className), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "flex items-center justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("h2", { className: "text-2xl font-bold text-gray-900", children: "FAQ Management" }),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("p", { className: "text-gray-600", children: "Manage your frequently asked questions and AI knowledge base" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Button, { onClick: () => setIsAdding(true), children: "Add FAQ" })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Card, { children: /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(CardContent, { className: "pt-6", children: /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Label, { htmlFor: "search", children: "Search FAQs" }),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+          Input,
+          {
+            id: "search",
+            placeholder: "Search by title or content...",
+            value: searchTerm,
+            onChange: (e) => setSearchTerm(e.target.value)
+          }
+        )
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Label, { htmlFor: "category", children: "Filter by Category" }),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)(
+          "select",
+          {
+            id: "category",
+            className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+            value: selectedCategory,
+            onChange: (e) => setSelectedCategory(e.target.value),
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("option", { value: "", children: "All Categories" }),
+              categories.map((category) => /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("option", { value: category, children: category }, category))
+            ]
+          }
+        )
+      ] })
+    ] }) }) }),
+    error && /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("div", { className: "p-4 bg-red-50 border border-red-200 rounded-lg", children: /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "flex", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("div", { className: "flex-shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("svg", { className: "h-5 w-5 text-red-400", viewBox: "0 0 20 20", fill: "currentColor", children: /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z", clipRule: "evenodd" }) }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "ml-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("h3", { className: "text-sm font-medium text-red-800", children: "Error" }),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("div", { className: "mt-2 text-sm text-red-700", children: error })
+      ] })
+    ] }) }),
+    isAdding && /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)(Card, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)(CardHeader, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(CardTitle, { children: "Add New FAQ" }),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(CardDescription, { children: "Create a new frequently asked question" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("form", { onSubmit: handleAddFAQ, className: "space-y-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Label, { htmlFor: "new-title", children: "Title" }),
+            /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+              Input,
+              {
+                id: "new-title",
+                value: newFAQ.title,
+                onChange: (e) => setNewFAQ((prev) => ({ ...prev, title: e.target.value })),
+                placeholder: "FAQ title...",
+                required: true
+              }
+            )
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Label, { htmlFor: "new-category", children: "Category" }),
+            /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+              Input,
+              {
+                id: "new-category",
+                value: newFAQ.category,
+                onChange: (e) => setNewFAQ((prev) => ({ ...prev, category: e.target.value })),
+                placeholder: "e.g., Getting Started, Billing, Technical",
+                required: true
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Label, { htmlFor: "new-content", children: "Content" }),
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+            "textarea",
+            {
+              id: "new-content",
+              className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+              rows: 4,
+              value: newFAQ.content,
+              onChange: (e) => setNewFAQ((prev) => ({ ...prev, content: e.target.value })),
+              placeholder: "FAQ content...",
+              required: true
+            }
+          )
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "flex space-x-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Button, { type: "submit", disabled: isAdding, children: isAdding ? "Adding..." : "Add FAQ" }),
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Button, { type: "button", variant: "outline", onClick: () => setIsAdding(false), children: "Cancel" })
+        ] })
+      ] }) })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("div", { className: "space-y-4", children: filteredFAQs.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Card, { children: /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)(CardContent, { className: "text-center py-8", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+        "svg",
+        {
+          className: "mx-auto h-12 w-12 text-gray-400",
+          fill: "none",
+          viewBox: "0 0 24 24",
+          stroke: "currentColor",
+          children: /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+            "path",
+            {
+              strokeLinecap: "round",
+              strokeLinejoin: "round",
+              strokeWidth: 2,
+              d: "M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            }
+          )
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("h3", { className: "mt-2 text-sm font-medium text-gray-900", children: "No FAQs found" }),
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("p", { className: "mt-1 text-sm text-gray-500", children: searchTerm || selectedCategory ? "Try adjusting your search or filter." : "Get started by adding your first FAQ." })
+    ] }) }) : filteredFAQs.map((faq) => /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Card, { children: /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(CardContent, { className: "pt-6", children: editingId === faq.id ? /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("form", { onSubmit: handleUpdateFAQ, className: "space-y-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Label, { htmlFor: "edit-title", children: "Title" }),
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+            Input,
+            {
+              id: "edit-title",
+              value: editFAQ.title,
+              onChange: (e) => setEditFAQ((prev) => ({ ...prev, title: e.target.value })),
+              required: true
+            }
+          )
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Label, { htmlFor: "edit-category", children: "Category" }),
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+            Input,
+            {
+              id: "edit-category",
+              value: editFAQ.category,
+              onChange: (e) => setEditFAQ((prev) => ({ ...prev, category: e.target.value })),
+              required: true
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Label, { htmlFor: "edit-content", children: "Content" }),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+          "textarea",
+          {
+            id: "edit-content",
+            className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+            rows: 4,
+            value: editFAQ.content,
+            onChange: (e) => setEditFAQ((prev) => ({ ...prev, content: e.target.value })),
+            required: true
+          }
+        )
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "flex space-x-2", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(Button, { type: "submit", size: "sm", children: "Save" }),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+          Button,
+          {
+            type: "button",
+            variant: "outline",
+            size: "sm",
+            onClick: () => setEditingId(null),
+            children: "Cancel"
+          }
+        )
+      ] })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "flex items-start justify-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "flex-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("h3", { className: "text-lg font-medium text-gray-900", children: faq.title }),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "mt-1 flex items-center space-x-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("span", { className: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800", children: faq.category }),
+          /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("span", { className: "text-sm text-gray-500", children: new Date(faq.created_at).toLocaleDateString() })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)("p", { className: "mt-2 text-gray-700 whitespace-pre-wrap", children: faq.content })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime28.jsxs)("div", { className: "flex items-center space-x-2 ml-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+          Button,
+          {
+            size: "sm",
+            variant: "outline",
+            onClick: () => handleProcessFAQ(faq.id),
+            disabled: loading,
+            children: "Process"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+          Button,
+          {
+            size: "sm",
+            variant: "outline",
+            onClick: () => handleEditFAQ(faq),
+            children: "Edit"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime28.jsx)(
+          Button,
+          {
+            size: "sm",
+            variant: "outline",
+            onClick: () => handleDeleteFAQ(faq.id),
+            className: "text-red-600 hover:text-red-700",
+            children: "Delete"
+          }
+        )
+      ] })
+    ] }) }) }) }, faq.id)) })
+  ] });
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AuthForm,
@@ -2409,11 +2956,14 @@ function DomainVerification({
   CardFooter,
   CardHeader,
   CardTitle,
+  Chatbot,
+  ChatbotWidget,
   DomainCard,
   DomainForm,
   DomainManager,
   DomainVerification,
   EntitlementCard,
+  FAQManager,
   FeatureBadge,
   FeatureComparison,
   FeatureGate,

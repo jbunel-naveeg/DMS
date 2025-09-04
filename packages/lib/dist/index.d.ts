@@ -577,4 +577,75 @@ declare function useFeatureGate(feature: string): {
     limit?: number;
 };
 
-export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CancelSubscriptionRequest, CancelSubscriptionResponse, CheckoutSession, CreateCheckoutSessionRequest, CreateCheckoutSessionResponse, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, CreateSubscriptionRequest, CreateSubscriptionResponse, DesignInput, Domain, EntitlementCheck, EntitlementService, FeatureEntitlement, OnboardingStatus, PLANS, Plan, PlanLimits, PlanUsage, ProcessWebhookResponse, STRIPE_WEBHOOK_SECRET, StripeCheckoutService, StripeSubscriptionService, StripeWebhookService, Subscription, TenWebAPI, TenWebDNSRecord, TenWebDomain, TenWebSite, UpdateSubscriptionRequest, UpdateSubscriptionResponse, UsageStats, UseAuthReturn, UseEntitlementReturn, UseFeatureGateProps, UserData, UserPlan, WebhookEvent, Website, authService, briefSchema, calculateUsagePercentage, createAuthClient, createBrowserClient, createServerClient, designSchema, entitlementService, formatBandwidthSize, formatCurrency, formatDate, formatStorageSize, generateSchema, generateSubdomain, getBrowserSupabaseClient, getPlanById, getPlanLimits, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, isFeatureAvailable, stripeCheckoutService, stripeSubscriptionService, stripeWebhookService, tenWebAPI, useAuth, useEntitlements, useFeatureGate, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser, useUserData };
+interface OpenAIEmbedding {
+    embedding: number[];
+    index: number;
+}
+interface OpenAIEmbeddingResponse {
+    data: OpenAIEmbedding[];
+    model: string;
+    usage: {
+        prompt_tokens: number;
+        total_tokens: number;
+    };
+}
+interface ChatMessage {
+    role: 'system' | 'user' | 'assistant';
+    content: string;
+}
+interface ChatCompletionResponse {
+    id: string;
+    object: string;
+    created: number;
+    model: string;
+    choices: Array<{
+        index: number;
+        message: ChatMessage;
+        finish_reason: string;
+    }>;
+    usage: {
+        prompt_tokens: number;
+        completion_tokens: number;
+        total_tokens: number;
+    };
+}
+interface FAQDocument {
+    id: string;
+    title: string;
+    content: string;
+    category: string;
+    embedding?: number[];
+    created_at: string;
+    updated_at: string;
+}
+interface ChatbotResponse {
+    answer: string;
+    sources: FAQDocument[];
+    confidence: number;
+    tokens_used: number;
+}
+declare class OpenAIService {
+    private apiKey;
+    private baseUrl;
+    constructor(apiKey: string);
+    private makeRequest;
+    generateEmbedding(text: string): Promise<number[]>;
+    generateEmbeddings(texts: string[]): Promise<number[][]>;
+    generateChatCompletion(messages: ChatMessage[], model?: string, maxTokens?: number, temperature?: number): Promise<ChatCompletionResponse>;
+    processFAQDocument(document: {
+        title: string;
+        content: string;
+        category: string;
+    }): Promise<{
+        embedding: number[];
+        processed_content: string;
+    }>;
+    private cleanText;
+    generateChatbotResponse(question: string, context: FAQDocument[], conversationHistory?: ChatMessage[]): Promise<ChatbotResponse>;
+    private calculateConfidence;
+    generateSearchQuery(question: string): string;
+}
+declare const openAIService: OpenAIService;
+declare function getOpenAIService(): OpenAIService;
+
+export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CancelSubscriptionRequest, CancelSubscriptionResponse, ChatCompletionResponse, ChatMessage, ChatbotResponse, CheckoutSession, CreateCheckoutSessionRequest, CreateCheckoutSessionResponse, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, CreateSubscriptionRequest, CreateSubscriptionResponse, DesignInput, Domain, EntitlementCheck, EntitlementService, FAQDocument, FeatureEntitlement, OnboardingStatus, OpenAIEmbedding, OpenAIEmbeddingResponse, OpenAIService, PLANS, Plan, PlanLimits, PlanUsage, ProcessWebhookResponse, STRIPE_WEBHOOK_SECRET, StripeCheckoutService, StripeSubscriptionService, StripeWebhookService, Subscription, TenWebAPI, TenWebDNSRecord, TenWebDomain, TenWebSite, UpdateSubscriptionRequest, UpdateSubscriptionResponse, UsageStats, UseAuthReturn, UseEntitlementReturn, UseFeatureGateProps, UserData, UserPlan, WebhookEvent, Website, authService, briefSchema, calculateUsagePercentage, createAuthClient, createBrowserClient, createServerClient, designSchema, entitlementService, formatBandwidthSize, formatCurrency, formatDate, formatStorageSize, generateSchema, generateSubdomain, getBrowserSupabaseClient, getOpenAIService, getPlanById, getPlanLimits, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, isFeatureAvailable, openAIService, stripeCheckoutService, stripeSubscriptionService, stripeWebhookService, tenWebAPI, useAuth, useEntitlements, useFeatureGate, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser, useUserData };
