@@ -25,6 +25,8 @@ export interface UserPlan {
   current_period_start: string
   current_period_end: string
   cancel_at_period_end: boolean
+  stripe_subscription_id?: string
+  stripe_customer_id?: string
   created_at: string
   updated_at: string
   plan: Plan

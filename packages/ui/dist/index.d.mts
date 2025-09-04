@@ -234,4 +234,64 @@ interface UsageUpgradeCTAProps {
 }
 declare function UsageUpgradeCTA({ feature, currentUsage, limit, suggestedPlan, onUpgrade, className }: UsageUpgradeCTAProps): react_jsx_runtime.JSX.Element;
 
-export { AuthForm, AuthFormData, AuthFormProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, DomainCard, DomainCardProps, DomainForm, DomainFormData, DomainFormProps, Input, InputProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, PlanBadge, PlanBadgeProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UpgradeCTA, UpgradeCTAProps, UsageBar, UsageBarProps, UsageUpgradeCTA, UsageUpgradeCTAProps, UserMenu, UserMenuProps, WebsiteCard, WebsiteCardProps, buttonVariants, cn };
+interface PricingCardProps {
+    plan: {
+        id: string;
+        name: string;
+        description: string;
+        price: number;
+        interval: string;
+        features: string[];
+        is_popular?: boolean;
+        is_enterprise?: boolean;
+    };
+    currentPlanId?: string;
+    onSelect: (planId: string) => void;
+    loading?: boolean;
+    className?: string;
+}
+declare function PricingCard({ plan, currentPlanId, onSelect, loading, className }: PricingCardProps): react_jsx_runtime.JSX.Element;
+
+interface BillingInfoProps {
+    subscription: {
+        id: string;
+        status: string;
+        current_period_start: string;
+        current_period_end: string;
+        cancel_at_period_end: boolean;
+        plan: {
+            id: string;
+            name: string;
+            price: number;
+            interval: string;
+        };
+    };
+    onManageBilling: () => void;
+    onUpgrade: () => void;
+    onCancel: () => void;
+    className?: string;
+}
+declare function BillingInfo({ subscription, onManageBilling, onUpgrade, onCancel, className }: BillingInfoProps): react_jsx_runtime.JSX.Element;
+
+interface Invoice {
+    id: string;
+    number: string;
+    status: 'paid' | 'open' | 'void' | 'uncollectible';
+    amount_paid: number;
+    amount_due: number;
+    currency: string;
+    created: number;
+    due_date?: number;
+    hosted_invoice_url?: string;
+    invoice_pdf?: string;
+}
+interface InvoiceListProps {
+    invoices: Invoice[];
+    onDownload: (invoiceId: string) => void;
+    onView: (invoiceId: string) => void;
+    loading?: boolean;
+    className?: string;
+}
+declare function InvoiceList({ invoices, onDownload, onView, loading, className }: InvoiceListProps): react_jsx_runtime.JSX.Element;
+
+export { AuthForm, AuthFormData, AuthFormProps, BillingInfo, BillingInfoProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, DomainCard, DomainCardProps, DomainForm, DomainFormData, DomainFormProps, Input, InputProps, Invoice, InvoiceList, InvoiceListProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, PlanBadge, PlanBadgeProps, PricingCard, PricingCardProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UpgradeCTA, UpgradeCTAProps, UsageBar, UsageBarProps, UsageUpgradeCTA, UsageUpgradeCTAProps, UserMenu, UserMenuProps, WebsiteCard, WebsiteCardProps, buttonVariants, cn };

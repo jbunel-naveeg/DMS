@@ -2381,6 +2381,9 @@ __export(src_exports, {
   AuthService: () => AuthService,
   PLANS: () => PLANS,
   STRIPE_WEBHOOK_SECRET: () => STRIPE_WEBHOOK_SECRET,
+  StripeCheckoutService: () => StripeCheckoutService,
+  StripeSubscriptionService: () => StripeSubscriptionService,
+  StripeWebhookService: () => StripeWebhookService,
   TenWebAPI: () => TenWebAPI,
   authService: () => authService,
   briefSchema: () => briefSchema,
@@ -2403,6 +2406,9 @@ __export(src_exports, {
   getStripe: () => getStripe,
   getTenWebAPI: () => getTenWebAPI,
   isFeatureAvailable: () => isFeatureAvailable,
+  stripeCheckoutService: () => stripeCheckoutService,
+  stripeSubscriptionService: () => stripeSubscriptionService,
+  stripeWebhookService: () => stripeWebhookService,
   tenWebAPI: () => tenWebAPI,
   useAuth: () => useAuth,
   useIsAuthenticated: () => useIsAuthenticated,
@@ -3017,125 +3023,8 @@ function getStripe() {
 }
 var STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || "";
 
-// src/tenweb/tenweb.ts
-var TenWebAPI = class {
-  constructor(apiKey) {
-    this.baseUrl = "https://my.10web.io/api";
-    this.apiKey = apiKey;
-  }
-  async makeRequest(endpoint, method = "GET", body) {
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      method,
-      headers: {
-        "Authorization": `Bearer ${this.apiKey}`,
-        "Content-Type": "application/json"
-      },
-      body: body ? JSON.stringify(body) : void 0
-    });
-    if (!response.ok) {
-      throw new Error(`TenWeb API error: ${response.status} ${response.statusText}`);
-    }
-    return response.json();
-  }
-  // Create a new WordPress site
-  async createSite(request) {
-    try {
-      const mockSite = {
-        id: `site_${Date.now()}`,
-        name: request.name,
-        url: `https://${request.subdomain}.naveeg.com`,
-        status: "active",
-        created_at: (/* @__PURE__ */ new Date()).toISOString(),
-        updated_at: (/* @__PURE__ */ new Date()).toISOString()
-      };
-      return {
-        success: true,
-        site: mockSite
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error"
-      };
-    }
-  }
-  // Get all sites for a user
-  async getSites() {
-    try {
-      return [];
-    } catch (error) {
-      console.error("Error fetching sites:", error);
-      return [];
-    }
-  }
-  // Get site details
-  async getSite(siteId) {
-    try {
-      return null;
-    } catch (error) {
-      console.error("Error fetching site:", error);
-      return null;
-    }
-  }
-  // Create a custom domain for a site
-  async createDomain(request) {
-    try {
-      const mockDomain = {
-        id: `domain_${Date.now()}`,
-        domain: request.domain,
-        site_id: request.site_id,
-        status: "pending",
-        ssl_enabled: false,
-        created_at: (/* @__PURE__ */ new Date()).toISOString(),
-        updated_at: (/* @__PURE__ */ new Date()).toISOString()
-      };
-      return {
-        success: true,
-        domain: mockDomain
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error"
-      };
-    }
-  }
-  // Get domains for a site
-  async getDomains(siteId) {
-    try {
-      return [];
-    } catch (error) {
-      console.error("Error fetching domains:", error);
-      return [];
-    }
-  }
-  // Delete a site
-  async deleteSite(siteId) {
-    try {
-      return true;
-    } catch (error) {
-      console.error("Error deleting site:", error);
-      return false;
-    }
-  }
-  // Delete a domain
-  async deleteDomain(domainId) {
-    try {
-      return true;
-    } catch (error) {
-      console.error("Error deleting domain:", error);
-      return false;
-    }
-  }
-};
-var tenWebAPI = new TenWebAPI(process.env.TENWEB_API_KEY || "");
-function getTenWebAPI() {
-  const apiKey = process.env.TENWEB_API_KEY;
-  if (!apiKey) {
-    throw new Error("TENWEB_API_KEY environment variable is required");
-  }
-  return new TenWebAPI(apiKey);
-}
+// src/stripe/checkout.ts
+var import_stripe2 = __toESM(require("stripe"));
 
 // src/types/plans.ts
 var PLANS = [
@@ -3282,6 +3171,579 @@ function formatBandwidthSize(gb) {
   return `${gb}GB`;
 }
 
+// src/stripe/checkout.ts
+var StripeCheckoutService = class {
+  constructor(apiKey) {
+    this.stripe = new import_stripe2.default(apiKey, {
+      apiVersion: "2022-11-15"
+    });
+  }
+  async createCheckoutSession(request) {
+    try {
+      const plan = PLANS.find((p) => p.id === request.plan_id);
+      if (!plan) {
+        return {
+          success: false,
+          error: "Plan not found"
+        };
+      }
+      if (!plan.stripe_price_id) {
+        return {
+          success: false,
+          error: "Plan does not support Stripe checkout"
+        };
+      }
+      const sessionParams = {
+        mode: "subscription",
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price: plan.stripe_price_id,
+            quantity: 1
+          }
+        ],
+        success_url: request.success_url,
+        cancel_url: request.cancel_url,
+        metadata: {
+          plan_id: plan.id
+        }
+      };
+      if (request.customer_id) {
+        sessionParams.customer = request.customer_id;
+      } else if (request.customer_email) {
+        sessionParams.customer_email = request.customer_email;
+      }
+      if (request.trial_period_days && request.trial_period_days > 0) {
+        sessionParams.subscription_data = {
+          trial_period_days: request.trial_period_days
+        };
+      }
+      const session = await this.stripe.checkout.sessions.create(sessionParams);
+      return {
+        success: true,
+        session: {
+          id: session.id,
+          url: session.url,
+          customer_email: session.customer_email || void 0,
+          customer_id: typeof session.customer === "string" ? session.customer : session.customer?.id,
+          subscription_id: typeof session.subscription === "string" ? session.subscription : session.subscription?.id
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to create checkout session"
+      };
+    }
+  }
+  async retrieveCheckoutSession(sessionId) {
+    try {
+      const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+      return {
+        id: session.id,
+        url: session.url,
+        customer_email: session.customer_email || void 0,
+        customer_id: typeof session.customer === "string" ? session.customer : session.customer?.id,
+        subscription_id: typeof session.subscription === "string" ? session.subscription : session.subscription?.id
+      };
+    } catch (error) {
+      console.error("Error retrieving checkout session:", error);
+      return null;
+    }
+  }
+  async createCustomerPortalSession(customerId, returnUrl) {
+    try {
+      const session = await this.stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: returnUrl
+      });
+      return { url: session.url };
+    } catch (error) {
+      console.error("Error creating customer portal session:", error);
+      return null;
+    }
+  }
+};
+var stripeCheckoutService = new StripeCheckoutService(
+  process.env.STRIPE_SECRET_KEY || ""
+);
+
+// src/stripe/subscriptions.ts
+var import_stripe3 = __toESM(require("stripe"));
+var StripeSubscriptionService = class {
+  constructor(apiKey) {
+    this.stripe = new import_stripe3.default(apiKey, {
+      apiVersion: "2022-11-15"
+    });
+  }
+  async createSubscription(request) {
+    try {
+      const subscriptionParams = {
+        customer: request.customer_id,
+        items: [
+          {
+            price: request.price_id
+          }
+        ],
+        payment_behavior: "default_incomplete",
+        payment_settings: { save_default_payment_method: "on_subscription" },
+        expand: ["latest_invoice.payment_intent"]
+      };
+      if (request.trial_period_days && request.trial_period_days > 0) {
+        subscriptionParams.trial_period_days = request.trial_period_days;
+      }
+      const subscription = await this.stripe.subscriptions.create(subscriptionParams);
+      return {
+        success: true,
+        subscription: this.mapSubscription(subscription)
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to create subscription"
+      };
+    }
+  }
+  async updateSubscription(request) {
+    try {
+      const updateParams = {};
+      if (request.price_id) {
+        const subscription2 = await this.stripe.subscriptions.retrieve(request.subscription_id);
+        await this.stripe.subscriptions.update(request.subscription_id, {
+          items: [
+            {
+              id: subscription2.items.data[0].id,
+              price: request.price_id
+            }
+          ]
+        });
+      }
+      if (request.cancel_at_period_end !== void 0) {
+        updateParams.cancel_at_period_end = request.cancel_at_period_end;
+      }
+      if (Object.keys(updateParams).length > 0) {
+        const subscription2 = await this.stripe.subscriptions.update(
+          request.subscription_id,
+          updateParams
+        );
+        return {
+          success: true,
+          subscription: this.mapSubscription(subscription2)
+        };
+      }
+      const subscription = await this.stripe.subscriptions.retrieve(request.subscription_id);
+      return {
+        success: true,
+        subscription: this.mapSubscription(subscription)
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to update subscription"
+      };
+    }
+  }
+  async cancelSubscription(request) {
+    try {
+      let subscription;
+      if (request.immediately) {
+        subscription = await this.stripe.subscriptions.cancel(request.subscription_id);
+      } else {
+        subscription = await this.stripe.subscriptions.update(request.subscription_id, {
+          cancel_at_period_end: true
+        });
+      }
+      return {
+        success: true,
+        subscription: this.mapSubscription(subscription)
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to cancel subscription"
+      };
+    }
+  }
+  async getSubscription(subscriptionId) {
+    try {
+      const subscription = await this.stripe.subscriptions.retrieve(subscriptionId);
+      return this.mapSubscription(subscription);
+    } catch (error) {
+      console.error("Error retrieving subscription:", error);
+      return null;
+    }
+  }
+  async getCustomerSubscriptions(customerId) {
+    try {
+      const subscriptions = await this.stripe.subscriptions.list({
+        customer: customerId,
+        status: "all"
+      });
+      return subscriptions.data.map((sub) => this.mapSubscription(sub));
+    } catch (error) {
+      console.error("Error retrieving customer subscriptions:", error);
+      return [];
+    }
+  }
+  async getUpcomingInvoice(customerId) {
+    try {
+      const invoice = await this.stripe.invoices.retrieveUpcoming({
+        customer: customerId
+      });
+      return invoice;
+    } catch (error) {
+      console.error("Error retrieving upcoming invoice:", error);
+      return null;
+    }
+  }
+  mapSubscription(subscription) {
+    const price = subscription.items.data[0]?.price;
+    const planId = price?.metadata?.plan_id || "unknown";
+    return {
+      id: subscription.id,
+      customer_id: subscription.customer,
+      status: subscription.status,
+      current_period_start: subscription.current_period_start,
+      current_period_end: subscription.current_period_end,
+      cancel_at_period_end: subscription.cancel_at_period_end,
+      canceled_at: subscription.canceled_at || void 0,
+      trial_start: subscription.trial_start || void 0,
+      trial_end: subscription.trial_end || void 0,
+      plan_id: planId,
+      price_id: price?.id || "",
+      created: subscription.created
+    };
+  }
+};
+var stripeSubscriptionService = new StripeSubscriptionService(
+  process.env.STRIPE_SECRET_KEY || ""
+);
+
+// src/stripe/webhooks.ts
+var import_stripe4 = __toESM(require("stripe"));
+var import_supabase_js4 = require("@supabase/supabase-js");
+var StripeWebhookService = class {
+  constructor(stripeSecretKey, supabaseUrl3, supabaseServiceKey) {
+    this.stripe = new import_stripe4.default(stripeSecretKey, {
+      apiVersion: "2022-11-15"
+    });
+    this.supabase = (0, import_supabase_js4.createClient)(supabaseUrl3, supabaseServiceKey);
+  }
+  async processWebhook(payload, signature, webhookSecret) {
+    try {
+      const event = this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+      switch (event.type) {
+        case "checkout.session.completed":
+          return await this.handleCheckoutSessionCompleted(event.data.object);
+        case "customer.subscription.created":
+          return await this.handleSubscriptionCreated(event.data.object);
+        case "customer.subscription.updated":
+          return await this.handleSubscriptionUpdated(event.data.object);
+        case "customer.subscription.deleted":
+          return await this.handleSubscriptionDeleted(event.data.object);
+        case "invoice.payment_succeeded":
+          return await this.handlePaymentSucceeded(event.data.object);
+        case "invoice.payment_failed":
+          return await this.handlePaymentFailed(event.data.object);
+        case "customer.created":
+          return await this.handleCustomerCreated(event.data.object);
+        case "customer.updated":
+          return await this.handleCustomerUpdated(event.data.object);
+        default:
+          console.log(`Unhandled event type: ${event.type}`);
+          return { success: true };
+      }
+    } catch (error) {
+      console.error("Webhook processing error:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Webhook processing failed"
+      };
+    }
+  }
+  async handleCheckoutSessionCompleted(session) {
+    try {
+      const customerId = session.customer;
+      const subscriptionId = session.subscription;
+      const planId = session.metadata?.plan_id;
+      if (!customerId || !subscriptionId || !planId) {
+        throw new Error("Missing required session data");
+      }
+      const subscription = await this.stripe.subscriptions.retrieve(subscriptionId);
+      const { error } = await this.supabase.from("user_plans").upsert({
+        user_id: customerId,
+        // Assuming customer_id maps to user_id
+        plan_id: planId,
+        stripe_subscription_id: subscriptionId,
+        status: subscription.status,
+        current_period_start: new Date(subscription.current_period_start * 1e3).toISOString(),
+        current_period_end: new Date(subscription.current_period_end * 1e3).toISOString(),
+        cancel_at_period_end: subscription.cancel_at_period_end
+      });
+      if (error) {
+        throw new Error(`Database error: ${error.message}`);
+      }
+      return { success: true };
+    } catch (error) {
+      console.error("Error handling checkout session completed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to process checkout session"
+      };
+    }
+  }
+  async handleSubscriptionCreated(subscription) {
+    try {
+      const customerId = subscription.customer;
+      const planId = subscription.metadata?.plan_id || "unknown";
+      const { error } = await this.supabase.from("user_plans").update({
+        status: subscription.status,
+        current_period_start: new Date(subscription.current_period_start * 1e3).toISOString(),
+        current_period_end: new Date(subscription.current_period_end * 1e3).toISOString(),
+        cancel_at_period_end: subscription.cancel_at_period_end
+      }).eq("stripe_subscription_id", subscription.id);
+      if (error) {
+        throw new Error(`Database error: ${error.message}`);
+      }
+      return { success: true };
+    } catch (error) {
+      console.error("Error handling subscription created:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to process subscription created"
+      };
+    }
+  }
+  async handleSubscriptionUpdated(subscription) {
+    try {
+      const { error } = await this.supabase.from("user_plans").update({
+        status: subscription.status,
+        current_period_start: new Date(subscription.current_period_start * 1e3).toISOString(),
+        current_period_end: new Date(subscription.current_period_end * 1e3).toISOString(),
+        cancel_at_period_end: subscription.cancel_at_period_end,
+        canceled_at: subscription.canceled_at ? new Date(subscription.canceled_at * 1e3).toISOString() : null
+      }).eq("stripe_subscription_id", subscription.id);
+      if (error) {
+        throw new Error(`Database error: ${error.message}`);
+      }
+      return { success: true };
+    } catch (error) {
+      console.error("Error handling subscription updated:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to process subscription updated"
+      };
+    }
+  }
+  async handleSubscriptionDeleted(subscription) {
+    try {
+      const { error } = await this.supabase.from("user_plans").update({
+        status: "canceled",
+        canceled_at: (/* @__PURE__ */ new Date()).toISOString()
+      }).eq("stripe_subscription_id", subscription.id);
+      if (error) {
+        throw new Error(`Database error: ${error.message}`);
+      }
+      return { success: true };
+    } catch (error) {
+      console.error("Error handling subscription deleted:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to process subscription deleted"
+      };
+    }
+  }
+  async handlePaymentSucceeded(invoice) {
+    try {
+      const subscriptionId = invoice.subscription;
+      if (subscriptionId) {
+        const { error } = await this.supabase.from("user_plans").update({
+          status: "active"
+        }).eq("stripe_subscription_id", subscriptionId);
+        if (error) {
+          throw new Error(`Database error: ${error.message}`);
+        }
+      }
+      return { success: true };
+    } catch (error) {
+      console.error("Error handling payment succeeded:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to process payment succeeded"
+      };
+    }
+  }
+  async handlePaymentFailed(invoice) {
+    try {
+      const subscriptionId = invoice.subscription;
+      if (subscriptionId) {
+        const { error } = await this.supabase.from("user_plans").update({
+          status: "past_due"
+        }).eq("stripe_subscription_id", subscriptionId);
+        if (error) {
+          throw new Error(`Database error: ${error.message}`);
+        }
+      }
+      return { success: true };
+    } catch (error) {
+      console.error("Error handling payment failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to process payment failed"
+      };
+    }
+  }
+  async handleCustomerCreated(customer) {
+    try {
+      console.log("Customer created:", customer.id);
+      return { success: true };
+    } catch (error) {
+      console.error("Error handling customer created:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to process customer created"
+      };
+    }
+  }
+  async handleCustomerUpdated(customer) {
+    try {
+      console.log("Customer updated:", customer.id);
+      return { success: true };
+    } catch (error) {
+      console.error("Error handling customer updated:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to process customer updated"
+      };
+    }
+  }
+};
+var stripeWebhookService = new StripeWebhookService(
+  process.env.STRIPE_SECRET_KEY || "",
+  process.env.SUPABASE_URL || "",
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ""
+);
+
+// src/tenweb/tenweb.ts
+var TenWebAPI = class {
+  constructor(apiKey) {
+    this.baseUrl = "https://my.10web.io/api";
+    this.apiKey = apiKey;
+  }
+  async makeRequest(endpoint, method = "GET", body) {
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      method,
+      headers: {
+        "Authorization": `Bearer ${this.apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: body ? JSON.stringify(body) : void 0
+    });
+    if (!response.ok) {
+      throw new Error(`TenWeb API error: ${response.status} ${response.statusText}`);
+    }
+    return response.json();
+  }
+  // Create a new WordPress site
+  async createSite(request) {
+    try {
+      const mockSite = {
+        id: `site_${Date.now()}`,
+        name: request.name,
+        url: `https://${request.subdomain}.naveeg.com`,
+        status: "active",
+        created_at: (/* @__PURE__ */ new Date()).toISOString(),
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
+      };
+      return {
+        success: true,
+        site: mockSite
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error"
+      };
+    }
+  }
+  // Get all sites for a user
+  async getSites() {
+    try {
+      return [];
+    } catch (error) {
+      console.error("Error fetching sites:", error);
+      return [];
+    }
+  }
+  // Get site details
+  async getSite(siteId) {
+    try {
+      return null;
+    } catch (error) {
+      console.error("Error fetching site:", error);
+      return null;
+    }
+  }
+  // Create a custom domain for a site
+  async createDomain(request) {
+    try {
+      const mockDomain = {
+        id: `domain_${Date.now()}`,
+        domain: request.domain,
+        site_id: request.site_id,
+        status: "pending",
+        ssl_enabled: false,
+        created_at: (/* @__PURE__ */ new Date()).toISOString(),
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
+      };
+      return {
+        success: true,
+        domain: mockDomain
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error"
+      };
+    }
+  }
+  // Get domains for a site
+  async getDomains(siteId) {
+    try {
+      return [];
+    } catch (error) {
+      console.error("Error fetching domains:", error);
+      return [];
+    }
+  }
+  // Delete a site
+  async deleteSite(siteId) {
+    try {
+      return true;
+    } catch (error) {
+      console.error("Error deleting site:", error);
+      return false;
+    }
+  }
+  // Delete a domain
+  async deleteDomain(domainId) {
+    try {
+      return true;
+    } catch (error) {
+      console.error("Error deleting domain:", error);
+      return false;
+    }
+  }
+};
+var tenWebAPI = new TenWebAPI(process.env.TENWEB_API_KEY || "");
+function getTenWebAPI() {
+  const apiKey = process.env.TENWEB_API_KEY;
+  if (!apiKey) {
+    throw new Error("TENWEB_API_KEY environment variable is required");
+  }
+  return new TenWebAPI(apiKey);
+}
+
 // src/validations/validations.ts
 var import_zod = require("zod");
 var briefSchema = import_zod.z.object({
@@ -3317,14 +3779,14 @@ function generateSubdomain(name) {
 }
 
 // src/auth/auth.ts
-var import_supabase_js4 = require("@supabase/supabase-js");
+var import_supabase_js5 = require("@supabase/supabase-js");
 function createAuthClient() {
   const supabaseUrl3 = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey3 = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!supabaseUrl3 || !supabaseAnonKey3) {
     throw new Error("Missing Supabase environment variables");
   }
-  return (0, import_supabase_js4.createClient)(supabaseUrl3, supabaseAnonKey3, {
+  return (0, import_supabase_js5.createClient)(supabaseUrl3, supabaseAnonKey3, {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
@@ -3422,7 +3884,7 @@ var createServerClient = (cookies) => {
   if (!supabaseUrl3 || !supabaseAnonKey3) {
     throw new Error("Missing Supabase environment variables");
   }
-  return (0, import_supabase_js4.createClient)(supabaseUrl3, supabaseAnonKey3, {
+  return (0, import_supabase_js5.createClient)(supabaseUrl3, supabaseAnonKey3, {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
@@ -3677,6 +4139,9 @@ function useUserData() {
   AuthService,
   PLANS,
   STRIPE_WEBHOOK_SECRET,
+  StripeCheckoutService,
+  StripeSubscriptionService,
+  StripeWebhookService,
   TenWebAPI,
   authService,
   briefSchema,
@@ -3699,6 +4164,9 @@ function useUserData() {
   getStripe,
   getTenWebAPI,
   isFeatureAvailable,
+  stripeCheckoutService,
+  stripeSubscriptionService,
+  stripeWebhookService,
   tenWebAPI,
   useAuth,
   useIsAuthenticated,

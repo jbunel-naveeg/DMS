@@ -1,47 +1,45 @@
-import { NextResponse } from "next/server";
-import { STRIPE_WEBHOOK_SECRET, getStripe } from "@/lib/stripe";
-import type Stripe from "stripe";
-import { getServiceSupabaseClient } from "@/lib/supabase-server";
+import { NextRequest, NextResponse } from 'next/server'
+import { stripeWebhookService } from '@naveeg/lib'
 
-export const runtime = "nodejs";
-
-export async function POST(request: Request) {
-  const signature = request.headers.get("stripe-signature");
-  const payload = await request.text();
+export async function POST(request: NextRequest) {
   try {
-    const stripe = getStripe();
-    const event = stripe.webhooks.constructEvent(payload, signature as string, STRIPE_WEBHOOK_SECRET);
-    // Handle subscription events (stub for MVP)
-    switch (event.type) {
-      case "customer.subscription.updated":
-      case "customer.subscription.deleted":
-        try {
-          const sub = event.data.object as Stripe.Subscription;
-          const supabase = getServiceSupabaseClient();
-          await supabase
-            .from("subscriptions")
-            .upsert({
-              stripe_customer_id: sub.customer,
-              stripe_subscription_id: sub.id,
-              status: sub.status,
-              plan: sub.items?.data?.[0]?.price?.nickname ?? null,
-              trial_end: sub.trial_end ? new Date((sub.trial_end as number) * 1000).toISOString() : null,
-            }, { onConflict: "stripe_subscription_id" });
-        } catch (error) {
-          console.error(error);
-        }
-        break;
-      default:
-        break;
+    const body = await request.text()
+    const signature = request.headers.get('stripe-signature')
+
+    if (!signature) {
+      return NextResponse.json(
+        { success: false, error: 'Missing stripe signature' },
+        { status: 400 }
+      )
     }
-    return new NextResponse("ok", { status: 200 });
+
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+    if (!webhookSecret) {
+      return NextResponse.json(
+        { success: false, error: 'Webhook secret not configured' },
+        { status: 500 }
+      )
+    }
+
+    const result = await stripeWebhookService.processWebhook(
+      body,
+      signature,
+      webhookSecret
+    )
+
+    if (!result.success) {
+      return NextResponse.json(
+        { success: false, error: result.error },
+        { status: 400 }
+      )
+    }
+
+    return NextResponse.json({ success: true })
   } catch (error) {
-    console.error(error);
-    return new NextResponse("invalid", { status: 400 });
+    console.error('Webhook error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Webhook processing failed' },
+      { status: 500 }
+    )
   }
 }
-
-export async function GET() {
-  return NextResponse.json({ ok: true });
-}
-

@@ -31,6 +31,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var src_exports = {};
 __export(src_exports, {
   AuthForm: () => AuthForm,
+  BillingInfo: () => BillingInfo,
   Button: () => Button,
   Card: () => Card,
   CardContent: () => CardContent,
@@ -41,10 +42,12 @@ __export(src_exports, {
   DomainCard: () => DomainCard,
   DomainForm: () => DomainForm,
   Input: () => Input,
+  InvoiceList: () => InvoiceList,
   Label: () => Label,
   OnboardingProgress: () => OnboardingProgress,
   OnboardingStep: () => OnboardingStep,
   PlanBadge: () => PlanBadge,
+  PricingCard: () => PricingCard,
   ProtectedRoute: () => ProtectedRoute,
   Separator: () => Separator,
   SiteForm: () => SiteForm,
@@ -1534,9 +1537,355 @@ function UsageUpgradeCTA({
     ] })
   ] }) }) });
 }
+
+// src/components/pricing-card.tsx
+var import_jsx_runtime20 = require("react/jsx-runtime");
+function PricingCard({
+  plan,
+  currentPlanId,
+  onSelect,
+  loading = false,
+  className
+}) {
+  const isCurrentPlan = currentPlanId === plan.id;
+  const isPopular = plan.is_popular;
+  const isEnterprise = plan.is_enterprise;
+  const formatPrice = (price, interval) => {
+    if (price === 0)
+      return "Free";
+    return `$${price}/${interval}`;
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(Card, { className: cn(
+    "relative w-full",
+    isPopular && "border-blue-500 shadow-lg",
+    isEnterprise && "border-purple-500 shadow-lg",
+    className
+  ), children: [
+    isPopular && /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("div", { className: "absolute -top-3 left-1/2 transform -translate-x-1/2", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("div", { className: "bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium", children: "Most Popular" }) }),
+    isEnterprise && /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("div", { className: "absolute -top-3 left-1/2 transform -translate-x-1/2", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("div", { className: "bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium", children: "Enterprise" }) }),
+    /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(CardHeader, { className: "text-center pb-4", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(CardTitle, { className: "text-2xl font-bold", children: plan.name }),
+      /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(CardDescription, { className: "text-lg", children: plan.description }),
+      /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("div", { className: "mt-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { className: "text-4xl font-bold", children: formatPrice(plan.price, plan.interval) }),
+        plan.price > 0 && /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("span", { className: "text-gray-500 ml-2", children: [
+          "per ",
+          plan.interval
+        ] })
+      ] })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(CardContent, { className: "space-y-6", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("ul", { className: "space-y-3", children: plan.features.map((feature, index) => /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)("li", { className: "flex items-start space-x-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+          "svg",
+          {
+            className: "w-5 h-5 text-green-500 mt-0.5 flex-shrink-0",
+            fill: "currentColor",
+            viewBox: "0 0 20 20",
+            children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+              "path",
+              {
+                fillRule: "evenodd",
+                d: "M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z",
+                clipRule: "evenodd"
+              }
+            )
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)("span", { className: "text-gray-700", children: feature })
+      ] }, index)) }),
+      /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        Button,
+        {
+          className: cn(
+            "w-full",
+            isCurrentPlan ? "bg-gray-500 cursor-not-allowed" : isPopular ? "bg-blue-600 hover:bg-blue-700" : isEnterprise ? "bg-purple-600 hover:bg-purple-700" : "bg-gray-900 hover:bg-gray-800"
+          ),
+          onClick: () => onSelect(plan.id),
+          disabled: isCurrentPlan || loading,
+          children: isCurrentPlan ? "Current Plan" : loading ? "Processing..." : "Get Started"
+        }
+      )
+    ] })
+  ] });
+}
+
+// src/components/billing-info.tsx
+var import_jsx_runtime21 = require("react/jsx-runtime");
+function BillingInfo({
+  subscription,
+  onManageBilling,
+  onUpgrade,
+  onCancel,
+  className
+}) {
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+  };
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "active":
+        return "text-green-600 bg-green-100";
+      case "trialing":
+        return "text-blue-600 bg-blue-100";
+      case "past_due":
+        return "text-yellow-600 bg-yellow-100";
+      case "canceled":
+        return "text-red-600 bg-red-100";
+      default:
+        return "text-gray-600 bg-gray-100";
+    }
+  };
+  const getStatusText = (status) => {
+    switch (status) {
+      case "active":
+        return "Active";
+      case "trialing":
+        return "Trial";
+      case "past_due":
+        return "Past Due";
+      case "canceled":
+        return "Canceled";
+      default:
+        return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+  };
+  const formatPrice = (price, interval) => {
+    if (price === 0)
+      return "Free";
+    return `$${price}/${interval}`;
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(Card, { className: cn("w-full", className), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(CardHeader, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(CardTitle, { children: "Billing Information" }),
+      /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(CardDescription, { children: "Manage your subscription and billing details" })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(CardContent, { className: "space-y-6", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("h3", { className: "font-medium text-gray-900", children: subscription.plan.name }),
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("p", { className: "text-sm text-gray-500", children: formatPrice(subscription.plan.price, subscription.plan.interval) })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("div", { className: cn(
+            "px-2 py-1 rounded-full text-xs font-medium",
+            getStatusColor(subscription.status)
+          ), children: getStatusText(subscription.status) })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "flex justify-between text-sm", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("span", { className: "text-gray-600", children: "Current Period" }),
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("span", { className: "font-medium", children: [
+              formatDate(subscription.current_period_start),
+              " - ",
+              formatDate(subscription.current_period_end)
+            ] })
+          ] }),
+          subscription.cancel_at_period_end && /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "flex justify-between text-sm", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("span", { className: "text-gray-600", children: "Cancellation" }),
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("span", { className: "text-red-600 font-medium", children: [
+              "Ends on ",
+              formatDate(subscription.current_period_end)
+            ] })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "flex flex-col sm:flex-row gap-3", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+          Button,
+          {
+            onClick: onManageBilling,
+            variant: "outline",
+            className: "flex-1",
+            children: "Manage Billing"
+          }
+        ),
+        subscription.status === "active" && !subscription.cancel_at_period_end && /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(import_jsx_runtime21.Fragment, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+            Button,
+            {
+              onClick: onUpgrade,
+              className: "flex-1",
+              children: "Upgrade Plan"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+            Button,
+            {
+              onClick: onCancel,
+              variant: "outline",
+              className: "flex-1 text-red-600 hover:text-red-700 hover:bg-red-50",
+              children: "Cancel Subscription"
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("div", { className: "text-xs text-gray-500 space-y-1", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)("p", { children: [
+          "Subscription ID: ",
+          subscription.id
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)("p", { children: subscription.cancel_at_period_end ? "Your subscription will end at the current period and you will not be charged again." : "You will be charged automatically at the end of each billing period." })
+      ] })
+    ] })
+  ] });
+}
+
+// src/components/invoice-list.tsx
+var import_jsx_runtime22 = require("react/jsx-runtime");
+function InvoiceList({
+  invoices,
+  onDownload,
+  onView,
+  loading = false,
+  className
+}) {
+  const formatDate = (timestamp) => {
+    return new Date(timestamp * 1e3).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    });
+  };
+  const formatAmount = (amount, currency) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency.toUpperCase()
+    }).format(amount / 100);
+  };
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "paid":
+        return "text-green-600 bg-green-100";
+      case "open":
+        return "text-yellow-600 bg-yellow-100";
+      case "void":
+        return "text-gray-600 bg-gray-100";
+      case "uncollectible":
+        return "text-red-600 bg-red-100";
+      default:
+        return "text-gray-600 bg-gray-100";
+    }
+  };
+  const getStatusText = (status) => {
+    switch (status) {
+      case "paid":
+        return "Paid";
+      case "open":
+        return "Open";
+      case "void":
+        return "Void";
+      case "uncollectible":
+        return "Uncollectible";
+      default:
+        return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+  };
+  if (loading) {
+    return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(Card, { className: cn("w-full", className), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(CardHeader, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(CardTitle, { children: "Invoices" }),
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(CardDescription, { children: "Your billing history" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("div", { className: "space-y-4", children: [1, 2, 3].map((i) => /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("div", { className: "animate-pulse", children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("div", { className: "h-16 bg-gray-200 rounded" }) }, i)) }) })
+    ] });
+  }
+  if (invoices.length === 0) {
+    return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(Card, { className: cn("w-full", className), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(CardHeader, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(CardTitle, { children: "Invoices" }),
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(CardDescription, { children: "Your billing history" })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)("div", { className: "text-center py-8", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+          "svg",
+          {
+            className: "mx-auto h-12 w-12 text-gray-400",
+            fill: "none",
+            viewBox: "0 0 24 24",
+            stroke: "currentColor",
+            children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+              "path",
+              {
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                strokeWidth: 2,
+                d: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              }
+            )
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("h3", { className: "mt-2 text-sm font-medium text-gray-900", children: "No invoices yet" }),
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("p", { className: "mt-1 text-sm text-gray-500", children: "Your invoices will appear here once you have a paid subscription." })
+      ] }) })
+    ] });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(Card, { className: cn("w-full", className), children: [
+    /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(CardHeader, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(CardTitle, { children: "Invoices" }),
+      /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(CardDescription, { children: "Your billing history" })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(CardContent, { children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("div", { className: "space-y-4", children: invoices.map((invoice) => /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
+      "div",
+      {
+        className: "flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50",
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)("div", { className: "flex-1 min-w-0", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)("div", { className: "flex items-center space-x-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)("div", { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)("p", { className: "text-sm font-medium text-gray-900", children: [
+                  "Invoice #",
+                  invoice.number
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("p", { className: "text-sm text-gray-500", children: formatDate(invoice.created) })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("div", { className: cn(
+                "px-2 py-1 rounded-full text-xs font-medium",
+                getStatusColor(invoice.status)
+              ), children: getStatusText(invoice.status) })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)("div", { className: "mt-1", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime22.jsx)("p", { className: "text-sm font-medium text-gray-900", children: formatAmount(invoice.amount_paid, invoice.currency) }),
+              invoice.amount_due > 0 && /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)("p", { className: "text-xs text-red-600", children: [
+                formatAmount(invoice.amount_due, invoice.currency),
+                " due"
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)("div", { className: "flex items-center space-x-2", children: [
+            invoice.hosted_invoice_url && /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+              Button,
+              {
+                variant: "outline",
+                size: "sm",
+                onClick: () => onView(invoice.id),
+                children: "View"
+              }
+            ),
+            invoice.invoice_pdf && /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+              Button,
+              {
+                variant: "outline",
+                size: "sm",
+                onClick: () => onDownload(invoice.id),
+                children: "Download"
+              }
+            )
+          ] })
+        ]
+      },
+      invoice.id
+    )) }) })
+  ] });
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AuthForm,
+  BillingInfo,
   Button,
   Card,
   CardContent,
@@ -1547,10 +1896,12 @@ function UsageUpgradeCTA({
   DomainCard,
   DomainForm,
   Input,
+  InvoiceList,
   Label,
   OnboardingProgress,
   OnboardingStep,
   PlanBadge,
+  PricingCard,
   ProtectedRoute,
   Separator,
   SiteForm,

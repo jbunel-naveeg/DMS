@@ -17,6 +17,119 @@ declare class AppError extends Error {
 declare function getStripe(): Stripe;
 declare const STRIPE_WEBHOOK_SECRET: string;
 
+interface CheckoutSession {
+    id: string;
+    url: string;
+    customer_email?: string;
+    customer_id?: string;
+    subscription_id?: string;
+}
+interface CreateCheckoutSessionRequest {
+    plan_id: string;
+    customer_id?: string;
+    customer_email?: string;
+    success_url: string;
+    cancel_url: string;
+    trial_period_days?: number;
+}
+interface CreateCheckoutSessionResponse {
+    success: boolean;
+    session?: CheckoutSession;
+    error?: string;
+}
+declare class StripeCheckoutService {
+    private stripe;
+    constructor(apiKey: string);
+    createCheckoutSession(request: CreateCheckoutSessionRequest): Promise<CreateCheckoutSessionResponse>;
+    retrieveCheckoutSession(sessionId: string): Promise<CheckoutSession | null>;
+    createCustomerPortalSession(customerId: string, returnUrl: string): Promise<{
+        url: string;
+    } | null>;
+}
+declare const stripeCheckoutService: StripeCheckoutService;
+
+interface Subscription {
+    id: string;
+    customer_id: string;
+    status: 'active' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'past_due' | 'trialing' | 'unpaid';
+    current_period_start: number;
+    current_period_end: number;
+    cancel_at_period_end: boolean;
+    canceled_at?: number;
+    trial_start?: number;
+    trial_end?: number;
+    plan_id: string;
+    price_id: string;
+    created: number;
+}
+interface CreateSubscriptionRequest {
+    customer_id: string;
+    price_id: string;
+    trial_period_days?: number;
+}
+interface CreateSubscriptionResponse {
+    success: boolean;
+    subscription?: Subscription;
+    error?: string;
+}
+interface UpdateSubscriptionRequest {
+    subscription_id: string;
+    price_id?: string;
+    cancel_at_period_end?: boolean;
+}
+interface UpdateSubscriptionResponse {
+    success: boolean;
+    subscription?: Subscription;
+    error?: string;
+}
+interface CancelSubscriptionRequest {
+    subscription_id: string;
+    immediately?: boolean;
+}
+interface CancelSubscriptionResponse {
+    success: boolean;
+    subscription?: Subscription;
+    error?: string;
+}
+declare class StripeSubscriptionService {
+    private stripe;
+    constructor(apiKey: string);
+    createSubscription(request: CreateSubscriptionRequest): Promise<CreateSubscriptionResponse>;
+    updateSubscription(request: UpdateSubscriptionRequest): Promise<UpdateSubscriptionResponse>;
+    cancelSubscription(request: CancelSubscriptionRequest): Promise<CancelSubscriptionResponse>;
+    getSubscription(subscriptionId: string): Promise<Subscription | null>;
+    getCustomerSubscriptions(customerId: string): Promise<Subscription[]>;
+    getUpcomingInvoice(customerId: string): Promise<Stripe.Invoice | null>;
+    private mapSubscription;
+}
+declare const stripeSubscriptionService: StripeSubscriptionService;
+
+interface WebhookEvent {
+    id: string;
+    type: string;
+    data: any;
+    created: number;
+}
+interface ProcessWebhookResponse {
+    success: boolean;
+    error?: string;
+}
+declare class StripeWebhookService {
+    private stripe;
+    private supabase;
+    constructor(stripeSecretKey: string, supabaseUrl: string, supabaseServiceKey: string);
+    processWebhook(payload: string | Buffer, signature: string, webhookSecret: string): Promise<ProcessWebhookResponse>;
+    private handleCheckoutSessionCompleted;
+    private handleSubscriptionCreated;
+    private handleSubscriptionUpdated;
+    private handleSubscriptionDeleted;
+    private handlePaymentSucceeded;
+    private handlePaymentFailed;
+    private handleCustomerCreated;
+    private handleCustomerUpdated;
+}
+declare const stripeWebhookService: StripeWebhookService;
+
 interface TenWebSite {
     id: string;
     name: string;
@@ -96,6 +209,8 @@ interface UserPlan {
     current_period_start: string;
     current_period_end: string;
     cancel_at_period_end: boolean;
+    stripe_subscription_id?: string;
+    stripe_customer_id?: string;
     created_at: string;
     updated_at: string;
     plan: Plan;
@@ -173,14 +288,14 @@ declare const briefSchema: z.ZodObject<{
     description: z.ZodString;
     vertical: z.ZodString;
 }, "strip", z.ZodTypeAny, {
+    description: string;
     businessName: string;
     tagline: string;
-    description: string;
     vertical: string;
 }, {
+    description: string;
     businessName: string;
     tagline: string;
-    description: string;
     vertical: string;
 }>;
 declare const designSchema: z.ZodObject<{
@@ -365,4 +480,4 @@ interface UserData {
 }
 declare function useUserData(): UserData;
 
-export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, DesignInput, Domain, OnboardingStatus, PLANS, Plan, PlanLimits, PlanUsage, STRIPE_WEBHOOK_SECRET, TenWebAPI, TenWebDomain, TenWebSite, UsageStats, UseAuthReturn, UserData, UserPlan, Website, authService, briefSchema, calculateUsagePercentage, createAuthClient, createBrowserClient, createServerClient, designSchema, formatBandwidthSize, formatCurrency, formatDate, formatStorageSize, generateSchema, generateSubdomain, getBrowserSupabaseClient, getPlanById, getPlanLimits, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, isFeatureAvailable, tenWebAPI, useAuth, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser, useUserData };
+export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CancelSubscriptionRequest, CancelSubscriptionResponse, CheckoutSession, CreateCheckoutSessionRequest, CreateCheckoutSessionResponse, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, CreateSubscriptionRequest, CreateSubscriptionResponse, DesignInput, Domain, OnboardingStatus, PLANS, Plan, PlanLimits, PlanUsage, ProcessWebhookResponse, STRIPE_WEBHOOK_SECRET, StripeCheckoutService, StripeSubscriptionService, StripeWebhookService, Subscription, TenWebAPI, TenWebDomain, TenWebSite, UpdateSubscriptionRequest, UpdateSubscriptionResponse, UsageStats, UseAuthReturn, UserData, UserPlan, WebhookEvent, Website, authService, briefSchema, calculateUsagePercentage, createAuthClient, createBrowserClient, createServerClient, designSchema, formatBandwidthSize, formatCurrency, formatDate, formatStorageSize, generateSchema, generateSubdomain, getBrowserSupabaseClient, getPlanById, getPlanLimits, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, isFeatureAvailable, stripeCheckoutService, stripeSubscriptionService, stripeWebhookService, tenWebAPI, useAuth, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser, useUserData };
