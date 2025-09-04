@@ -142,10 +142,22 @@ interface TenWebDomain {
     id: string;
     domain: string;
     site_id: string;
-    status: 'active' | 'inactive' | 'pending';
+    status: 'active' | 'inactive' | 'pending' | 'failed' | 'suspended';
     ssl_enabled: boolean;
+    ssl_status: 'pending' | 'active' | 'failed' | 'expired';
     created_at: string;
     updated_at: string;
+    verified_at?: string;
+    expires_at?: string;
+    nameservers?: string[];
+    dns_records?: TenWebDNSRecord[];
+}
+interface TenWebDNSRecord {
+    type: 'A' | 'CNAME' | 'TXT' | 'MX';
+    name: string;
+    value: string;
+    ttl: number;
+    priority?: number;
 }
 interface CreateSiteRequest {
     name: string;
@@ -179,6 +191,28 @@ declare class TenWebAPI {
     getDomains(siteId: string): Promise<TenWebDomain[]>;
     deleteSite(siteId: string): Promise<boolean>;
     deleteDomain(domainId: string): Promise<boolean>;
+    getDomainStatus(domainId: string): Promise<TenWebDomain | null>;
+    updateDomainDNS(domainId: string, records: TenWebDNSRecord[]): Promise<boolean>;
+    verifyDomainOwnership(domain: string): Promise<{
+        success: boolean;
+        verified: boolean;
+        error?: string;
+    }>;
+    getSSLStatus(domainId: string): Promise<{
+        status: string;
+        expires_at?: string;
+        error?: string;
+    }>;
+    requestSSLCertificate(domainId: string): Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    getDomainAnalytics(domainId: string, period?: '7d' | '30d' | '90d'): Promise<{
+        visitors: number;
+        page_views: number;
+        bounce_rate: number;
+        avg_session_duration: number;
+    } | null>;
 }
 declare const tenWebAPI: TenWebAPI;
 declare function getTenWebAPI(): TenWebAPI;
@@ -543,4 +577,4 @@ declare function useFeatureGate(feature: string): {
     limit?: number;
 };
 
-export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CancelSubscriptionRequest, CancelSubscriptionResponse, CheckoutSession, CreateCheckoutSessionRequest, CreateCheckoutSessionResponse, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, CreateSubscriptionRequest, CreateSubscriptionResponse, DesignInput, Domain, EntitlementCheck, EntitlementService, FeatureEntitlement, OnboardingStatus, PLANS, Plan, PlanLimits, PlanUsage, ProcessWebhookResponse, STRIPE_WEBHOOK_SECRET, StripeCheckoutService, StripeSubscriptionService, StripeWebhookService, Subscription, TenWebAPI, TenWebDomain, TenWebSite, UpdateSubscriptionRequest, UpdateSubscriptionResponse, UsageStats, UseAuthReturn, UseEntitlementReturn, UseFeatureGateProps, UserData, UserPlan, WebhookEvent, Website, authService, briefSchema, calculateUsagePercentage, createAuthClient, createBrowserClient, createServerClient, designSchema, entitlementService, formatBandwidthSize, formatCurrency, formatDate, formatStorageSize, generateSchema, generateSubdomain, getBrowserSupabaseClient, getPlanById, getPlanLimits, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, isFeatureAvailable, stripeCheckoutService, stripeSubscriptionService, stripeWebhookService, tenWebAPI, useAuth, useEntitlements, useFeatureGate, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser, useUserData };
+export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CancelSubscriptionRequest, CancelSubscriptionResponse, CheckoutSession, CreateCheckoutSessionRequest, CreateCheckoutSessionResponse, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, CreateSubscriptionRequest, CreateSubscriptionResponse, DesignInput, Domain, EntitlementCheck, EntitlementService, FeatureEntitlement, OnboardingStatus, PLANS, Plan, PlanLimits, PlanUsage, ProcessWebhookResponse, STRIPE_WEBHOOK_SECRET, StripeCheckoutService, StripeSubscriptionService, StripeWebhookService, Subscription, TenWebAPI, TenWebDNSRecord, TenWebDomain, TenWebSite, UpdateSubscriptionRequest, UpdateSubscriptionResponse, UsageStats, UseAuthReturn, UseEntitlementReturn, UseFeatureGateProps, UserData, UserPlan, WebhookEvent, Website, authService, briefSchema, calculateUsagePercentage, createAuthClient, createBrowserClient, createServerClient, designSchema, entitlementService, formatBandwidthSize, formatCurrency, formatDate, formatStorageSize, generateSchema, generateSubdomain, getBrowserSupabaseClient, getPlanById, getPlanLimits, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, isFeatureAvailable, stripeCheckoutService, stripeSubscriptionService, stripeWebhookService, tenWebAPI, useAuth, useEntitlements, useFeatureGate, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser, useUserData };

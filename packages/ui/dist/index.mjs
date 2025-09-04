@@ -1964,6 +1964,359 @@ function FeatureComparison({
     onUpgrade && /* @__PURE__ */ jsx24("div", { className: "text-center pt-4", children: /* @__PURE__ */ jsx24(Button, { onClick: onUpgrade, children: "Upgrade to Access More Features" }) })
   ] });
 }
+
+// src/components/domain-manager.tsx
+import * as React8 from "react";
+import { jsx as jsx25, jsxs as jsxs18 } from "react/jsx-runtime";
+function DomainManager({
+  websiteId,
+  domains,
+  onAddDomain,
+  onRemoveDomain,
+  onVerifyDomain,
+  onRequestSSL,
+  loading = false,
+  className
+}) {
+  const [newDomain, setNewDomain] = React8.useState("");
+  const [isAdding, setIsAdding] = React8.useState(false);
+  const [error, setError] = React8.useState(null);
+  const handleAddDomain = async (e) => {
+    e.preventDefault();
+    if (!newDomain.trim())
+      return;
+    setIsAdding(true);
+    setError(null);
+    try {
+      const result = await onAddDomain(newDomain.trim());
+      if (result.success) {
+        setNewDomain("");
+      } else {
+        setError(result.error || "Failed to add domain");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add domain");
+    } finally {
+      setIsAdding(false);
+    }
+  };
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "active":
+        return "text-green-600 bg-green-100";
+      case "pending":
+        return "text-yellow-600 bg-yellow-100";
+      case "failed":
+      case "suspended":
+        return "text-red-600 bg-red-100";
+      default:
+        return "text-gray-600 bg-gray-100";
+    }
+  };
+  const getStatusText = (status) => {
+    switch (status) {
+      case "active":
+        return "Active";
+      case "pending":
+        return "Pending";
+      case "failed":
+        return "Failed";
+      case "suspended":
+        return "Suspended";
+      default:
+        return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+  };
+  const getSSLStatusColor = (sslStatus) => {
+    switch (sslStatus) {
+      case "active":
+        return "text-green-600 bg-green-100";
+      case "pending":
+        return "text-yellow-600 bg-yellow-100";
+      case "failed":
+      case "expired":
+        return "text-red-600 bg-red-100";
+      default:
+        return "text-gray-600 bg-gray-100";
+    }
+  };
+  const getSSLStatusText = (sslStatus) => {
+    switch (sslStatus) {
+      case "active":
+        return "Active";
+      case "pending":
+        return "Pending";
+      case "failed":
+        return "Failed";
+      case "expired":
+        return "Expired";
+      default:
+        return sslStatus.charAt(0).toUpperCase() + sslStatus.slice(1);
+    }
+  };
+  return /* @__PURE__ */ jsxs18("div", { className: cn("space-y-6", className), children: [
+    /* @__PURE__ */ jsxs18(Card, { children: [
+      /* @__PURE__ */ jsxs18(CardHeader, { children: [
+        /* @__PURE__ */ jsx25(CardTitle, { children: "Add Custom Domain" }),
+        /* @__PURE__ */ jsx25(CardDescription, { children: "Connect your own domain to your website" })
+      ] }),
+      /* @__PURE__ */ jsx25(CardContent, { children: /* @__PURE__ */ jsxs18("form", { onSubmit: handleAddDomain, className: "space-y-4", children: [
+        /* @__PURE__ */ jsxs18("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsx25(Label, { htmlFor: "domain", children: "Domain Name" }),
+          /* @__PURE__ */ jsx25(
+            Input,
+            {
+              id: "domain",
+              type: "text",
+              placeholder: "example.com",
+              value: newDomain,
+              onChange: (e) => setNewDomain(e.target.value),
+              disabled: isAdding || loading
+            }
+          ),
+          /* @__PURE__ */ jsx25("p", { className: "text-sm text-gray-500", children: "Enter your domain name without http:// or https://" })
+        ] }),
+        error && /* @__PURE__ */ jsx25("div", { className: "p-3 bg-red-50 border border-red-200 rounded-md", children: /* @__PURE__ */ jsx25("p", { className: "text-sm text-red-600", children: error }) }),
+        /* @__PURE__ */ jsx25(
+          Button,
+          {
+            type: "submit",
+            disabled: !newDomain.trim() || isAdding || loading,
+            className: "w-full",
+            children: isAdding ? "Adding Domain..." : "Add Domain"
+          }
+        )
+      ] }) })
+    ] }),
+    /* @__PURE__ */ jsxs18(Card, { children: [
+      /* @__PURE__ */ jsxs18(CardHeader, { children: [
+        /* @__PURE__ */ jsx25(CardTitle, { children: "Connected Domains" }),
+        /* @__PURE__ */ jsx25(CardDescription, { children: "Manage your connected domains and SSL certificates" })
+      ] }),
+      /* @__PURE__ */ jsx25(CardContent, { children: domains.length === 0 ? /* @__PURE__ */ jsxs18("div", { className: "text-center py-8", children: [
+        /* @__PURE__ */ jsx25(
+          "svg",
+          {
+            className: "mx-auto h-12 w-12 text-gray-400",
+            fill: "none",
+            viewBox: "0 0 24 24",
+            stroke: "currentColor",
+            children: /* @__PURE__ */ jsx25(
+              "path",
+              {
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                strokeWidth: 2,
+                d: "M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"
+              }
+            )
+          }
+        ),
+        /* @__PURE__ */ jsx25("h3", { className: "mt-2 text-sm font-medium text-gray-900", children: "No domains connected" }),
+        /* @__PURE__ */ jsx25("p", { className: "mt-1 text-sm text-gray-500", children: "Add a custom domain to get started." })
+      ] }) : /* @__PURE__ */ jsx25("div", { className: "space-y-4", children: domains.map((domain) => /* @__PURE__ */ jsxs18("div", { className: "border rounded-lg p-4", children: [
+        /* @__PURE__ */ jsxs18("div", { className: "flex items-center justify-between mb-3", children: [
+          /* @__PURE__ */ jsxs18("div", { children: [
+            /* @__PURE__ */ jsx25("h3", { className: "font-medium text-gray-900", children: domain.domain }),
+            /* @__PURE__ */ jsxs18("div", { className: "flex items-center space-x-2 mt-1", children: [
+              /* @__PURE__ */ jsx25("span", { className: cn(
+                "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium",
+                getStatusColor(domain.status)
+              ), children: getStatusText(domain.status) }),
+              /* @__PURE__ */ jsxs18("span", { className: cn(
+                "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium",
+                getSSLStatusColor(domain.ssl_status)
+              ), children: [
+                "SSL ",
+                getSSLStatusText(domain.ssl_status)
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxs18("div", { className: "flex items-center space-x-2", children: [
+            domain.status === "pending" && /* @__PURE__ */ jsx25(
+              Button,
+              {
+                size: "sm",
+                variant: "outline",
+                onClick: () => onVerifyDomain(domain.id),
+                children: "Verify"
+              }
+            ),
+            domain.ssl_status === "failed" && /* @__PURE__ */ jsx25(
+              Button,
+              {
+                size: "sm",
+                variant: "outline",
+                onClick: () => onRequestSSL(domain.id),
+                children: "Request SSL"
+              }
+            ),
+            /* @__PURE__ */ jsx25(
+              Button,
+              {
+                size: "sm",
+                variant: "outline",
+                onClick: () => onRemoveDomain(domain.id),
+                className: "text-red-600 hover:text-red-700",
+                children: "Remove"
+              }
+            )
+          ] })
+        ] }),
+        domain.nameservers && domain.nameservers.length > 0 && /* @__PURE__ */ jsxs18("div", { className: "mt-3", children: [
+          /* @__PURE__ */ jsx25("h4", { className: "text-sm font-medium text-gray-700 mb-2", children: "Nameservers" }),
+          /* @__PURE__ */ jsx25("div", { className: "space-y-1", children: domain.nameservers.map((ns, index) => /* @__PURE__ */ jsx25("div", { className: "text-sm text-gray-600 font-mono", children: ns }, index)) })
+        ] }),
+        domain.dns_records && domain.dns_records.length > 0 && /* @__PURE__ */ jsxs18("div", { className: "mt-3", children: [
+          /* @__PURE__ */ jsx25("h4", { className: "text-sm font-medium text-gray-700 mb-2", children: "DNS Records" }),
+          /* @__PURE__ */ jsx25("div", { className: "space-y-1", children: domain.dns_records.map((record, index) => /* @__PURE__ */ jsxs18("div", { className: "text-sm text-gray-600 font-mono", children: [
+            record.name,
+            " ",
+            record.type,
+            " ",
+            record.value
+          ] }, index)) })
+        ] })
+      ] }, domain.id)) }) })
+    ] })
+  ] });
+}
+
+// src/components/domain-verification.tsx
+import * as React9 from "react";
+import { jsx as jsx26, jsxs as jsxs19 } from "react/jsx-runtime";
+function DomainVerification({
+  domain,
+  verificationMethod,
+  verificationData,
+  onVerify,
+  onRefresh,
+  loading = false,
+  className
+}) {
+  const [isVerifying, setIsVerifying] = React9.useState(false);
+  const [isRefreshing, setIsRefreshing] = React9.useState(false);
+  const [error, setError] = React9.useState(null);
+  const handleVerify = async () => {
+    setIsVerifying(true);
+    setError(null);
+    try {
+      const result = await onVerify();
+      if (!result.success) {
+        setError(result.error || "Verification failed");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Verification failed");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    setError(null);
+    try {
+      await onRefresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to refresh");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+  return /* @__PURE__ */ jsxs19(Card, { className: cn("w-full", className), children: [
+    /* @__PURE__ */ jsxs19(CardHeader, { children: [
+      /* @__PURE__ */ jsx26(CardTitle, { children: "Verify Domain Ownership" }),
+      /* @__PURE__ */ jsxs19(CardDescription, { children: [
+        "Verify that you own ",
+        domain,
+        " by completing one of the following steps:"
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxs19(CardContent, { className: "space-y-6", children: [
+      verificationMethod === "dns" && verificationData.dns_record && /* @__PURE__ */ jsxs19("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxs19("div", { children: [
+          /* @__PURE__ */ jsx26("h3", { className: "text-lg font-medium text-gray-900 mb-2", children: "DNS Record Verification" }),
+          /* @__PURE__ */ jsx26("p", { className: "text-sm text-gray-600 mb-4", children: "Add the following DNS record to your domain's DNS settings:" })
+        ] }),
+        /* @__PURE__ */ jsx26("div", { className: "bg-gray-50 rounded-lg p-4", children: /* @__PURE__ */ jsxs19("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4 text-sm", children: [
+          /* @__PURE__ */ jsxs19("div", { children: [
+            /* @__PURE__ */ jsx26("span", { className: "font-medium text-gray-700", children: "Type:" }),
+            /* @__PURE__ */ jsx26("div", { className: "mt-1 font-mono text-gray-900", children: verificationData.dns_record.type })
+          ] }),
+          /* @__PURE__ */ jsxs19("div", { children: [
+            /* @__PURE__ */ jsx26("span", { className: "font-medium text-gray-700", children: "Name:" }),
+            /* @__PURE__ */ jsx26("div", { className: "mt-1 font-mono text-gray-900", children: verificationData.dns_record.name })
+          ] }),
+          /* @__PURE__ */ jsxs19("div", { children: [
+            /* @__PURE__ */ jsx26("span", { className: "font-medium text-gray-700", children: "Value:" }),
+            /* @__PURE__ */ jsx26("div", { className: "mt-1 font-mono text-gray-900 break-all", children: verificationData.dns_record.value })
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsx26("div", { className: "bg-blue-50 border border-blue-200 rounded-lg p-4", children: /* @__PURE__ */ jsxs19("div", { className: "flex", children: [
+          /* @__PURE__ */ jsx26("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsx26("svg", { className: "h-5 w-5 text-blue-400", viewBox: "0 0 20 20", fill: "currentColor", children: /* @__PURE__ */ jsx26("path", { fillRule: "evenodd", d: "M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z", clipRule: "evenodd" }) }) }),
+          /* @__PURE__ */ jsxs19("div", { className: "ml-3", children: [
+            /* @__PURE__ */ jsx26("h3", { className: "text-sm font-medium text-blue-800", children: "DNS Propagation" }),
+            /* @__PURE__ */ jsx26("div", { className: "mt-2 text-sm text-blue-700", children: /* @__PURE__ */ jsx26("p", { children: "DNS changes can take up to 24 hours to propagate. If verification fails, wait a few minutes and try again." }) })
+          ] })
+        ] }) })
+      ] }),
+      verificationMethod === "file" && verificationData.file_path && /* @__PURE__ */ jsxs19("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxs19("div", { children: [
+          /* @__PURE__ */ jsx26("h3", { className: "text-lg font-medium text-gray-900 mb-2", children: "File Upload Verification" }),
+          /* @__PURE__ */ jsx26("p", { className: "text-sm text-gray-600 mb-4", children: "Upload a file to your website's root directory:" })
+        ] }),
+        /* @__PURE__ */ jsx26("div", { className: "bg-gray-50 rounded-lg p-4", children: /* @__PURE__ */ jsxs19("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxs19("div", { children: [
+            /* @__PURE__ */ jsx26("span", { className: "font-medium text-gray-700", children: "File Path:" }),
+            /* @__PURE__ */ jsx26("div", { className: "mt-1 font-mono text-gray-900", children: verificationData.file_path })
+          ] }),
+          /* @__PURE__ */ jsxs19("div", { children: [
+            /* @__PURE__ */ jsx26("span", { className: "font-medium text-gray-700", children: "File Content:" }),
+            /* @__PURE__ */ jsx26("div", { className: "mt-1 font-mono text-gray-900 bg-white p-2 rounded border", children: verificationData.file_content })
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsx26("div", { className: "bg-blue-50 border border-blue-200 rounded-lg p-4", children: /* @__PURE__ */ jsxs19("div", { className: "flex", children: [
+          /* @__PURE__ */ jsx26("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsx26("svg", { className: "h-5 w-5 text-blue-400", viewBox: "0 0 20 20", fill: "currentColor", children: /* @__PURE__ */ jsx26("path", { fillRule: "evenodd", d: "M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z", clipRule: "evenodd" }) }) }),
+          /* @__PURE__ */ jsxs19("div", { className: "ml-3", children: [
+            /* @__PURE__ */ jsx26("h3", { className: "text-sm font-medium text-blue-800", children: "File Upload Instructions" }),
+            /* @__PURE__ */ jsx26("div", { className: "mt-2 text-sm text-blue-700", children: /* @__PURE__ */ jsxs19("p", { children: [
+              "Upload the file to your website's root directory. The file should be accessible at ",
+              domain,
+              "/",
+              verificationData.file_path
+            ] }) })
+          ] })
+        ] }) })
+      ] }),
+      error && /* @__PURE__ */ jsx26("div", { className: "p-4 bg-red-50 border border-red-200 rounded-lg", children: /* @__PURE__ */ jsxs19("div", { className: "flex", children: [
+        /* @__PURE__ */ jsx26("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsx26("svg", { className: "h-5 w-5 text-red-400", viewBox: "0 0 20 20", fill: "currentColor", children: /* @__PURE__ */ jsx26("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z", clipRule: "evenodd" }) }) }),
+        /* @__PURE__ */ jsxs19("div", { className: "ml-3", children: [
+          /* @__PURE__ */ jsx26("h3", { className: "text-sm font-medium text-red-800", children: "Verification Failed" }),
+          /* @__PURE__ */ jsx26("div", { className: "mt-2 text-sm text-red-700", children: error })
+        ] })
+      ] }) }),
+      /* @__PURE__ */ jsxs19("div", { className: "flex items-center space-x-3", children: [
+        /* @__PURE__ */ jsx26(
+          Button,
+          {
+            onClick: handleVerify,
+            disabled: isVerifying || loading,
+            className: "flex-1",
+            children: isVerifying ? "Verifying..." : "Verify Domain"
+          }
+        ),
+        /* @__PURE__ */ jsx26(
+          Button,
+          {
+            variant: "outline",
+            onClick: handleRefresh,
+            disabled: isRefreshing || loading,
+            children: isRefreshing ? "Refreshing..." : "Refresh"
+          }
+        )
+      ] })
+    ] })
+  ] });
+}
 export {
   AuthForm,
   BillingInfo,
@@ -1976,6 +2329,8 @@ export {
   CardTitle,
   DomainCard,
   DomainForm,
+  DomainManager,
+  DomainVerification,
   EntitlementCard,
   FeatureBadge,
   FeatureComparison,

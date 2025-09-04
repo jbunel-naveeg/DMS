@@ -13,10 +13,23 @@ export interface TenWebDomain {
   id: string
   domain: string
   site_id: string
-  status: 'active' | 'inactive' | 'pending'
+  status: 'active' | 'inactive' | 'pending' | 'failed' | 'suspended'
   ssl_enabled: boolean
+  ssl_status: 'pending' | 'active' | 'failed' | 'expired'
   created_at: string
   updated_at: string
+  verified_at?: string
+  expires_at?: string
+  nameservers?: string[]
+  dns_records?: TenWebDNSRecord[]
+}
+
+export interface TenWebDNSRecord {
+  type: 'A' | 'CNAME' | 'TXT' | 'MX'
+  name: string
+  value: string
+  ttl: number
+  priority?: number
 }
 
 export interface CreateSiteRequest {
@@ -132,6 +145,7 @@ export class TenWebAPI {
         site_id: request.site_id,
         status: 'pending',
         ssl_enabled: false,
+        ssl_status: 'pending',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }
@@ -181,6 +195,136 @@ export class TenWebAPI {
     } catch (error) {
       console.error('Error deleting domain:', error)
       return false
+    }
+  }
+
+  // Get domain status and details
+  async getDomainStatus(domainId: string): Promise<TenWebDomain | null> {
+    try {
+      // Simulate API call - replace with actual implementation
+      const mockDomain: TenWebDomain = {
+        id: domainId,
+        domain: 'example.com',
+        site_id: `site_${Date.now()}`,
+        status: 'active',
+        ssl_enabled: true,
+        ssl_status: 'active',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        verified_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+        nameservers: ['ns1.10web.io', 'ns2.10web.io'],
+        dns_records: [
+          {
+            type: 'A',
+            name: '@',
+            value: '192.168.1.1',
+            ttl: 3600
+          },
+          {
+            type: 'CNAME',
+            name: 'www',
+            value: 'example.com',
+            ttl: 3600
+          }
+        ]
+      }
+      return mockDomain
+    } catch (error) {
+      console.error('Error fetching domain status:', error)
+      return null
+    }
+  }
+
+  // Update domain DNS records
+  async updateDomainDNS(domainId: string, records: TenWebDNSRecord[]): Promise<boolean> {
+    try {
+      // Simulate API call - replace with actual implementation
+      console.log('Updating DNS records for domain:', domainId, records)
+      return true
+    } catch (error) {
+      console.error('Error updating domain DNS:', error)
+      return false
+    }
+  }
+
+  // Verify domain ownership
+  async verifyDomainOwnership(domain: string): Promise<{ success: boolean; verified: boolean; error?: string }> {
+    try {
+      // Simulate API call - replace with actual implementation
+      console.log('Verifying domain ownership:', domain)
+      
+      // Mock verification - in real implementation, this would check DNS records
+      const verified = Math.random() > 0.3 // 70% success rate for demo
+      
+      return {
+        success: true,
+        verified
+      }
+    } catch (error) {
+      return {
+        success: false,
+        verified: false,
+        error: error instanceof Error ? error.message : 'Failed to verify domain ownership'
+      }
+    }
+  }
+
+  // Get SSL certificate status
+  async getSSLStatus(domainId: string): Promise<{ status: string; expires_at?: string; error?: string }> {
+    try {
+      // Simulate API call - replace with actual implementation
+      console.log('Getting SSL status for domain:', domainId)
+      
+      return {
+        status: 'active',
+        expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+      }
+    } catch (error) {
+      return {
+        status: 'failed',
+        error: error instanceof Error ? error.message : 'Failed to get SSL status'
+      }
+    }
+  }
+
+  // Request SSL certificate
+  async requestSSLCertificate(domainId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      // Simulate API call - replace with actual implementation
+      console.log('Requesting SSL certificate for domain:', domainId)
+      
+      return {
+        success: true
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to request SSL certificate'
+      }
+    }
+  }
+
+  // Get domain analytics
+  async getDomainAnalytics(domainId: string, period: '7d' | '30d' | '90d' = '30d'): Promise<{
+    visitors: number
+    page_views: number
+    bounce_rate: number
+    avg_session_duration: number
+  } | null> {
+    try {
+      // Simulate API call - replace with actual implementation
+      console.log('Getting domain analytics for:', domainId, period)
+      
+      return {
+        visitors: Math.floor(Math.random() * 10000),
+        page_views: Math.floor(Math.random() * 50000),
+        bounce_rate: Math.random() * 0.5 + 0.2, // 20-70%
+        avg_session_duration: Math.random() * 300 + 60 // 1-6 minutes
+      }
+    } catch (error) {
+      console.error('Error fetching domain analytics:', error)
+      return null
     }
   }
 }

@@ -337,4 +337,65 @@ interface FeatureComparisonProps {
 }
 declare function FeatureComparison({ features, onUpgrade, className }: FeatureComparisonProps): react_jsx_runtime.JSX.Element;
 
-export { AuthForm, AuthFormData, AuthFormProps, BillingInfo, BillingInfoProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, DomainCard, DomainCardProps, DomainForm, DomainFormData, DomainFormProps, EntitlementCard, EntitlementCardProps, FeatureBadge, FeatureBadgeProps, FeatureComparison, FeatureComparisonProps, FeatureGate, FeatureGateProps, FeatureTooltip, FeatureTooltipProps, Input, InputProps, Invoice, InvoiceList, InvoiceListProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, PlanBadge, PlanBadgeProps, PricingCard, PricingCardProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UpgradeCTA, UpgradeCTAProps, UsageBar, UsageBarProps, UsageUpgradeCTA, UsageUpgradeCTAProps, UserMenu, UserMenuProps, WebsiteCard, WebsiteCardProps, buttonVariants, cn };
+interface DomainManagerProps {
+    websiteId: string;
+    domains: Array<{
+        id: string;
+        domain: string;
+        status: 'active' | 'inactive' | 'pending' | 'failed' | 'suspended';
+        ssl_status: 'pending' | 'active' | 'failed' | 'expired';
+        ssl_enabled: boolean;
+        verified_at?: string;
+        expires_at?: string;
+        nameservers?: string[];
+        dns_records?: Array<{
+            type: string;
+            name: string;
+            value: string;
+            ttl: number;
+        }>;
+    }>;
+    onAddDomain: (domain: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onRemoveDomain: (domainId: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onVerifyDomain: (domainId: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onRequestSSL: (domainId: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    loading?: boolean;
+    className?: string;
+}
+declare function DomainManager({ websiteId, domains, onAddDomain, onRemoveDomain, onVerifyDomain, onRequestSSL, loading, className }: DomainManagerProps): react_jsx_runtime.JSX.Element;
+
+interface DomainVerificationProps {
+    domain: string;
+    verificationMethod: 'dns' | 'file';
+    verificationData: {
+        dns_record?: {
+            type: string;
+            name: string;
+            value: string;
+        };
+        file_path?: string;
+        file_content?: string;
+    };
+    onVerify: () => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onRefresh: () => Promise<void>;
+    loading?: boolean;
+    className?: string;
+}
+declare function DomainVerification({ domain, verificationMethod, verificationData, onVerify, onRefresh, loading, className }: DomainVerificationProps): react_jsx_runtime.JSX.Element;
+
+export { AuthForm, AuthFormData, AuthFormProps, BillingInfo, BillingInfoProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, DomainCard, DomainCardProps, DomainForm, DomainFormData, DomainFormProps, DomainManager, DomainManagerProps, DomainVerification, DomainVerificationProps, EntitlementCard, EntitlementCardProps, FeatureBadge, FeatureBadgeProps, FeatureComparison, FeatureComparisonProps, FeatureGate, FeatureGateProps, FeatureTooltip, FeatureTooltipProps, Input, InputProps, Invoice, InvoiceList, InvoiceListProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, PlanBadge, PlanBadgeProps, PricingCard, PricingCardProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UpgradeCTA, UpgradeCTAProps, UsageBar, UsageBarProps, UsageUpgradeCTA, UsageUpgradeCTAProps, UserMenu, UserMenuProps, WebsiteCard, WebsiteCardProps, buttonVariants, cn };

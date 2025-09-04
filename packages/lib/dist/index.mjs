@@ -3642,6 +3642,7 @@ var TenWebAPI = class {
         site_id: request.site_id,
         status: "pending",
         ssl_enabled: false,
+        ssl_status: "pending",
         created_at: (/* @__PURE__ */ new Date()).toISOString(),
         updated_at: (/* @__PURE__ */ new Date()).toISOString()
       };
@@ -3681,6 +3682,115 @@ var TenWebAPI = class {
     } catch (error) {
       console.error("Error deleting domain:", error);
       return false;
+    }
+  }
+  // Get domain status and details
+  async getDomainStatus(domainId) {
+    try {
+      const mockDomain = {
+        id: domainId,
+        domain: "example.com",
+        site_id: `site_${Date.now()}`,
+        status: "active",
+        ssl_enabled: true,
+        ssl_status: "active",
+        created_at: (/* @__PURE__ */ new Date()).toISOString(),
+        updated_at: (/* @__PURE__ */ new Date()).toISOString(),
+        verified_at: (/* @__PURE__ */ new Date()).toISOString(),
+        expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1e3).toISOString(),
+        nameservers: ["ns1.10web.io", "ns2.10web.io"],
+        dns_records: [
+          {
+            type: "A",
+            name: "@",
+            value: "192.168.1.1",
+            ttl: 3600
+          },
+          {
+            type: "CNAME",
+            name: "www",
+            value: "example.com",
+            ttl: 3600
+          }
+        ]
+      };
+      return mockDomain;
+    } catch (error) {
+      console.error("Error fetching domain status:", error);
+      return null;
+    }
+  }
+  // Update domain DNS records
+  async updateDomainDNS(domainId, records) {
+    try {
+      console.log("Updating DNS records for domain:", domainId, records);
+      return true;
+    } catch (error) {
+      console.error("Error updating domain DNS:", error);
+      return false;
+    }
+  }
+  // Verify domain ownership
+  async verifyDomainOwnership(domain) {
+    try {
+      console.log("Verifying domain ownership:", domain);
+      const verified = Math.random() > 0.3;
+      return {
+        success: true,
+        verified
+      };
+    } catch (error) {
+      return {
+        success: false,
+        verified: false,
+        error: error instanceof Error ? error.message : "Failed to verify domain ownership"
+      };
+    }
+  }
+  // Get SSL certificate status
+  async getSSLStatus(domainId) {
+    try {
+      console.log("Getting SSL status for domain:", domainId);
+      return {
+        status: "active",
+        expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1e3).toISOString()
+      };
+    } catch (error) {
+      return {
+        status: "failed",
+        error: error instanceof Error ? error.message : "Failed to get SSL status"
+      };
+    }
+  }
+  // Request SSL certificate
+  async requestSSLCertificate(domainId) {
+    try {
+      console.log("Requesting SSL certificate for domain:", domainId);
+      return {
+        success: true
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to request SSL certificate"
+      };
+    }
+  }
+  // Get domain analytics
+  async getDomainAnalytics(domainId, period = "30d") {
+    try {
+      console.log("Getting domain analytics for:", domainId, period);
+      return {
+        visitors: Math.floor(Math.random() * 1e4),
+        page_views: Math.floor(Math.random() * 5e4),
+        bounce_rate: Math.random() * 0.5 + 0.2,
+        // 20-70%
+        avg_session_duration: Math.random() * 300 + 60
+        // 1-6 minutes
+      };
+    } catch (error) {
+      console.error("Error fetching domain analytics:", error);
+      return null;
     }
   }
 };
