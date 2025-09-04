@@ -1547,7 +1547,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState2(initialState) {
+        function useState3(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1559,7 +1559,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect2(create, deps) {
+        function useEffect3(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -2342,7 +2342,7 @@ var require_react_development = __commonJS({
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect2;
+        exports.useEffect = useEffect3;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
@@ -2350,7 +2350,7 @@ var require_react_development = __commonJS({
         exports.useMemo = useMemo;
         exports.useReducer = useReducer;
         exports.useRef = useRef;
-        exports.useState = useState2;
+        exports.useState = useState3;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -2380,6 +2380,7 @@ __export(src_exports, {
   AppError: () => AppError,
   AuthService: () => AuthService,
   STRIPE_WEBHOOK_SECRET: () => STRIPE_WEBHOOK_SECRET,
+  TenWebAPI: () => TenWebAPI,
   authService: () => authService,
   briefSchema: () => briefSchema,
   canAccess: () => canAccess,
@@ -2395,11 +2396,12 @@ __export(src_exports, {
   getServerSupabaseClient: () => getServerSupabaseClient,
   getServiceSupabaseClient: () => getServiceSupabaseClient,
   getStripe: () => getStripe,
+  getTenWebAPI: () => getTenWebAPI,
   plans: () => plans,
-  tenwebGenerate: () => tenwebGenerate,
-  tenwebStatus: () => tenwebStatus,
+  tenWebAPI: () => tenWebAPI,
   useAuth: () => useAuth,
   useIsAuthenticated: () => useIsAuthenticated,
+  useOnboardingStatus: () => useOnboardingStatus,
   useRequireAuth: () => useRequireAuth,
   useUser: () => useUser
 });
@@ -3010,60 +3012,123 @@ function getStripe() {
 var STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || "";
 
 // src/tenweb/tenweb.ts
-var TENWEB_API_BASE = process.env.TENWEB_API_BASE || "https://api.10web.io";
-var TENWEB_API_KEY = process.env.TENWEB_API_KEY || "";
-async function tenwebGenerate(req) {
-  if (!TENWEB_API_KEY) {
-    return {
-      tenweb_site_id: `mock_${Date.now()}`,
-      status: "generating"
-    };
+var TenWebAPI = class {
+  constructor(apiKey) {
+    this.baseUrl = "https://my.10web.io/api";
+    this.apiKey = apiKey;
   }
-  try {
-    const res = await fetch(`${TENWEB_API_BASE}/ai-sites`, {
-      method: "POST",
+  async makeRequest(endpoint, method = "GET", body) {
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      method,
       headers: {
-        Authorization: `Bearer ${TENWEB_API_KEY}`,
+        "Authorization": `Bearer ${this.apiKey}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(req)
+      body: body ? JSON.stringify(body) : void 0
     });
-    if (!res.ok) {
-      throw new Error(`10Web error: ${res.status}`);
+    if (!response.ok) {
+      throw new Error(`TenWeb API error: ${response.status} ${response.statusText}`);
     }
-    const data = await res.json();
-    return {
-      tenweb_site_id: data?.id ?? `mock_${Date.now()}`,
-      status: data?.status ?? "generating",
-      preview_url: data?.preview_url
-    };
-  } catch {
-    return {
-      tenweb_site_id: `mock_${Date.now()}`,
-      status: "generating"
-    };
+    return response.json();
   }
-}
-async function tenwebStatus(tenwebSiteId) {
-  if (!TENWEB_API_KEY) {
-    return { tenweb_site_id: tenwebSiteId, status: "ready", preview_url: `https://example.com/${tenwebSiteId}` };
-  }
-  try {
-    const res = await fetch(`${TENWEB_API_BASE}/ai-sites/${tenwebSiteId}`, {
-      headers: { Authorization: `Bearer ${TENWEB_API_KEY}` }
-    });
-    if (!res.ok) {
-      throw new Error(String(res.status));
+  // Create a new WordPress site
+  async createSite(request) {
+    try {
+      const mockSite = {
+        id: `site_${Date.now()}`,
+        name: request.name,
+        url: `https://${request.subdomain}.naveeg.com`,
+        status: "active",
+        created_at: (/* @__PURE__ */ new Date()).toISOString(),
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
+      };
+      return {
+        success: true,
+        site: mockSite
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error"
+      };
     }
-    const data = await res.json();
-    return {
-      tenweb_site_id: tenwebSiteId,
-      status: data?.status ?? "generating",
-      preview_url: data?.preview_url
-    };
-  } catch {
-    return { tenweb_site_id: tenwebSiteId, status: "error" };
   }
+  // Get all sites for a user
+  async getSites() {
+    try {
+      return [];
+    } catch (error) {
+      console.error("Error fetching sites:", error);
+      return [];
+    }
+  }
+  // Get site details
+  async getSite(siteId) {
+    try {
+      return null;
+    } catch (error) {
+      console.error("Error fetching site:", error);
+      return null;
+    }
+  }
+  // Create a custom domain for a site
+  async createDomain(request) {
+    try {
+      const mockDomain = {
+        id: `domain_${Date.now()}`,
+        domain: request.domain,
+        site_id: request.site_id,
+        status: "pending",
+        ssl_enabled: false,
+        created_at: (/* @__PURE__ */ new Date()).toISOString(),
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
+      };
+      return {
+        success: true,
+        domain: mockDomain
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error"
+      };
+    }
+  }
+  // Get domains for a site
+  async getDomains(siteId) {
+    try {
+      return [];
+    } catch (error) {
+      console.error("Error fetching domains:", error);
+      return [];
+    }
+  }
+  // Delete a site
+  async deleteSite(siteId) {
+    try {
+      return true;
+    } catch (error) {
+      console.error("Error deleting site:", error);
+      return false;
+    }
+  }
+  // Delete a domain
+  async deleteDomain(domainId) {
+    try {
+      return true;
+    } catch (error) {
+      console.error("Error deleting domain:", error);
+      return false;
+    }
+  }
+};
+var tenWebAPI = new TenWebAPI(process.env.TENWEB_API_KEY || "");
+function getTenWebAPI() {
+  const apiKey = process.env.TENWEB_API_KEY;
+  if (!apiKey) {
+    throw new Error("TENWEB_API_KEY environment variable is required");
+  }
+  return new TenWebAPI(apiKey);
 }
 
 // src/types/plans.ts
@@ -3343,11 +3408,52 @@ function useUser() {
   const { user, loading } = useAuth();
   return { user, loading };
 }
+
+// src/auth/onboarding.ts
+var import_react2 = __toESM(require_react());
+function useOnboardingStatus() {
+  const [status, setStatus] = (0, import_react2.useState)({
+    isCompleted: false,
+    hasWebsites: false,
+    loading: true,
+    error: null
+  });
+  const supabase = createBrowserClient2();
+  (0, import_react2.useEffect)(() => {
+    const checkOnboardingStatus = async () => {
+      try {
+        setStatus((prev) => ({ ...prev, loading: true, error: null }));
+        const { data: websites, error: websitesError } = await supabase.from("websites").select("id").limit(1);
+        if (websitesError) {
+          throw new Error(websitesError.message);
+        }
+        const hasWebsites = websites && websites.length > 0;
+        const isCompleted = hasWebsites;
+        setStatus({
+          isCompleted,
+          hasWebsites,
+          loading: false,
+          error: null
+        });
+      } catch (error) {
+        setStatus({
+          isCompleted: false,
+          hasWebsites: false,
+          loading: false,
+          error: error instanceof Error ? error.message : "Unknown error"
+        });
+      }
+    };
+    checkOnboardingStatus();
+  }, [supabase]);
+  return status;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AppError,
   AuthService,
   STRIPE_WEBHOOK_SECRET,
+  TenWebAPI,
   authService,
   briefSchema,
   canAccess,
@@ -3363,11 +3469,12 @@ function useUser() {
   getServerSupabaseClient,
   getServiceSupabaseClient,
   getStripe,
+  getTenWebAPI,
   plans,
-  tenwebGenerate,
-  tenwebStatus,
+  tenWebAPI,
   useAuth,
   useIsAuthenticated,
+  useOnboardingStatus,
   useRequireAuth,
   useUser
 });

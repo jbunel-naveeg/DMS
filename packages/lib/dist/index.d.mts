@@ -17,21 +17,58 @@ declare class AppError extends Error {
 declare function getStripe(): Stripe;
 declare const STRIPE_WEBHOOK_SECRET: string;
 
-type TenWebStatus = "generating" | "ready" | "error";
-type GenerateRequest = {
-    businessName: string;
-    description: string;
-    vertical?: string;
-    colors?: Record<string, string>;
-    fonts?: Record<string, string>;
-};
-type GenerateResponse = {
-    tenweb_site_id: string;
-    status: TenWebStatus;
-    preview_url?: string;
-};
-declare function tenwebGenerate(req: GenerateRequest): Promise<GenerateResponse>;
-declare function tenwebStatus(tenwebSiteId: string): Promise<GenerateResponse>;
+interface TenWebSite {
+    id: string;
+    name: string;
+    url: string;
+    status: 'active' | 'inactive' | 'pending';
+    created_at: string;
+    updated_at: string;
+}
+interface TenWebDomain {
+    id: string;
+    domain: string;
+    site_id: string;
+    status: 'active' | 'inactive' | 'pending';
+    ssl_enabled: boolean;
+    created_at: string;
+    updated_at: string;
+}
+interface CreateSiteRequest {
+    name: string;
+    subdomain: string;
+    template?: string;
+    description?: string;
+}
+interface CreateSiteResponse {
+    success: boolean;
+    site?: TenWebSite;
+    error?: string;
+}
+interface CreateDomainRequest {
+    site_id: string;
+    domain: string;
+}
+interface CreateDomainResponse {
+    success: boolean;
+    domain?: TenWebDomain;
+    error?: string;
+}
+declare class TenWebAPI {
+    private apiKey;
+    private baseUrl;
+    constructor(apiKey: string);
+    private makeRequest;
+    createSite(request: CreateSiteRequest): Promise<CreateSiteResponse>;
+    getSites(): Promise<TenWebSite[]>;
+    getSite(siteId: string): Promise<TenWebSite | null>;
+    createDomain(request: CreateDomainRequest): Promise<CreateDomainResponse>;
+    getDomains(siteId: string): Promise<TenWebDomain[]>;
+    deleteSite(siteId: string): Promise<boolean>;
+    deleteDomain(domainId: string): Promise<boolean>;
+}
+declare const tenWebAPI: TenWebAPI;
+declare function getTenWebAPI(): TenWebAPI;
 
 type Plan = "starter" | "pro" | "custom";
 declare function canAccess(feature: string, plan: Plan): boolean;
@@ -221,4 +258,12 @@ declare function useUser(): {
     loading: boolean;
 };
 
-export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, DesignInput, GenerateRequest, GenerateResponse, Plan, STRIPE_WEBHOOK_SECRET, UseAuthReturn, authService, briefSchema, canAccess, createAuthClient, createBrowserClient, createServerClient, designSchema, formatCurrency, formatDate, generateSchema, generateSubdomain, getBrowserSupabaseClient, getServerSupabaseClient, getServiceSupabaseClient, getStripe, plans, tenwebGenerate, tenwebStatus, useAuth, useIsAuthenticated, useRequireAuth, useUser };
+interface OnboardingStatus {
+    isCompleted: boolean;
+    hasWebsites: boolean;
+    loading: boolean;
+    error: string | null;
+}
+declare function useOnboardingStatus(): OnboardingStatus;
+
+export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, DesignInput, OnboardingStatus, Plan, STRIPE_WEBHOOK_SECRET, TenWebAPI, TenWebDomain, TenWebSite, UseAuthReturn, authService, briefSchema, canAccess, createAuthClient, createBrowserClient, createServerClient, designSchema, formatCurrency, formatDate, generateSchema, generateSubdomain, getBrowserSupabaseClient, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, plans, tenWebAPI, useAuth, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser };

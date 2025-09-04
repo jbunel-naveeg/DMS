@@ -94,4 +94,57 @@ interface UserMenuProps {
 }
 declare function UserMenu({ user, onSignOut, onProfileClick, onSettingsClick, className }: UserMenuProps): react_jsx_runtime.JSX.Element;
 
-export { AuthForm, AuthFormData, AuthFormProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Input, InputProps, Label, ProtectedRoute, ProtectedRouteProps, Separator, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UserMenu, UserMenuProps, buttonVariants, cn };
+interface OnboardingStepProps {
+    step: number;
+    totalSteps: number;
+    title: string;
+    description?: string;
+    children: React.ReactNode;
+    isCompleted?: boolean;
+    isActive?: boolean;
+    className?: string;
+}
+declare function OnboardingStep({ step, totalSteps, title, description, children, isCompleted, isActive, className }: OnboardingStepProps): react_jsx_runtime.JSX.Element;
+
+interface SiteFormData {
+    name: string;
+    subdomain: string;
+    template: string;
+    description?: string;
+}
+interface SiteFormProps {
+    onSubmit: (data: SiteFormData) => Promise<{
+        error?: string;
+    }>;
+    loading?: boolean;
+    className?: string;
+}
+declare function SiteForm({ onSubmit, loading, className }: SiteFormProps): react_jsx_runtime.JSX.Element;
+
+interface DomainFormData {
+    domain: string;
+}
+interface DomainFormProps {
+    siteUrl: string;
+    onSubmit: (data: DomainFormData) => Promise<{
+        error?: string;
+    }>;
+    onSkip: () => void;
+    loading?: boolean;
+    className?: string;
+}
+declare function DomainForm({ siteUrl, onSubmit, onSkip, loading, className }: DomainFormProps): react_jsx_runtime.JSX.Element;
+
+interface OnboardingProgressProps {
+    currentStep: number;
+    totalSteps: number;
+    steps: {
+        id: string;
+        title: string;
+        completed: boolean;
+    }[];
+    className?: string;
+}
+declare function OnboardingProgress({ currentStep, totalSteps, steps, className }: OnboardingProgressProps): react_jsx_runtime.JSX.Element;
+
+export { AuthForm, AuthFormData, AuthFormProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, DomainForm, DomainFormData, DomainFormProps, Input, InputProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UserMenu, UserMenuProps, buttonVariants, cn };

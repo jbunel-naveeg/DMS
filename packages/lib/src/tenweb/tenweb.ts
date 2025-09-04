@@ -1,78 +1,198 @@
-type TenWebStatus = "generating" | "ready" | "error";
+import { createClient } from '@supabase/supabase-js'
 
-export type GenerateRequest = {
-  businessName: string;
-  description: string;
-  vertical?: string;
-  colors?: Record<string, string>;
-  fonts?: Record<string, string>;
-};
+export interface TenWebSite {
+  id: string
+  name: string
+  url: string
+  status: 'active' | 'inactive' | 'pending'
+  created_at: string
+  updated_at: string
+}
 
-export type GenerateResponse = {
-  tenweb_site_id: string;
-  status: TenWebStatus;
-  preview_url?: string;
-};
+export interface TenWebDomain {
+  id: string
+  domain: string
+  site_id: string
+  status: 'active' | 'inactive' | 'pending'
+  ssl_enabled: boolean
+  created_at: string
+  updated_at: string
+}
 
-const TENWEB_API_BASE = process.env.TENWEB_API_BASE || "https://api.10web.io";
-const TENWEB_API_KEY = process.env.TENWEB_API_KEY || "";
+export interface CreateSiteRequest {
+  name: string
+  subdomain: string
+  template?: string
+  description?: string
+}
 
-export async function tenwebGenerate(req: GenerateRequest): Promise<GenerateResponse> {
-  // Placeholder: integrate typed client generated from openapi.yaml later.
-  // For MVP, simulate the response and normalize statuses.
-  if (!TENWEB_API_KEY) {
-    // Allow running in local dev by mocking
-    return {
-      tenweb_site_id: `mock_${Date.now()}`,
-      status: "generating",
-    };
+export interface CreateSiteResponse {
+  success: boolean
+  site?: TenWebSite
+  error?: string
+}
+
+export interface CreateDomainRequest {
+  site_id: string
+  domain: string
+}
+
+export interface CreateDomainResponse {
+  success: boolean
+  domain?: TenWebDomain
+  error?: string
+}
+
+export class TenWebAPI {
+  private apiKey: string
+  private baseUrl = 'https://my.10web.io/api'
+
+  constructor(apiKey: string) {
+    this.apiKey = apiKey
   }
-  // Example fetch scaffold (endpoint placeholder)
-  try {
-    const res = await fetch(`${TENWEB_API_BASE}/ai-sites`, {
-      method: "POST",
+
+  private async makeRequest<T>(
+    endpoint: string,
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
+    body?: any
+  ): Promise<T> {
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      method,
       headers: {
-        Authorization: `Bearer ${TENWEB_API_KEY}`,
-        "Content-Type": "application/json",
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(req),
-    });
-    if (!res.ok) {
-      throw new Error(`10Web error: ${res.status}`);
+      body: body ? JSON.stringify(body) : undefined,
+    })
+
+    if (!response.ok) {
+      throw new Error(`TenWeb API error: ${response.status} ${response.statusText}`)
     }
-    const data = (await res.json()) as { id?: string; status?: TenWebStatus; preview_url?: string };
-    return {
-      tenweb_site_id: data?.id ?? `mock_${Date.now()}`,
-      status: (data?.status as TenWebStatus) ?? "generating",
-      preview_url: data?.preview_url,
-    };
-  } catch {
-    return {
-      tenweb_site_id: `mock_${Date.now()}`,
-      status: "generating",
-    };
+
+    return response.json()
+  }
+
+  // Create a new WordPress site
+  async createSite(request: CreateSiteRequest): Promise<CreateSiteResponse> {
+    try {
+      // Simulate 10Web API call - replace with actual API integration
+      const mockSite: TenWebSite = {
+        id: `site_${Date.now()}`,
+        name: request.name,
+        url: `https://${request.subdomain}.naveeg.com`,
+        status: 'active',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+
+      // In a real implementation, you would call the actual 10Web API:
+      // const response = await this.makeRequest<TenWebSite>('/sites', 'POST', request)
+      
+      return {
+        success: true,
+        site: mockSite,
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    }
+  }
+
+  // Get all sites for a user
+  async getSites(): Promise<TenWebSite[]> {
+    try {
+      // Simulate API call - replace with actual implementation
+      return []
+    } catch (error) {
+      console.error('Error fetching sites:', error)
+      return []
+    }
+  }
+
+  // Get site details
+  async getSite(siteId: string): Promise<TenWebSite | null> {
+    try {
+      // Simulate API call - replace with actual implementation
+      return null
+    } catch (error) {
+      console.error('Error fetching site:', error)
+      return null
+    }
+  }
+
+  // Create a custom domain for a site
+  async createDomain(request: CreateDomainRequest): Promise<CreateDomainResponse> {
+    try {
+      // Simulate 10Web API call - replace with actual API integration
+      const mockDomain: TenWebDomain = {
+        id: `domain_${Date.now()}`,
+        domain: request.domain,
+        site_id: request.site_id,
+        status: 'pending',
+        ssl_enabled: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+
+      // In a real implementation, you would call the actual 10Web API:
+      // const response = await this.makeRequest<TenWebDomain>('/domains', 'POST', request)
+      
+      return {
+        success: true,
+        domain: mockDomain,
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    }
+  }
+
+  // Get domains for a site
+  async getDomains(siteId: string): Promise<TenWebDomain[]> {
+    try {
+      // Simulate API call - replace with actual implementation
+      return []
+    } catch (error) {
+      console.error('Error fetching domains:', error)
+      return []
+    }
+  }
+
+  // Delete a site
+  async deleteSite(siteId: string): Promise<boolean> {
+    try {
+      // Simulate API call - replace with actual implementation
+      return true
+    } catch (error) {
+      console.error('Error deleting site:', error)
+      return false
+    }
+  }
+
+  // Delete a domain
+  async deleteDomain(domainId: string): Promise<boolean> {
+    try {
+      // Simulate API call - replace with actual implementation
+      return true
+    } catch (error) {
+      console.error('Error deleting domain:', error)
+      return false
+    }
   }
 }
 
-export async function tenwebStatus(tenwebSiteId: string): Promise<GenerateResponse> {
-  if (!TENWEB_API_KEY) {
-    return { tenweb_site_id: tenwebSiteId, status: "ready", preview_url: `https://example.com/${tenwebSiteId}` };
-  }
-  try {
-    const res = await fetch(`${TENWEB_API_BASE}/ai-sites/${tenwebSiteId}`, {
-      headers: { Authorization: `Bearer ${TENWEB_API_KEY}` },
-    });
-    if (!res.ok) {
-      throw new Error(String(res.status));
-    }
-    const data = (await res.json()) as { status?: TenWebStatus; preview_url?: string };
-    return {
-      tenweb_site_id: tenwebSiteId,
-      status: (data?.status as TenWebStatus) ?? "generating",
-      preview_url: data?.preview_url,
-    };
-  } catch {
-    return { tenweb_site_id: tenwebSiteId, status: "error" };
-  }
-}
+// Create a singleton instance
+export const tenWebAPI = new TenWebAPI(process.env.TENWEB_API_KEY || '')
 
+// Helper function to get TenWeb API instance
+export function getTenWebAPI(): TenWebAPI {
+  const apiKey = process.env.TENWEB_API_KEY
+  if (!apiKey) {
+    throw new Error('TENWEB_API_KEY environment variable is required')
+  }
+  return new TenWebAPI(apiKey)
+}

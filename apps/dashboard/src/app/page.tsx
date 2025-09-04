@@ -2,23 +2,28 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useUser } from '@naveeg/lib'
+import { useUser, useOnboardingStatus } from '@naveeg/lib'
 
 export default function Home() {
   const router = useRouter()
-  const { user, loading } = useUser()
+  const { user, loading: userLoading } = useUser()
+  const { isCompleted, loading: onboardingLoading } = useOnboardingStatus()
 
   useEffect(() => {
-    if (!loading) {
+    if (!userLoading && !onboardingLoading) {
       if (user) {
-        router.push('/dashboard')
+        if (isCompleted) {
+          router.push('/dashboard')
+        } else {
+          router.push('/onboarding')
+        }
       } else {
         router.push('/auth/signin')
       }
     }
-  }, [user, loading, router])
+  }, [user, userLoading, isCompleted, onboardingLoading, router])
 
-  if (loading) {
+  if (userLoading || onboardingLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">

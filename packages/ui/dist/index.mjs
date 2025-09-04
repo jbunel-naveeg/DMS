@@ -687,6 +687,348 @@ function UserMenu({
     ] })
   ] });
 }
+
+// src/components/onboarding-step.tsx
+import { jsx as jsx11, jsxs as jsxs4 } from "react/jsx-runtime";
+function OnboardingStep({
+  step,
+  totalSteps,
+  title,
+  description,
+  children,
+  isCompleted = false,
+  isActive = false,
+  className
+}) {
+  return /* @__PURE__ */ jsxs4("div", { className: cn("space-y-6", className), children: [
+    /* @__PURE__ */ jsxs4("div", { className: "flex items-center space-x-4", children: [
+      /* @__PURE__ */ jsx11("div", { className: cn(
+        "flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-medium",
+        isCompleted ? "border-green-500 bg-green-500 text-white" : isActive ? "border-blue-500 bg-blue-500 text-white" : "border-gray-300 bg-white text-gray-500"
+      ), children: isCompleted ? /* @__PURE__ */ jsx11("svg", { className: "h-5 w-5", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ jsx11("path", { fillRule: "evenodd", d: "M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z", clipRule: "evenodd" }) }) : step }),
+      /* @__PURE__ */ jsxs4("div", { className: "flex-1", children: [
+        /* @__PURE__ */ jsx11("h3", { className: "text-lg font-medium text-gray-900", children: title }),
+        description && /* @__PURE__ */ jsx11("p", { className: "text-sm text-gray-500", children: description })
+      ] })
+    ] }),
+    isActive && /* @__PURE__ */ jsx11("div", { className: "ml-14", children })
+  ] });
+}
+
+// src/components/site-form.tsx
+import { useState as useState3 } from "react";
+import { jsx as jsx12, jsxs as jsxs5 } from "react/jsx-runtime";
+var TEMPLATES = [
+  { id: "business", name: "Business", description: "Professional business website" },
+  { id: "portfolio", name: "Portfolio", description: "Creative portfolio showcase" },
+  { id: "blog", name: "Blog", description: "Content-focused blog site" },
+  { id: "ecommerce", name: "E-commerce", description: "Online store with shopping cart" },
+  { id: "restaurant", name: "Restaurant", description: "Restaurant with menu and reservations" },
+  { id: "agency", name: "Agency", description: "Marketing agency website" }
+];
+function SiteForm({ onSubmit, loading = false, className }) {
+  const [formData, setFormData] = useState3({
+    name: "",
+    subdomain: "",
+    template: "business",
+    description: ""
+  });
+  const [error, setError] = useState3(null);
+  const [isSubmitting, setIsSubmitting] = useState3(false);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      const { error: error2 } = await onSubmit(formData);
+      if (error2) {
+        setError(error2);
+      }
+    } catch (err) {
+      setError("An unexpected error occurred");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  const handleInputChange = (field) => (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: e.target.value
+    }));
+  };
+  const generateSubdomain = () => {
+    const subdomain = formData.name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+    setFormData((prev) => ({ ...prev, subdomain }));
+  };
+  return /* @__PURE__ */ jsxs5(Card, { className: cn("w-full max-w-2xl mx-auto", className), children: [
+    /* @__PURE__ */ jsxs5(CardHeader, { children: [
+      /* @__PURE__ */ jsx12(CardTitle, { children: "Create Your Website" }),
+      /* @__PURE__ */ jsx12(CardDescription, { children: "Let's set up your new WordPress website. Choose a name, subdomain, and template." })
+    ] }),
+    /* @__PURE__ */ jsx12(CardContent, { children: /* @__PURE__ */ jsxs5("form", { onSubmit: handleSubmit, className: "space-y-6", children: [
+      /* @__PURE__ */ jsxs5("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: [
+        /* @__PURE__ */ jsxs5("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsx12(Label, { htmlFor: "name", children: "Website Name *" }),
+          /* @__PURE__ */ jsx12(
+            Input,
+            {
+              id: "name",
+              type: "text",
+              placeholder: "My Awesome Website",
+              value: formData.name,
+              onChange: handleInputChange("name"),
+              required: true,
+              disabled: isSubmitting || loading
+            }
+          ),
+          /* @__PURE__ */ jsx12("p", { className: "text-xs text-gray-500", children: "This will be the title of your website" })
+        ] }),
+        /* @__PURE__ */ jsxs5("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsx12(Label, { htmlFor: "subdomain", children: "Subdomain *" }),
+          /* @__PURE__ */ jsxs5("div", { className: "flex space-x-2", children: [
+            /* @__PURE__ */ jsx12(
+              Input,
+              {
+                id: "subdomain",
+                type: "text",
+                placeholder: "my-awesome-website",
+                value: formData.subdomain,
+                onChange: handleInputChange("subdomain"),
+                required: true,
+                disabled: isSubmitting || loading,
+                className: "flex-1"
+              }
+            ),
+            /* @__PURE__ */ jsx12(
+              Button,
+              {
+                type: "button",
+                variant: "outline",
+                onClick: generateSubdomain,
+                disabled: isSubmitting || loading || !formData.name,
+                children: "Generate"
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxs5("p", { className: "text-xs text-gray-500", children: [
+            "Your site will be available at: ",
+            formData.subdomain ? `${formData.subdomain}.naveeg.com` : "subdomain.naveeg.com"
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs5("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ jsx12(Label, { htmlFor: "template", children: "Template *" }),
+        /* @__PURE__ */ jsx12(
+          "select",
+          {
+            id: "template",
+            value: formData.template,
+            onChange: handleInputChange("template"),
+            disabled: isSubmitting || loading,
+            className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+            children: TEMPLATES.map((template) => /* @__PURE__ */ jsxs5("option", { value: template.id, children: [
+              template.name,
+              " - ",
+              template.description
+            ] }, template.id))
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxs5("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ jsx12(Label, { htmlFor: "description", children: "Description (Optional)" }),
+        /* @__PURE__ */ jsx12(
+          "textarea",
+          {
+            id: "description",
+            placeholder: "Brief description of your website...",
+            value: formData.description,
+            onChange: handleInputChange("description"),
+            disabled: isSubmitting || loading,
+            rows: 3,
+            className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          }
+        )
+      ] }),
+      error && /* @__PURE__ */ jsx12("div", { className: "text-sm text-red-600 bg-red-50 p-3 rounded-md", children: error }),
+      /* @__PURE__ */ jsx12("div", { className: "flex justify-end", children: /* @__PURE__ */ jsx12(
+        Button,
+        {
+          type: "submit",
+          disabled: isSubmitting || loading || !formData.name || !formData.subdomain,
+          children: isSubmitting ? "Creating Website..." : "Create Website"
+        }
+      ) })
+    ] }) })
+  ] });
+}
+
+// src/components/domain-form.tsx
+import { useState as useState4 } from "react";
+import { jsx as jsx13, jsxs as jsxs6 } from "react/jsx-runtime";
+function DomainForm({
+  siteUrl,
+  onSubmit,
+  onSkip,
+  loading = false,
+  className
+}) {
+  const [formData, setFormData] = useState4({
+    domain: ""
+  });
+  const [error, setError] = useState4(null);
+  const [isSubmitting, setIsSubmitting] = useState4(false);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      const { error: error2 } = await onSubmit(formData);
+      if (error2) {
+        setError(error2);
+      }
+    } catch (err) {
+      setError("An unexpected error occurred");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  const handleInputChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      domain: e.target.value
+    }));
+  };
+  const isValidDomain = (domain) => {
+    const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/;
+    return domainRegex.test(domain);
+  };
+  return /* @__PURE__ */ jsxs6(Card, { className: cn("w-full max-w-2xl mx-auto", className), children: [
+    /* @__PURE__ */ jsxs6(CardHeader, { children: [
+      /* @__PURE__ */ jsx13(CardTitle, { children: "Connect Custom Domain" }),
+      /* @__PURE__ */ jsx13(CardDescription, { children: "Add your own domain to your website. You can skip this step and do it later." })
+    ] }),
+    /* @__PURE__ */ jsx13(CardContent, { children: /* @__PURE__ */ jsxs6("div", { className: "space-y-6", children: [
+      /* @__PURE__ */ jsxs6("div", { className: "bg-blue-50 p-4 rounded-lg", children: [
+        /* @__PURE__ */ jsx13("h4", { className: "font-medium text-blue-900", children: "Your Website" }),
+        /* @__PURE__ */ jsxs6("p", { className: "text-sm text-blue-700 mt-1", children: [
+          "Currently available at: ",
+          /* @__PURE__ */ jsx13("span", { className: "font-mono", children: siteUrl })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs6("form", { onSubmit: handleSubmit, className: "space-y-6", children: [
+        /* @__PURE__ */ jsxs6("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsx13(Label, { htmlFor: "domain", children: "Custom Domain" }),
+          /* @__PURE__ */ jsx13(
+            Input,
+            {
+              id: "domain",
+              type: "text",
+              placeholder: "example.com",
+              value: formData.domain,
+              onChange: handleInputChange,
+              disabled: isSubmitting || loading,
+              className: cn(
+                formData.domain && !isValidDomain(formData.domain) && "border-red-300"
+              )
+            }
+          ),
+          /* @__PURE__ */ jsx13("p", { className: "text-xs text-gray-500", children: "Enter your domain without www (e.g., example.com)" }),
+          formData.domain && !isValidDomain(formData.domain) && /* @__PURE__ */ jsx13("p", { className: "text-xs text-red-600", children: "Please enter a valid domain name" })
+        ] }),
+        error && /* @__PURE__ */ jsx13("div", { className: "text-sm text-red-600 bg-red-50 p-3 rounded-md", children: error }),
+        /* @__PURE__ */ jsxs6("div", { className: "flex justify-between", children: [
+          /* @__PURE__ */ jsx13(
+            Button,
+            {
+              type: "button",
+              variant: "outline",
+              onClick: onSkip,
+              disabled: isSubmitting || loading,
+              children: "Skip for Now"
+            }
+          ),
+          /* @__PURE__ */ jsx13(
+            Button,
+            {
+              type: "submit",
+              disabled: isSubmitting || loading || !formData.domain || !isValidDomain(formData.domain),
+              children: isSubmitting ? "Connecting Domain..." : "Connect Domain"
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs6("div", { className: "bg-gray-50 p-4 rounded-lg", children: [
+        /* @__PURE__ */ jsx13("h4", { className: "font-medium text-gray-900 mb-2", children: "Domain Setup Instructions" }),
+        /* @__PURE__ */ jsxs6("div", { className: "text-sm text-gray-600 space-y-2", children: [
+          /* @__PURE__ */ jsx13("p", { children: "To connect your domain, you'll need to update your DNS settings:" }),
+          /* @__PURE__ */ jsxs6("ol", { className: "list-decimal list-inside space-y-1 ml-4", children: [
+            /* @__PURE__ */ jsxs6("li", { children: [
+              "Add a CNAME record pointing to ",
+              /* @__PURE__ */ jsx13("code", { className: "bg-gray-200 px-1 rounded", children: "naveeg.com" })
+            ] }),
+            /* @__PURE__ */ jsx13("li", { children: "Or add an A record pointing to our IP address" }),
+            /* @__PURE__ */ jsx13("li", { children: "Wait for DNS propagation (usually 5-30 minutes)" })
+          ] }),
+          /* @__PURE__ */ jsx13("p", { className: "text-xs text-gray-500 mt-2", children: "Need help? Contact our support team for assistance." })
+        ] })
+      ] })
+    ] }) })
+  ] });
+}
+
+// src/components/onboarding-progress.tsx
+import { jsx as jsx14, jsxs as jsxs7 } from "react/jsx-runtime";
+function OnboardingProgress({
+  currentStep,
+  totalSteps,
+  steps,
+  className
+}) {
+  const progress = currentStep / totalSteps * 100;
+  return /* @__PURE__ */ jsxs7("div", { className: cn("w-full", className), children: [
+    /* @__PURE__ */ jsxs7("div", { className: "mb-6", children: [
+      /* @__PURE__ */ jsxs7("div", { className: "flex justify-between text-sm text-gray-600 mb-2", children: [
+        /* @__PURE__ */ jsxs7("span", { children: [
+          "Step ",
+          currentStep,
+          " of ",
+          totalSteps
+        ] }),
+        /* @__PURE__ */ jsxs7("span", { children: [
+          Math.round(progress),
+          "% Complete"
+        ] })
+      ] }),
+      /* @__PURE__ */ jsx14("div", { className: "w-full bg-gray-200 rounded-full h-2", children: /* @__PURE__ */ jsx14(
+        "div",
+        {
+          className: "bg-blue-600 h-2 rounded-full transition-all duration-300 ease-in-out",
+          style: { width: `${progress}%` }
+        }
+      ) })
+    ] }),
+    /* @__PURE__ */ jsx14("div", { className: "space-y-3", children: steps.map((step, index) => /* @__PURE__ */ jsxs7(
+      "div",
+      {
+        className: cn(
+          "flex items-center space-x-3 text-sm",
+          index < currentStep ? "text-green-600" : index === currentStep - 1 ? "text-blue-600" : "text-gray-400"
+        ),
+        children: [
+          /* @__PURE__ */ jsx14("div", { className: cn(
+            "flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs font-medium",
+            step.completed ? "border-green-500 bg-green-500 text-white" : index === currentStep - 1 ? "border-blue-500 bg-blue-500 text-white" : "border-gray-300 bg-white text-gray-400"
+          ), children: step.completed ? /* @__PURE__ */ jsx14("svg", { className: "h-3 w-3", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ jsx14("path", { fillRule: "evenodd", d: "M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z", clipRule: "evenodd" }) }) : index + 1 }),
+          /* @__PURE__ */ jsx14("span", { className: cn(
+            "font-medium",
+            step.completed ? "text-green-600" : index === currentStep - 1 ? "text-blue-600" : "text-gray-400"
+          ), children: step.title })
+        ]
+      },
+      step.id
+    )) })
+  ] });
+}
 export {
   AuthForm,
   Button,
@@ -696,10 +1038,14 @@ export {
   CardFooter,
   CardHeader,
   CardTitle,
+  DomainForm,
   Input,
   Label,
+  OnboardingProgress,
+  OnboardingStep,
   ProtectedRoute,
   Separator,
+  SiteForm,
   Toast,
   ToastAction,
   ToastClose,
