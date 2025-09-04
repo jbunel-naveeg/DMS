@@ -1159,4 +1159,276 @@ declare const GOOGLE_OAUTH_SCOPES: {
 declare function getAllGoogleScopes(): string[];
 declare function getScopesForServices(services: Array<'analytics' | 'search_console' | 'business_profile'>): string[];
 
-export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CancelSubscriptionRequest, CancelSubscriptionResponse, ChatCompletionResponse, ChatMessage, ChatbotResponse, CheckoutSession, CreateCheckoutSessionRequest, CreateCheckoutSessionResponse, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, CreateSubscriptionRequest, CreateSubscriptionResponse, DesignInput, Domain, EntitlementCheck, EntitlementService, FAQDocument, FeatureEntitlement, GOOGLE_OAUTH_SCOPES, GoogleAnalyticsAccount, GoogleAnalyticsDataStream, GoogleAnalyticsMetrics, GoogleAnalyticsProperty, GoogleAnalyticsReport, GoogleAnalyticsService, GoogleBusinessProfileAccount, GoogleBusinessProfileInsight, GoogleBusinessProfileLocation, GoogleBusinessProfileMetrics, GoogleBusinessProfilePost, GoogleBusinessProfileService, GoogleIntegration, GoogleMetricsSummary, GoogleOAuthConfig, GoogleSearchConsoleMetrics, GoogleSearchConsoleSearchAnalyticsData, GoogleSearchConsoleSearchAnalyticsQuery, GoogleSearchConsoleService, GoogleSearchConsoleSite, GoogleSearchConsoleSitemap, GoogleSearchConsoleUrlInspectionResult, GoogleService, OnboardingStatus, OpenAIEmbedding, OpenAIEmbeddingResponse, OpenAIService, PLANS, Plan, PlanLimits, PlanUsage, ProcessWebhookResponse, STRIPE_WEBHOOK_SECRET, StripeCheckoutService, StripeSubscriptionService, StripeWebhookService, Subscription, TenWebAPI, TenWebDNSRecord, TenWebDomain, TenWebSite, UpdateSubscriptionRequest, UpdateSubscriptionResponse, UsageStats, UseAuthReturn, UseEntitlementReturn, UseFeatureGateProps, UserData, UserPlan, WebhookEvent, Website, authService, briefSchema, calculateUsagePercentage, createAuthClient, createBrowserClient, createServerClient, designSchema, entitlementService, formatBandwidthSize, formatCurrency, formatDate, formatStorageSize, generateSchema, generateSubdomain, getAllGoogleScopes, getBrowserSupabaseClient, getOpenAIService, getPlanById, getPlanLimits, getScopesForServices, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, isFeatureAvailable, openAIService, stripeCheckoutService, stripeSubscriptionService, stripeWebhookService, tenWebAPI, useAuth, useEntitlements, useFeatureGate, useIsAuthenticated, useOnboardingStatus, useRequireAuth, useUser, useUserData };
+interface TeamMember {
+    id: string;
+    user_id: string;
+    website_id: string;
+    role: 'admin' | 'editor';
+    permissions: TeamPermissions;
+    invited_by: string;
+    invited_at: string;
+    joined_at?: string;
+    status: 'pending' | 'active' | 'suspended';
+    last_active?: string;
+    created_at: string;
+    updated_at: string;
+    user?: {
+        id: string;
+        email: string;
+        full_name?: string;
+        avatar_url?: string;
+    };
+}
+interface TeamPermissions {
+    can_manage_website: boolean;
+    can_manage_domains: boolean;
+    can_manage_analytics: boolean;
+    can_manage_billing: boolean;
+    can_manage_team: boolean;
+    can_manage_integrations: boolean;
+    can_manage_content: boolean;
+    can_manage_settings: boolean;
+}
+interface TeamInvitation {
+    id: string;
+    email: string;
+    website_id: string;
+    role: 'admin' | 'editor';
+    permissions: TeamPermissions;
+    invited_by: string;
+    token: string;
+    expires_at: string;
+    status: 'pending' | 'accepted' | 'expired' | 'revoked';
+    created_at: string;
+    updated_at: string;
+}
+interface TeamActivity {
+    id: string;
+    user_id: string;
+    website_id: string;
+    action: string;
+    resource_type: string;
+    resource_id?: string;
+    details: Record<string, any>;
+    ip_address?: string;
+    user_agent?: string;
+    created_at: string;
+}
+interface TeamSettings {
+    id: string;
+    website_id: string;
+    allow_self_registration: boolean;
+    require_approval: boolean;
+    max_team_members: number;
+    session_timeout: number;
+    two_factor_required: boolean;
+    password_policy: {
+        min_length: number;
+        require_uppercase: boolean;
+        require_lowercase: boolean;
+        require_numbers: boolean;
+        require_symbols: boolean;
+    };
+    notification_settings: {
+        email_invitations: boolean;
+        email_activity: boolean;
+        email_security: boolean;
+    };
+    created_at: string;
+    updated_at: string;
+}
+declare const DEFAULT_ROLE_PERMISSIONS: Record<'admin' | 'editor', TeamPermissions>;
+declare const TEAM_MEMBER_STATUS_COLORS: {
+    readonly pending: "yellow";
+    readonly active: "green";
+    readonly suspended: "red";
+};
+declare const TEAM_MEMBER_ROLE_COLORS: {
+    readonly admin: "purple";
+    readonly editor: "blue";
+};
+
+declare class TeamService {
+    private supabase;
+    constructor(serverClient?: any);
+    getTeamMembers(websiteId: string): Promise<{
+        data: TeamMember[];
+        error: any;
+    }>;
+    addTeamMember(websiteId: string, email: string, role: 'admin' | 'editor', invitedBy: string): Promise<{
+        data: TeamInvitation | null;
+        error: any;
+    }>;
+    updateTeamMember(memberId: string, updates: Partial<Pick<TeamMember, 'role' | 'permissions' | 'status'>>): Promise<{
+        data: TeamMember | null;
+        error: any;
+    }>;
+    removeTeamMember(memberId: string): Promise<{
+        error: any;
+    }>;
+    getTeamInvitations(websiteId: string): Promise<{
+        data: TeamInvitation[];
+        error: any;
+    }>;
+    acceptInvitation(token: string, userId: string): Promise<{
+        data: TeamMember | null;
+        error: any;
+    }>;
+    revokeInvitation(invitationId: string): Promise<{
+        error: any;
+    }>;
+    logActivity(websiteId: string, userId: string, action: string, resourceType: string, resourceId?: string, details?: Record<string, any>, ipAddress?: string, userAgent?: string): Promise<{
+        error: any;
+    }>;
+    getTeamActivity(websiteId: string, limit?: number, offset?: number): Promise<{
+        data: TeamActivity[];
+        error: any;
+    }>;
+    getTeamSettings(websiteId: string): Promise<{
+        data: TeamSettings | null;
+        error: any;
+    }>;
+    updateTeamSettings(websiteId: string, settings: Partial<TeamSettings>): Promise<{
+        data: TeamSettings | null;
+        error: any;
+    }>;
+    checkPermission(userId: string, websiteId: string, permission: string): Promise<boolean>;
+    getUserRole(userId: string, websiteId: string): Promise<'admin' | 'editor' | null>;
+    private generateInvitationToken;
+    private sendInvitationEmail;
+    static createServerInstance(cookies: any): TeamService;
+}
+
+declare function useTeamMembers(websiteId: string): {
+    members: TeamMember[];
+    loading: boolean;
+    error: string | null;
+    addMember: (email: string, role: "admin" | "editor", invitedBy: string) => Promise<{
+        success: boolean;
+        error: any;
+    } | {
+        success: boolean;
+        error?: undefined;
+    }>;
+    updateMember: (memberId: string, updates: Partial<Pick<TeamMember, "role" | "permissions" | "status">>) => Promise<{
+        success: boolean;
+        error: any;
+    } | {
+        success: boolean;
+        error?: undefined;
+    }>;
+    removeMember: (memberId: string) => Promise<{
+        success: boolean;
+        error: any;
+    } | {
+        success: boolean;
+        error?: undefined;
+    }>;
+    refresh: () => Promise<void>;
+};
+declare function useTeamInvitations(websiteId: string): {
+    invitations: TeamInvitation[];
+    loading: boolean;
+    error: string | null;
+    revokeInvitation: (invitationId: string) => Promise<{
+        success: boolean;
+        error: any;
+    } | {
+        success: boolean;
+        error?: undefined;
+    }>;
+    refresh: () => Promise<void>;
+};
+declare function useTeamActivity(websiteId: string): {
+    activities: TeamActivity[];
+    loading: boolean;
+    error: string | null;
+    hasMore: boolean;
+    loadMore: () => void;
+    refresh: () => Promise<void>;
+};
+declare function useTeamSettings(websiteId: string): {
+    settings: TeamSettings | null;
+    loading: boolean;
+    error: string | null;
+    updateSettings: (updates: Partial<TeamSettings>) => Promise<{
+        success: boolean;
+        error: any;
+    } | {
+        success: boolean;
+        error?: undefined;
+    }>;
+    refresh: () => Promise<void>;
+};
+declare function useTeamPermissions(userId: string, websiteId: string): {
+    permissions: Record<string, boolean>;
+    role: "admin" | "editor" | null;
+    loading: boolean;
+    checkPermission: (permission: string) => Promise<boolean>;
+    refresh: () => Promise<void>;
+};
+
+interface LeadData {
+    email: string;
+    name: string;
+    company?: string;
+    phone?: string;
+    source: string;
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+}
+interface SiteProvisioningData {
+    user_id: string;
+    site_name: string;
+    subdomain: string;
+    template?: string;
+}
+interface DomainActionData {
+    action: 'verify' | 'ssl_request' | 'delete';
+    domain: string;
+    user_id: string;
+    website_id?: string;
+}
+interface N8NResponse {
+    success: boolean;
+    message: string;
+    [key: string]: any;
+}
+declare class N8NService {
+    private baseUrl;
+    constructor(baseUrl?: string);
+    /**
+     * Capture a lead from the marketing site
+     */
+    captureLead(leadData: LeadData): Promise<N8NResponse>;
+    /**
+     * Provision a new site
+     */
+    provisionSite(siteData: SiteProvisioningData): Promise<N8NResponse>;
+    /**
+     * Process domain action
+     */
+    processDomainAction(domainData: DomainActionData): Promise<N8NResponse>;
+    /**
+     * Check N8N health
+     */
+    checkHealth(): Promise<boolean>;
+    /**
+     * Get workflow status
+     */
+    getWorkflowStatus(workflowId: string): Promise<any>;
+}
+declare const n8nService: N8NService;
+
+interface UseN8NReturn {
+    captureLead: (leadData: LeadData) => Promise<N8NResponse>;
+    provisionSite: (siteData: SiteProvisioningData) => Promise<N8NResponse>;
+    processDomainAction: (domainData: DomainActionData) => Promise<N8NResponse>;
+    checkHealth: () => Promise<boolean>;
+    loading: boolean;
+    error: string | null;
+}
+declare function useN8N(): UseN8NReturn;
+
+export { AppError, AuthResponse, AuthService, AuthSession, AuthUser, BriefInput, CancelSubscriptionRequest, CancelSubscriptionResponse, ChatCompletionResponse, ChatMessage, ChatbotResponse, CheckoutSession, CreateCheckoutSessionRequest, CreateCheckoutSessionResponse, CreateDomainRequest, CreateDomainResponse, CreateSiteRequest, CreateSiteResponse, CreateSubscriptionRequest, CreateSubscriptionResponse, DEFAULT_ROLE_PERMISSIONS, DesignInput, Domain, DomainActionData, EntitlementCheck, EntitlementService, FAQDocument, FeatureEntitlement, GOOGLE_OAUTH_SCOPES, GoogleAnalyticsAccount, GoogleAnalyticsDataStream, GoogleAnalyticsMetrics, GoogleAnalyticsProperty, GoogleAnalyticsReport, GoogleAnalyticsService, GoogleBusinessProfileAccount, GoogleBusinessProfileInsight, GoogleBusinessProfileLocation, GoogleBusinessProfileMetrics, GoogleBusinessProfilePost, GoogleBusinessProfileService, GoogleIntegration, GoogleMetricsSummary, GoogleOAuthConfig, GoogleSearchConsoleMetrics, GoogleSearchConsoleSearchAnalyticsData, GoogleSearchConsoleSearchAnalyticsQuery, GoogleSearchConsoleService, GoogleSearchConsoleSite, GoogleSearchConsoleSitemap, GoogleSearchConsoleUrlInspectionResult, GoogleService, LeadData, N8NResponse, N8NService, OnboardingStatus, OpenAIEmbedding, OpenAIEmbeddingResponse, OpenAIService, PLANS, Plan, PlanLimits, PlanUsage, ProcessWebhookResponse, STRIPE_WEBHOOK_SECRET, SiteProvisioningData, StripeCheckoutService, StripeSubscriptionService, StripeWebhookService, Subscription, TEAM_MEMBER_ROLE_COLORS, TEAM_MEMBER_STATUS_COLORS, TeamActivity, TeamInvitation, TeamMember, TeamPermissions, TeamService, TeamSettings, TenWebAPI, TenWebDNSRecord, TenWebDomain, TenWebSite, UpdateSubscriptionRequest, UpdateSubscriptionResponse, UsageStats, UseAuthReturn, UseEntitlementReturn, UseFeatureGateProps, UseN8NReturn, UserData, UserPlan, WebhookEvent, Website, authService, briefSchema, calculateUsagePercentage, createAuthClient, createBrowserClient, createServerClient, designSchema, entitlementService, formatBandwidthSize, formatCurrency, formatDate, formatStorageSize, generateSchema, generateSubdomain, getAllGoogleScopes, getBrowserSupabaseClient, getOpenAIService, getPlanById, getPlanLimits, getScopesForServices, getServerSupabaseClient, getServiceSupabaseClient, getStripe, getTenWebAPI, isFeatureAvailable, n8nService, openAIService, stripeCheckoutService, stripeSubscriptionService, stripeWebhookService, tenWebAPI, useAuth, useEntitlements, useFeatureGate, useIsAuthenticated, useN8N, useOnboardingStatus, useRequireAuth, useTeamActivity, useTeamInvitations, useTeamMembers, useTeamPermissions, useTeamSettings, useUser, useUserData };

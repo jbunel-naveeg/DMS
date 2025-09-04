@@ -1541,7 +1541,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState5(initialState) {
+        function useState7(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1553,7 +1553,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect5(create, deps) {
+        function useEffect6(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1565,7 +1565,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useLayoutEffect(create, deps);
         }
-        function useCallback2(callback, deps) {
+        function useCallback4(callback, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useCallback(callback, deps);
         }
@@ -2332,11 +2332,11 @@ var require_react_development = __commonJS({
         exports.memo = memo;
         exports.startTransition = startTransition;
         exports.unstable_act = act;
-        exports.useCallback = useCallback2;
+        exports.useCallback = useCallback4;
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect5;
+        exports.useEffect = useEffect6;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
@@ -2344,7 +2344,7 @@ var require_react_development = __commonJS({
         exports.useMemo = useMemo;
         exports.useReducer = useReducer;
         exports.useRef = useRef;
-        exports.useState = useState5;
+        exports.useState = useState7;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -5348,21 +5348,715 @@ function getScopesForServices(services) {
   });
   return [...new Set(scopes)];
 }
+
+// src/team/types.ts
+var DEFAULT_ROLE_PERMISSIONS = {
+  admin: {
+    can_manage_website: true,
+    can_manage_domains: true,
+    can_manage_analytics: true,
+    can_manage_billing: true,
+    can_manage_team: true,
+    can_manage_integrations: true,
+    can_manage_content: true,
+    can_manage_settings: true
+  },
+  editor: {
+    can_manage_website: true,
+    can_manage_domains: false,
+    can_manage_analytics: true,
+    can_manage_billing: false,
+    can_manage_team: false,
+    can_manage_integrations: false,
+    can_manage_content: true,
+    can_manage_settings: false
+  }
+};
+var TEAM_MEMBER_STATUS_COLORS = {
+  pending: "yellow",
+  active: "green",
+  suspended: "red"
+};
+var TEAM_MEMBER_ROLE_COLORS = {
+  admin: "purple",
+  editor: "blue"
+};
+
+// src/team/team-service.ts
+var TeamService = class _TeamService {
+  constructor(serverClient) {
+    this.supabase = serverClient || createBrowserClient2();
+  }
+  // Team Members Management
+  async getTeamMembers(websiteId) {
+    try {
+      const { data, error } = await this.supabase.from("team_members").select(`
+          *,
+          user:user_id (
+            id,
+            email,
+            full_name,
+            avatar_url
+          )
+        `).eq("website_id", websiteId).order("created_at", { ascending: false });
+      return { data: data || [], error };
+    } catch (error) {
+      return { data: [], error };
+    }
+  }
+  async addTeamMember(websiteId, email, role, invitedBy) {
+    try {
+      const { data: existingUser } = await this.supabase.from("users").select("id").eq("email", email).single();
+      if (existingUser) {
+        const { data, error } = await this.supabase.from("team_members").insert({
+          user_id: existingUser.id,
+          website_id: websiteId,
+          role,
+          permissions: DEFAULT_ROLE_PERMISSIONS[role],
+          invited_by: invitedBy,
+          status: "active",
+          joined_at: (/* @__PURE__ */ new Date()).toISOString()
+        }).select().single();
+        return { data: null, error };
+      } else {
+        const invitationToken = this.generateInvitationToken();
+        const expiresAt = /* @__PURE__ */ new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7);
+        const { data, error } = await this.supabase.from("team_invitations").insert({
+          email,
+          website_id: websiteId,
+          role,
+          permissions: DEFAULT_ROLE_PERMISSIONS[role],
+          invited_by: invitedBy,
+          token: invitationToken,
+          expires_at: expiresAt.toISOString()
+        }).select().single();
+        await this.sendInvitationEmail(email, invitationToken, websiteId);
+        return { data, error };
+      }
+    } catch (error) {
+      return { data: null, error };
+    }
+  }
+  async updateTeamMember(memberId, updates) {
+    try {
+      const { data, error } = await this.supabase.from("team_members").update({
+        ...updates,
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
+      }).eq("id", memberId).select().single();
+      return { data, error };
+    } catch (error) {
+      return { data: null, error };
+    }
+  }
+  async removeTeamMember(memberId) {
+    try {
+      const { error } = await this.supabase.from("team_members").delete().eq("id", memberId);
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  }
+  // Team Invitations Management
+  async getTeamInvitations(websiteId) {
+    try {
+      const { data, error } = await this.supabase.from("team_invitations").select("*").eq("website_id", websiteId).order("created_at", { ascending: false });
+      return { data: data || [], error };
+    } catch (error) {
+      return { data: [], error };
+    }
+  }
+  async acceptInvitation(token, userId) {
+    try {
+      const { data: invitation, error: invitationError } = await this.supabase.from("team_invitations").select("*").eq("token", token).eq("status", "pending").single();
+      if (invitationError || !invitation) {
+        return { data: null, error: "Invalid or expired invitation" };
+      }
+      if (new Date(invitation.expires_at) < /* @__PURE__ */ new Date()) {
+        return { data: null, error: "Invitation has expired" };
+      }
+      const { data: teamMember, error: memberError } = await this.supabase.from("team_members").insert({
+        user_id: userId,
+        website_id: invitation.website_id,
+        role: invitation.role,
+        permissions: invitation.permissions,
+        invited_by: invitation.invited_by,
+        status: "active",
+        joined_at: (/* @__PURE__ */ new Date()).toISOString()
+      }).select().single();
+      if (memberError) {
+        return { data: null, error: memberError };
+      }
+      await this.supabase.from("team_invitations").update({ status: "accepted" }).eq("id", invitation.id);
+      return { data: teamMember, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  }
+  async revokeInvitation(invitationId) {
+    try {
+      const { error } = await this.supabase.from("team_invitations").update({ status: "revoked" }).eq("id", invitationId);
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  }
+  // Team Activity Logging
+  async logActivity(websiteId, userId, action, resourceType, resourceId, details, ipAddress, userAgent) {
+    try {
+      const { error } = await this.supabase.from("team_activities").insert({
+        website_id: websiteId,
+        user_id: userId,
+        action,
+        resource_type: resourceType,
+        resource_id: resourceId,
+        details: details || {},
+        ip_address: ipAddress,
+        user_agent: userAgent
+      });
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  }
+  async getTeamActivity(websiteId, limit = 50, offset = 0) {
+    try {
+      const { data, error } = await this.supabase.from("team_activities").select(`
+          *,
+          user:user_id (
+            id,
+            email,
+            full_name,
+            avatar_url
+          )
+        `).eq("website_id", websiteId).order("created_at", { ascending: false }).range(offset, offset + limit - 1);
+      return { data: data || [], error };
+    } catch (error) {
+      return { data: [], error };
+    }
+  }
+  // Team Settings Management
+  async getTeamSettings(websiteId) {
+    try {
+      const { data, error } = await this.supabase.from("team_settings").select("*").eq("website_id", websiteId).single();
+      return { data, error };
+    } catch (error) {
+      return { data: null, error };
+    }
+  }
+  async updateTeamSettings(websiteId, settings) {
+    try {
+      const { data, error } = await this.supabase.from("team_settings").upsert({
+        website_id: websiteId,
+        ...settings,
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
+      }).select().single();
+      return { data, error };
+    } catch (error) {
+      return { data: null, error };
+    }
+  }
+  // Permission Checking
+  async checkPermission(userId, websiteId, permission) {
+    try {
+      const { data: member } = await this.supabase.from("team_members").select("permissions").eq("user_id", userId).eq("website_id", websiteId).eq("status", "active").single();
+      return member?.permissions?.[permission] || false;
+    } catch (error) {
+      return false;
+    }
+  }
+  async getUserRole(userId, websiteId) {
+    try {
+      const { data: member } = await this.supabase.from("team_members").select("role").eq("user_id", userId).eq("website_id", websiteId).eq("status", "active").single();
+      return member?.role || null;
+    } catch (error) {
+      return null;
+    }
+  }
+  // Utility Methods
+  generateInvitationToken() {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  }
+  async sendInvitationEmail(email, token, websiteId) {
+    console.log(`Sending invitation email to ${email} with token ${token} for website ${websiteId}`);
+  }
+  // Static method to create server-side instance
+  static createServerInstance(cookies) {
+    return new _TeamService(createServerClient(cookies));
+  }
+};
+
+// src/team/hooks.ts
+var import_react5 = __toESM(require_react());
+function useTeamMembers(websiteId) {
+  const [members, setMembers] = (0, import_react5.useState)([]);
+  const [loading, setLoading] = (0, import_react5.useState)(true);
+  const [error, setError] = (0, import_react5.useState)(null);
+  const teamService = new TeamService();
+  const loadMembers = (0, import_react5.useCallback)(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { data, error: error2 } = await teamService.getTeamMembers(websiteId);
+      if (error2) {
+        setError(error2.message || "Failed to load team members");
+      } else {
+        setMembers(data);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load team members");
+    } finally {
+      setLoading(false);
+    }
+  }, [websiteId, teamService]);
+  const addMember = (0, import_react5.useCallback)(async (email, role, invitedBy) => {
+    try {
+      setError(null);
+      const { data, error: error2 } = await teamService.addTeamMember(websiteId, email, role, invitedBy);
+      if (error2) {
+        setError(error2.message || "Failed to add team member");
+        return { success: false, error: error2.message };
+      }
+      await loadMembers();
+      return { success: true };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to add team member";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, [websiteId, teamService, loadMembers]);
+  const updateMember = (0, import_react5.useCallback)(async (memberId, updates) => {
+    try {
+      setError(null);
+      const { data, error: error2 } = await teamService.updateTeamMember(memberId, updates);
+      if (error2) {
+        setError(error2.message || "Failed to update team member");
+        return { success: false, error: error2.message };
+      }
+      setMembers((prev) => prev.map(
+        (member) => member.id === memberId ? { ...member, ...updates } : member
+      ));
+      return { success: true };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to update team member";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, [teamService]);
+  const removeMember = (0, import_react5.useCallback)(async (memberId) => {
+    try {
+      setError(null);
+      const { error: error2 } = await teamService.removeTeamMember(memberId);
+      if (error2) {
+        setError(error2.message || "Failed to remove team member");
+        return { success: false, error: error2.message };
+      }
+      setMembers((prev) => prev.filter((member) => member.id !== memberId));
+      return { success: true };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to remove team member";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, [teamService]);
+  (0, import_react5.useEffect)(() => {
+    if (websiteId) {
+      loadMembers();
+    }
+  }, [websiteId, loadMembers]);
+  return {
+    members,
+    loading,
+    error,
+    addMember,
+    updateMember,
+    removeMember,
+    refresh: loadMembers
+  };
+}
+function useTeamInvitations(websiteId) {
+  const [invitations, setInvitations] = (0, import_react5.useState)([]);
+  const [loading, setLoading] = (0, import_react5.useState)(true);
+  const [error, setError] = (0, import_react5.useState)(null);
+  const teamService = new TeamService();
+  const loadInvitations = (0, import_react5.useCallback)(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { data, error: error2 } = await teamService.getTeamInvitations(websiteId);
+      if (error2) {
+        setError(error2.message || "Failed to load invitations");
+      } else {
+        setInvitations(data);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load invitations");
+    } finally {
+      setLoading(false);
+    }
+  }, [websiteId, teamService]);
+  const revokeInvitation = (0, import_react5.useCallback)(async (invitationId) => {
+    try {
+      setError(null);
+      const { error: error2 } = await teamService.revokeInvitation(invitationId);
+      if (error2) {
+        setError(error2.message || "Failed to revoke invitation");
+        return { success: false, error: error2.message };
+      }
+      setInvitations((prev) => prev.map(
+        (invitation) => invitation.id === invitationId ? { ...invitation, status: "revoked" } : invitation
+      ));
+      return { success: true };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to revoke invitation";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, [teamService]);
+  (0, import_react5.useEffect)(() => {
+    if (websiteId) {
+      loadInvitations();
+    }
+  }, [websiteId, loadInvitations]);
+  return {
+    invitations,
+    loading,
+    error,
+    revokeInvitation,
+    refresh: loadInvitations
+  };
+}
+function useTeamActivity(websiteId) {
+  const [activities, setActivities] = (0, import_react5.useState)([]);
+  const [loading, setLoading] = (0, import_react5.useState)(true);
+  const [error, setError] = (0, import_react5.useState)(null);
+  const [hasMore, setHasMore] = (0, import_react5.useState)(true);
+  const teamService = new TeamService();
+  const loadActivities = (0, import_react5.useCallback)(async (limit = 50, offset = 0) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { data, error: error2 } = await teamService.getTeamActivity(websiteId, limit, offset);
+      if (error2) {
+        setError(error2.message || "Failed to load activities");
+      } else {
+        if (offset === 0) {
+          setActivities(data);
+        } else {
+          setActivities((prev) => [...prev, ...data]);
+        }
+        setHasMore(data.length === limit);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load activities");
+    } finally {
+      setLoading(false);
+    }
+  }, [websiteId, teamService]);
+  const loadMore = (0, import_react5.useCallback)(() => {
+    if (!loading && hasMore) {
+      loadActivities(50, activities.length);
+    }
+  }, [loading, hasMore, activities.length, loadActivities]);
+  (0, import_react5.useEffect)(() => {
+    if (websiteId) {
+      loadActivities();
+    }
+  }, [websiteId, loadActivities]);
+  return {
+    activities,
+    loading,
+    error,
+    hasMore,
+    loadMore,
+    refresh: () => loadActivities()
+  };
+}
+function useTeamSettings(websiteId) {
+  const [settings, setSettings] = (0, import_react5.useState)(null);
+  const [loading, setLoading] = (0, import_react5.useState)(true);
+  const [error, setError] = (0, import_react5.useState)(null);
+  const teamService = new TeamService();
+  const loadSettings = (0, import_react5.useCallback)(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { data, error: error2 } = await teamService.getTeamSettings(websiteId);
+      if (error2) {
+        setError(error2.message || "Failed to load settings");
+      } else {
+        setSettings(data);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load settings");
+    } finally {
+      setLoading(false);
+    }
+  }, [websiteId, teamService]);
+  const updateSettings = (0, import_react5.useCallback)(async (updates) => {
+    try {
+      setError(null);
+      const { data, error: error2 } = await teamService.updateTeamSettings(websiteId, updates);
+      if (error2) {
+        setError(error2.message || "Failed to update settings");
+        return { success: false, error: error2.message };
+      }
+      setSettings(data);
+      return { success: true };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to update settings";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, [websiteId, teamService]);
+  (0, import_react5.useEffect)(() => {
+    if (websiteId) {
+      loadSettings();
+    }
+  }, [websiteId, loadSettings]);
+  return {
+    settings,
+    loading,
+    error,
+    updateSettings,
+    refresh: loadSettings
+  };
+}
+function useTeamPermissions(userId, websiteId) {
+  const [permissions, setPermissions] = (0, import_react5.useState)({});
+  const [role, setRole] = (0, import_react5.useState)(null);
+  const [loading, setLoading] = (0, import_react5.useState)(true);
+  const teamService = new TeamService();
+  const checkPermission = (0, import_react5.useCallback)(async (permission) => {
+    try {
+      const hasPermission = await teamService.checkPermission(userId, websiteId, permission);
+      setPermissions((prev) => ({ ...prev, [permission]: hasPermission }));
+      return hasPermission;
+    } catch (error) {
+      return false;
+    }
+  }, [userId, websiteId, teamService]);
+  const loadPermissions = (0, import_react5.useCallback)(async () => {
+    try {
+      setLoading(true);
+      const userRole = await teamService.getUserRole(userId, websiteId);
+      setRole(userRole);
+      const permissionKeys = [
+        "can_manage_website",
+        "can_manage_domains",
+        "can_manage_analytics",
+        "can_manage_billing",
+        "can_manage_team",
+        "can_manage_integrations",
+        "can_manage_content",
+        "can_manage_settings"
+      ];
+      const permissionChecks = permissionKeys.map(
+        (key) => teamService.checkPermission(userId, websiteId, key)
+      );
+      const results = await Promise.all(permissionChecks);
+      const permissionMap = permissionKeys.reduce((acc, key, index) => {
+        acc[key] = results[index];
+        return acc;
+      }, {});
+      setPermissions(permissionMap);
+    } catch (error) {
+      console.error("Failed to load permissions:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId, websiteId, teamService]);
+  (0, import_react5.useEffect)(() => {
+    if (userId && websiteId) {
+      loadPermissions();
+    }
+  }, [userId, websiteId, loadPermissions]);
+  return {
+    permissions,
+    role,
+    loading,
+    checkPermission,
+    refresh: loadPermissions
+  };
+}
+
+// src/n8n/n8n.ts
+var N8NService = class {
+  constructor(baseUrl = process.env.N8N_WEBHOOK_URL || "http://localhost:5678") {
+    this.baseUrl = baseUrl;
+  }
+  /**
+   * Capture a lead from the marketing site
+   */
+  async captureLead(leadData) {
+    try {
+      const response = await fetch(`${this.baseUrl}/webhook/lead-captured`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          ...leadData,
+          timestamp: (/* @__PURE__ */ new Date()).toISOString()
+        })
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error capturing lead:", error);
+      throw new Error("Failed to capture lead");
+    }
+  }
+  /**
+   * Provision a new site
+   */
+  async provisionSite(siteData) {
+    try {
+      const response = await fetch(`${this.baseUrl}/webhook/provision-site`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          ...siteData,
+          timestamp: (/* @__PURE__ */ new Date()).toISOString()
+        })
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error provisioning site:", error);
+      throw new Error("Failed to provision site");
+    }
+  }
+  /**
+   * Process domain action
+   */
+  async processDomainAction(domainData) {
+    try {
+      const response = await fetch(`${this.baseUrl}/webhook/domain-webhook`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          ...domainData,
+          timestamp: (/* @__PURE__ */ new Date()).toISOString()
+        })
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error processing domain action:", error);
+      throw new Error("Failed to process domain action");
+    }
+  }
+  /**
+   * Check N8N health
+   */
+  async checkHealth() {
+    try {
+      const response = await fetch(`${this.baseUrl}/healthz`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      return response.ok;
+    } catch (error) {
+      console.error("Error checking N8N health:", error);
+      return false;
+    }
+  }
+  /**
+   * Get workflow status
+   */
+  async getWorkflowStatus(workflowId) {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/workflows/${workflowId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error getting workflow status:", error);
+      throw new Error("Failed to get workflow status");
+    }
+  }
+};
+var n8nService = new N8NService();
+
+// src/n8n/hooks.ts
+var import_react6 = __toESM(require_react());
+function useN8N() {
+  const [loading, setLoading] = (0, import_react6.useState)(false);
+  const [error, setError] = (0, import_react6.useState)(null);
+  const handleRequest = (0, import_react6.useCallback)(async (requestFn) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await requestFn();
+      return result;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  const captureLead = (0, import_react6.useCallback)(async (leadData) => {
+    return handleRequest(() => n8nService.captureLead(leadData));
+  }, [handleRequest]);
+  const provisionSite = (0, import_react6.useCallback)(async (siteData) => {
+    return handleRequest(() => n8nService.provisionSite(siteData));
+  }, [handleRequest]);
+  const processDomainAction = (0, import_react6.useCallback)(async (domainData) => {
+    return handleRequest(() => n8nService.processDomainAction(domainData));
+  }, [handleRequest]);
+  const checkHealth = (0, import_react6.useCallback)(async () => {
+    return handleRequest(() => n8nService.checkHealth());
+  }, [handleRequest]);
+  return {
+    captureLead,
+    provisionSite,
+    processDomainAction,
+    checkHealth,
+    loading,
+    error
+  };
+}
 export {
   AppError,
   AuthService,
+  DEFAULT_ROLE_PERMISSIONS,
   EntitlementService,
   GOOGLE_OAUTH_SCOPES,
   GoogleAnalyticsService,
   GoogleBusinessProfileService,
   GoogleSearchConsoleService,
   GoogleService,
+  N8NService,
   OpenAIService,
   PLANS,
   STRIPE_WEBHOOK_SECRET,
   StripeCheckoutService,
   StripeSubscriptionService,
   StripeWebhookService,
+  TEAM_MEMBER_ROLE_COLORS,
+  TEAM_MEMBER_STATUS_COLORS,
+  TeamService,
   TenWebAPI,
   authService,
   briefSchema,
@@ -5389,6 +6083,7 @@ export {
   getStripe,
   getTenWebAPI,
   isFeatureAvailable,
+  n8nService,
   openAIService,
   stripeCheckoutService,
   stripeSubscriptionService,
@@ -5398,8 +6093,14 @@ export {
   useEntitlements,
   useFeatureGate,
   useIsAuthenticated,
+  useN8N,
   useOnboardingStatus,
   useRequireAuth,
+  useTeamActivity,
+  useTeamInvitations,
+  useTeamMembers,
+  useTeamPermissions,
+  useTeamSettings,
   useUser,
   useUserData
 };

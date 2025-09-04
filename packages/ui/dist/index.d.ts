@@ -7,6 +7,7 @@ import * as SeparatorPrimitive from '@radix-ui/react-separator';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import * as react_jsx_runtime from 'react/jsx-runtime';
+import { TeamMember, TeamInvitation } from '@naveeg/lib';
 
 declare function cn(...inputs: ClassValue[]): string;
 
@@ -553,4 +554,60 @@ interface GoogleAnalyticsDashboardProps {
 }
 declare function GoogleAnalyticsDashboard({ metrics, loading, onRefresh, className }: GoogleAnalyticsDashboardProps): react_jsx_runtime.JSX.Element;
 
-export { AuthForm, AuthFormData, AuthFormProps, BillingInfo, BillingInfoProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, ChatMessage, Chatbot, ChatbotProps, ChatbotWidget, ChatbotWidgetProps, DomainCard, DomainCardProps, DomainForm, DomainFormData, DomainFormProps, DomainManager, DomainManagerProps, DomainVerification, DomainVerificationProps, EntitlementCard, EntitlementCardProps, FAQDocument, FAQManager, FAQManagerProps, FeatureBadge, FeatureBadgeProps, FeatureComparison, FeatureComparisonProps, FeatureGate, FeatureGateProps, FeatureTooltip, FeatureTooltipProps, GoogleAnalyticsDashboard, GoogleAnalyticsDashboardProps, GoogleAnalyticsMetrics, GoogleIntegration, GoogleIntegrationCard, GoogleIntegrationCardProps, GoogleIntegrationManager, GoogleIntegrationManagerProps, Input, InputProps, Invoice, InvoiceList, InvoiceListProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, PlanBadge, PlanBadgeProps, PricingCard, PricingCardProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UpgradeCTA, UpgradeCTAProps, UsageBar, UsageBarProps, UsageUpgradeCTA, UsageUpgradeCTAProps, UserMenu, UserMenuProps, WebsiteCard, WebsiteCardProps, buttonVariants, cn };
+interface TeamMemberCardProps {
+    member: TeamMember;
+    currentUserId: string;
+    onUpdateRole: (memberId: string, role: 'admin' | 'editor') => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onUpdateStatus: (memberId: string, status: 'active' | 'suspended') => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onRemove: (memberId: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    loading?: boolean;
+    className?: string;
+}
+declare function TeamMemberCard({ member, currentUserId, onUpdateRole, onUpdateStatus, onRemove, loading, className }: TeamMemberCardProps): react_jsx_runtime.JSX.Element;
+
+interface TeamInvitationCardProps {
+    invitation: TeamInvitation;
+    onRevoke: (invitationId: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    loading?: boolean;
+    className?: string;
+}
+declare function TeamInvitationCard({ invitation, onRevoke, loading, className }: TeamInvitationCardProps): react_jsx_runtime.JSX.Element;
+
+interface TeamManagerProps {
+    members: TeamMember[];
+    invitations: TeamInvitation[];
+    currentUserId: string;
+    onAddMember: (email: string, role: 'admin' | 'editor') => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onUpdateMember: (memberId: string, updates: Partial<Pick<TeamMember, 'role' | 'permissions' | 'status'>>) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onRemoveMember: (memberId: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    onRevokeInvitation: (invitationId: string) => Promise<{
+        success: boolean;
+        error?: string;
+    }>;
+    loading?: boolean;
+    className?: string;
+}
+declare function TeamManager({ members, invitations, currentUserId, onAddMember, onUpdateMember, onRemoveMember, onRevokeInvitation, loading, className }: TeamManagerProps): react_jsx_runtime.JSX.Element;
+
+export { AuthForm, AuthFormData, AuthFormProps, BillingInfo, BillingInfoProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, ChatMessage, Chatbot, ChatbotProps, ChatbotWidget, ChatbotWidgetProps, DomainCard, DomainCardProps, DomainForm, DomainFormData, DomainFormProps, DomainManager, DomainManagerProps, DomainVerification, DomainVerificationProps, EntitlementCard, EntitlementCardProps, FAQDocument, FAQManager, FAQManagerProps, FeatureBadge, FeatureBadgeProps, FeatureComparison, FeatureComparisonProps, FeatureGate, FeatureGateProps, FeatureTooltip, FeatureTooltipProps, GoogleAnalyticsDashboard, GoogleAnalyticsDashboardProps, GoogleAnalyticsMetrics, GoogleIntegration, GoogleIntegrationCard, GoogleIntegrationCardProps, GoogleIntegrationManager, GoogleIntegrationManagerProps, Input, InputProps, Invoice, InvoiceList, InvoiceListProps, Label, OnboardingProgress, OnboardingProgressProps, OnboardingStep, OnboardingStepProps, PlanBadge, PlanBadgeProps, PricingCard, PricingCardProps, ProtectedRoute, ProtectedRouteProps, Separator, SiteForm, SiteFormData, SiteFormProps, TeamInvitationCard, TeamInvitationCardProps, TeamManager, TeamManagerProps, TeamMemberCard, TeamMemberCardProps, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UpgradeCTA, UpgradeCTAProps, UsageBar, UsageBarProps, UsageUpgradeCTA, UsageUpgradeCTAProps, UserMenu, UserMenuProps, WebsiteCard, WebsiteCardProps, buttonVariants, cn };

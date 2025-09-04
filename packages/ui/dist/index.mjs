@@ -3291,6 +3291,460 @@ function GoogleAnalyticsDashboard({
     ] })
   ] });
 }
+
+// src/components/team-member-card.tsx
+import * as React13 from "react";
+import { TEAM_MEMBER_STATUS_COLORS, TEAM_MEMBER_ROLE_COLORS } from "@naveeg/lib";
+import { Fragment as Fragment7, jsx as jsx31, jsxs as jsxs24 } from "react/jsx-runtime";
+function TeamMemberCard({
+  member,
+  currentUserId,
+  onUpdateRole,
+  onUpdateStatus,
+  onRemove,
+  loading = false,
+  className
+}) {
+  const [isUpdating, setIsUpdating] = React13.useState(false);
+  const [error, setError] = React13.useState(null);
+  const isCurrentUser = member.user_id === currentUserId;
+  const canManage = member.role === "admin" || isCurrentUser;
+  const handleRoleChange = async (newRole) => {
+    if (isCurrentUser)
+      return;
+    setIsUpdating(true);
+    setError(null);
+    try {
+      const result = await onUpdateRole(member.id, newRole);
+      if (!result.success) {
+        setError(result.error || "Failed to update role");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update role");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+  const handleStatusChange = async (newStatus) => {
+    if (isCurrentUser)
+      return;
+    setIsUpdating(true);
+    setError(null);
+    try {
+      const result = await onUpdateStatus(member.id, newStatus);
+      if (!result.success) {
+        setError(result.error || "Failed to update status");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update status");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+  const handleRemove = async () => {
+    if (isCurrentUser)
+      return;
+    setIsUpdating(true);
+    setError(null);
+    try {
+      const result = await onRemove(member.id);
+      if (!result.success) {
+        setError(result.error || "Failed to remove member");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to remove member");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+  const getStatusColor = (status) => {
+    const color = TEAM_MEMBER_STATUS_COLORS[status];
+    return color === "yellow" ? "bg-yellow-100 text-yellow-800" : color === "green" ? "bg-green-100 text-green-800" : color === "red" ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800";
+  };
+  const getRoleColor = (role) => {
+    const color = TEAM_MEMBER_ROLE_COLORS[role];
+    return color === "purple" ? "bg-purple-100 text-purple-800" : color === "blue" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800";
+  };
+  return /* @__PURE__ */ jsx31(Card, { className: cn("w-full", className), children: /* @__PURE__ */ jsxs24(CardContent, { className: "pt-6", children: [
+    /* @__PURE__ */ jsxs24("div", { className: "flex items-start justify-between", children: [
+      /* @__PURE__ */ jsxs24("div", { className: "flex items-start space-x-3", children: [
+        /* @__PURE__ */ jsx31("div", { className: "flex-shrink-0", children: member.user?.avatar_url ? /* @__PURE__ */ jsx31(
+          "img",
+          {
+            src: member.user.avatar_url,
+            alt: member.user.full_name || member.user.email,
+            className: "w-10 h-10 rounded-full"
+          }
+        ) : /* @__PURE__ */ jsx31("div", { className: "w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center", children: /* @__PURE__ */ jsx31("span", { className: "text-sm font-medium text-gray-600", children: (member.user?.full_name || member.user?.email || "U").charAt(0).toUpperCase() }) }) }),
+        /* @__PURE__ */ jsxs24("div", { className: "flex-1 min-w-0", children: [
+          /* @__PURE__ */ jsx31("h3", { className: "text-lg font-medium text-gray-900", children: member.user?.full_name || "Unknown User" }),
+          /* @__PURE__ */ jsx31("p", { className: "text-sm text-gray-500 mt-1", children: member.user?.email || "No email" }),
+          /* @__PURE__ */ jsxs24("div", { className: "mt-2 flex items-center space-x-2", children: [
+            /* @__PURE__ */ jsx31("span", { className: cn(
+              "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium",
+              getRoleColor(member.role)
+            ), children: member.role.charAt(0).toUpperCase() + member.role.slice(1) }),
+            /* @__PURE__ */ jsx31("span", { className: cn(
+              "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium",
+              getStatusColor(member.status)
+            ), children: member.status.charAt(0).toUpperCase() + member.status.slice(1) })
+          ] }),
+          /* @__PURE__ */ jsxs24("div", { className: "mt-2 text-xs text-gray-500", children: [
+            member.joined_at ? /* @__PURE__ */ jsxs24(Fragment7, { children: [
+              "Joined ",
+              new Date(member.joined_at).toLocaleDateString()
+            ] }) : /* @__PURE__ */ jsxs24(Fragment7, { children: [
+              "Invited ",
+              new Date(member.invited_at).toLocaleDateString()
+            ] }),
+            member.last_active && /* @__PURE__ */ jsxs24(Fragment7, { children: [
+              " \u2022 Last active ",
+              new Date(member.last_active).toLocaleDateString()
+            ] })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs24("div", { className: "flex items-center space-x-2", children: [
+        !isCurrentUser && canManage && /* @__PURE__ */ jsxs24(Fragment7, { children: [
+          /* @__PURE__ */ jsxs24(
+            "select",
+            {
+              value: member.role,
+              onChange: (e) => handleRoleChange(e.target.value),
+              disabled: isUpdating || loading,
+              className: "text-sm border border-gray-300 rounded-md px-2 py-1",
+              children: [
+                /* @__PURE__ */ jsx31("option", { value: "editor", children: "Editor" }),
+                /* @__PURE__ */ jsx31("option", { value: "admin", children: "Admin" })
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxs24(
+            "select",
+            {
+              value: member.status,
+              onChange: (e) => handleStatusChange(e.target.value),
+              disabled: isUpdating || loading,
+              className: "text-sm border border-gray-300 rounded-md px-2 py-1",
+              children: [
+                /* @__PURE__ */ jsx31("option", { value: "active", children: "Active" }),
+                /* @__PURE__ */ jsx31("option", { value: "suspended", children: "Suspended" })
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsx31(
+            Button,
+            {
+              variant: "outline",
+              size: "sm",
+              onClick: handleRemove,
+              disabled: isUpdating || loading,
+              className: "text-red-600 hover:text-red-700",
+              children: isUpdating ? "..." : "Remove"
+            }
+          )
+        ] }),
+        isCurrentUser && /* @__PURE__ */ jsx31("span", { className: "text-sm text-gray-500 italic", children: "You" })
+      ] })
+    ] }),
+    error && /* @__PURE__ */ jsx31("div", { className: "mt-4 p-3 bg-red-50 border border-red-200 rounded-md", children: /* @__PURE__ */ jsx31("p", { className: "text-sm text-red-600", children: error }) })
+  ] }) });
+}
+
+// src/components/team-invitation-card.tsx
+import * as React14 from "react";
+import { Fragment as Fragment8, jsx as jsx32, jsxs as jsxs25 } from "react/jsx-runtime";
+function TeamInvitationCard({
+  invitation,
+  onRevoke,
+  loading = false,
+  className
+}) {
+  const [isRevoking, setIsRevoking] = React14.useState(false);
+  const [error, setError] = React14.useState(null);
+  const isExpired = new Date(invitation.expires_at) < /* @__PURE__ */ new Date();
+  const isPending = invitation.status === "pending";
+  const handleRevoke = async () => {
+    setIsRevoking(true);
+    setError(null);
+    try {
+      const result = await onRevoke(invitation.id);
+      if (!result.success) {
+        setError(result.error || "Failed to revoke invitation");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to revoke invitation");
+    } finally {
+      setIsRevoking(false);
+    }
+  };
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "accepted":
+        return "bg-green-100 text-green-800";
+      case "expired":
+        return "bg-red-100 text-red-800";
+      case "revoked":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+  const getRoleColor = (role) => {
+    return role === "admin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800";
+  };
+  return /* @__PURE__ */ jsx32(Card, { className: cn("w-full", className), children: /* @__PURE__ */ jsxs25(CardContent, { className: "pt-6", children: [
+    /* @__PURE__ */ jsxs25("div", { className: "flex items-start justify-between", children: [
+      /* @__PURE__ */ jsxs25("div", { className: "flex items-start space-x-3", children: [
+        /* @__PURE__ */ jsx32("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsx32("div", { className: "w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center", children: /* @__PURE__ */ jsx32("span", { className: "text-sm font-medium text-gray-600", children: invitation.email.charAt(0).toUpperCase() }) }) }),
+        /* @__PURE__ */ jsxs25("div", { className: "flex-1 min-w-0", children: [
+          /* @__PURE__ */ jsx32("h3", { className: "text-lg font-medium text-gray-900", children: invitation.email }),
+          /* @__PURE__ */ jsx32("p", { className: "text-sm text-gray-500 mt-1", children: "Invited to join the team" }),
+          /* @__PURE__ */ jsxs25("div", { className: "mt-2 flex items-center space-x-2", children: [
+            /* @__PURE__ */ jsx32("span", { className: cn(
+              "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium",
+              getRoleColor(invitation.role)
+            ), children: invitation.role.charAt(0).toUpperCase() + invitation.role.slice(1) }),
+            /* @__PURE__ */ jsx32("span", { className: cn(
+              "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium",
+              getStatusColor(invitation.status)
+            ), children: invitation.status.charAt(0).toUpperCase() + invitation.status.slice(1) }),
+            isExpired && isPending && /* @__PURE__ */ jsx32("span", { className: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800", children: "Expired" })
+          ] }),
+          /* @__PURE__ */ jsxs25("div", { className: "mt-2 text-xs text-gray-500", children: [
+            "Invited ",
+            new Date(invitation.created_at).toLocaleDateString(),
+            invitation.expires_at && /* @__PURE__ */ jsxs25(Fragment8, { children: [
+              " \u2022 Expires ",
+              new Date(invitation.expires_at).toLocaleDateString()
+            ] })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs25("div", { className: "flex items-center space-x-2", children: [
+        isPending && !isExpired && /* @__PURE__ */ jsx32(
+          Button,
+          {
+            variant: "outline",
+            size: "sm",
+            onClick: handleRevoke,
+            disabled: isRevoking || loading,
+            className: "text-red-600 hover:text-red-700",
+            children: isRevoking ? "Revoking..." : "Revoke"
+          }
+        ),
+        isExpired && isPending && /* @__PURE__ */ jsx32("span", { className: "text-sm text-gray-500 italic", children: "Expired" }),
+        invitation.status === "accepted" && /* @__PURE__ */ jsx32("span", { className: "text-sm text-green-600 italic", children: "Accepted" }),
+        invitation.status === "revoked" && /* @__PURE__ */ jsx32("span", { className: "text-sm text-gray-500 italic", children: "Revoked" })
+      ] })
+    ] }),
+    error && /* @__PURE__ */ jsx32("div", { className: "mt-4 p-3 bg-red-50 border border-red-200 rounded-md", children: /* @__PURE__ */ jsx32("p", { className: "text-sm text-red-600", children: error }) })
+  ] }) });
+}
+
+// src/components/team-manager.tsx
+import * as React15 from "react";
+import { jsx as jsx33, jsxs as jsxs26 } from "react/jsx-runtime";
+function TeamManager({
+  members,
+  invitations,
+  currentUserId,
+  onAddMember,
+  onUpdateMember,
+  onRemoveMember,
+  onRevokeInvitation,
+  loading = false,
+  className
+}) {
+  const [showAddForm, setShowAddForm] = React15.useState(false);
+  const [newMemberEmail, setNewMemberEmail] = React15.useState("");
+  const [newMemberRole, setNewMemberRole] = React15.useState("editor");
+  const [isAdding, setIsAdding] = React15.useState(false);
+  const [error, setError] = React15.useState(null);
+  const handleAddMember = async (e) => {
+    e.preventDefault();
+    if (!newMemberEmail.trim()) {
+      setError("Email is required");
+      return;
+    }
+    setIsAdding(true);
+    setError(null);
+    try {
+      const result = await onAddMember(newMemberEmail.trim(), newMemberRole);
+      if (result.success) {
+        setNewMemberEmail("");
+        setNewMemberRole("editor");
+        setShowAddForm(false);
+      } else {
+        setError(result.error || "Failed to add team member");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add team member");
+    } finally {
+      setIsAdding(false);
+    }
+  };
+  const handleUpdateMember = async (memberId, updates) => {
+    setError(null);
+    return await onUpdateMember(memberId, updates);
+  };
+  const handleRemoveMember = async (memberId) => {
+    setError(null);
+    return await onRemoveMember(memberId);
+  };
+  const handleRevokeInvitation = async (invitationId) => {
+    setError(null);
+    return await onRevokeInvitation(invitationId);
+  };
+  const activeMembers = members.filter((member) => member.status === "active");
+  const pendingInvitations = invitations.filter((invitation) => invitation.status === "pending");
+  return /* @__PURE__ */ jsxs26("div", { className: cn("space-y-6", className), children: [
+    /* @__PURE__ */ jsxs26("div", { className: "flex items-center justify-between", children: [
+      /* @__PURE__ */ jsxs26("div", { children: [
+        /* @__PURE__ */ jsx33("h2", { className: "text-2xl font-bold text-gray-900", children: "Team Management" }),
+        /* @__PURE__ */ jsx33("p", { className: "text-gray-600 mt-1", children: "Manage team members and their permissions" })
+      ] }),
+      /* @__PURE__ */ jsx33(
+        Button,
+        {
+          onClick: () => setShowAddForm(!showAddForm),
+          disabled: loading,
+          children: "Add Team Member"
+        }
+      )
+    ] }),
+    showAddForm && /* @__PURE__ */ jsxs26(Card, { children: [
+      /* @__PURE__ */ jsxs26(CardHeader, { children: [
+        /* @__PURE__ */ jsx33(CardTitle, { children: "Add Team Member" }),
+        /* @__PURE__ */ jsx33(CardDescription, { children: "Invite a new team member by email address" })
+      ] }),
+      /* @__PURE__ */ jsx33(CardContent, { children: /* @__PURE__ */ jsxs26("form", { onSubmit: handleAddMember, className: "space-y-4", children: [
+        /* @__PURE__ */ jsxs26("div", { children: [
+          /* @__PURE__ */ jsx33(Label, { htmlFor: "email", children: "Email Address" }),
+          /* @__PURE__ */ jsx33(
+            Input,
+            {
+              id: "email",
+              type: "email",
+              value: newMemberEmail,
+              onChange: (e) => setNewMemberEmail(e.target.value),
+              placeholder: "Enter email address",
+              required: true
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxs26("div", { children: [
+          /* @__PURE__ */ jsx33(Label, { htmlFor: "role", children: "Role" }),
+          /* @__PURE__ */ jsxs26(
+            "select",
+            {
+              id: "role",
+              value: newMemberRole,
+              onChange: (e) => setNewMemberRole(e.target.value),
+              className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+              children: [
+                /* @__PURE__ */ jsx33("option", { value: "editor", children: "Editor" }),
+                /* @__PURE__ */ jsx33("option", { value: "admin", children: "Admin" })
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsx33("p", { className: "text-sm text-gray-500 mt-1", children: newMemberRole === "admin" ? "Admins can manage all aspects of the website including team members and billing" : "Editors can manage content and analytics but cannot manage team or billing" })
+        ] }),
+        /* @__PURE__ */ jsxs26("div", { className: "flex items-center space-x-2", children: [
+          /* @__PURE__ */ jsx33(
+            Button,
+            {
+              type: "submit",
+              disabled: isAdding || loading,
+              children: isAdding ? "Adding..." : "Add Member"
+            }
+          ),
+          /* @__PURE__ */ jsx33(
+            Button,
+            {
+              type: "button",
+              variant: "outline",
+              onClick: () => {
+                setShowAddForm(false);
+                setNewMemberEmail("");
+                setError(null);
+              },
+              children: "Cancel"
+            }
+          )
+        ] })
+      ] }) })
+    ] }),
+    error && /* @__PURE__ */ jsx33("div", { className: "p-4 bg-red-50 border border-red-200 rounded-lg", children: /* @__PURE__ */ jsxs26("div", { className: "flex", children: [
+      /* @__PURE__ */ jsx33("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsx33("svg", { className: "h-5 w-5 text-red-400", viewBox: "0 0 20 20", fill: "currentColor", children: /* @__PURE__ */ jsx33("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z", clipRule: "evenodd" }) }) }),
+      /* @__PURE__ */ jsxs26("div", { className: "ml-3", children: [
+        /* @__PURE__ */ jsx33("h3", { className: "text-sm font-medium text-red-800", children: "Error" }),
+        /* @__PURE__ */ jsx33("div", { className: "mt-2 text-sm text-red-700", children: error })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxs26("div", { children: [
+      /* @__PURE__ */ jsxs26("h3", { className: "text-lg font-medium text-gray-900 mb-4", children: [
+        "Team Members (",
+        activeMembers.length,
+        ")"
+      ] }),
+      /* @__PURE__ */ jsxs26("div", { className: "space-y-4", children: [
+        activeMembers.map((member) => /* @__PURE__ */ jsx33(
+          TeamMemberCard,
+          {
+            member,
+            currentUserId,
+            onUpdateRole: (memberId, role) => handleUpdateMember(memberId, { role }),
+            onUpdateStatus: (memberId, status) => handleUpdateMember(memberId, { status }),
+            onRemove: handleRemoveMember,
+            loading
+          },
+          member.id
+        )),
+        activeMembers.length === 0 && /* @__PURE__ */ jsx33(Card, { children: /* @__PURE__ */ jsxs26(CardContent, { className: "text-center py-8", children: [
+          /* @__PURE__ */ jsx33("div", { className: "text-6xl mb-4", children: "\u{1F465}" }),
+          /* @__PURE__ */ jsx33("h3", { className: "text-lg font-medium text-gray-900 mb-2", children: "No team members yet" }),
+          /* @__PURE__ */ jsx33("p", { className: "text-gray-500", children: "Add team members to collaborate on your website." })
+        ] }) })
+      ] })
+    ] }),
+    pendingInvitations.length > 0 && /* @__PURE__ */ jsxs26("div", { children: [
+      /* @__PURE__ */ jsxs26("h3", { className: "text-lg font-medium text-gray-900 mb-4", children: [
+        "Pending Invitations (",
+        pendingInvitations.length,
+        ")"
+      ] }),
+      /* @__PURE__ */ jsx33("div", { className: "space-y-4", children: pendingInvitations.map((invitation) => /* @__PURE__ */ jsx33(
+        TeamInvitationCard,
+        {
+          invitation,
+          onRevoke: handleRevokeInvitation,
+          loading
+        },
+        invitation.id
+      )) })
+    ] }),
+    /* @__PURE__ */ jsxs26(Card, { children: [
+      /* @__PURE__ */ jsx33(CardHeader, { children: /* @__PURE__ */ jsx33(CardTitle, { children: "Team Statistics" }) }),
+      /* @__PURE__ */ jsx33(CardContent, { children: /* @__PURE__ */ jsxs26("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [
+        /* @__PURE__ */ jsxs26("div", { className: "text-center", children: [
+          /* @__PURE__ */ jsx33("div", { className: "text-2xl font-bold text-gray-900", children: activeMembers.length }),
+          /* @__PURE__ */ jsx33("div", { className: "text-sm text-gray-500", children: "Active Members" })
+        ] }),
+        /* @__PURE__ */ jsxs26("div", { className: "text-center", children: [
+          /* @__PURE__ */ jsx33("div", { className: "text-2xl font-bold text-gray-900", children: members.filter((m) => m.role === "admin").length }),
+          /* @__PURE__ */ jsx33("div", { className: "text-sm text-gray-500", children: "Admins" })
+        ] }),
+        /* @__PURE__ */ jsxs26("div", { className: "text-center", children: [
+          /* @__PURE__ */ jsx33("div", { className: "text-2xl font-bold text-gray-900", children: pendingInvitations.length }),
+          /* @__PURE__ */ jsx33("div", { className: "text-sm text-gray-500", children: "Pending Invitations" })
+        ] })
+      ] }) })
+    ] })
+  ] });
+}
 export {
   AuthForm,
   BillingInfo,
@@ -3326,6 +3780,9 @@ export {
   ProtectedRoute,
   Separator,
   SiteForm,
+  TeamInvitationCard,
+  TeamManager,
+  TeamMemberCard,
   Toast,
   ToastAction,
   ToastClose,

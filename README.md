@@ -1,208 +1,192 @@
-# Naveeg - Automated WordPress Site Creation SaaS Platform
+# Naveeg - Automated WordPress Site Creation Platform
 
-A comprehensive monorepo SaaS platform that automates WordPress site creation and management for solopreneurs and SMEs.
-
-## 🏗️ Architecture
-
-This is a monorepo containing multiple applications and shared packages:
-
-### Applications
-
-- **`/apps/marketing`** - Public marketing website (naveeg.com)
-- **`/apps/dashboard`** - User dashboard application (app.naveeg.com)
-
-### Packages
-
-- **`/packages/ui`** - Shared design system with Tailwind CSS + shadcn/ui
-- **`/packages/lib`** - Shared TypeScript utilities and API clients
-
-### Backend
-
-- **`/supabase`** - Database schema, migrations, and Edge Functions
+A comprehensive SaaS platform for automated WordPress site creation, designed specifically for European businesses. Built with Next.js, Supabase, and modern web technologies.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+- Node.js 18+
+- Vercel CLI (`npm i -g vercel`)
+- Supabase account
+- Stripe account
+- 10Web account
 
-- Node.js 18+ 
-- npm 8+
-- Supabase CLI
-- Docker (for local Supabase)
+### Development Setup
 
-### Installation
-
-1. **Clone and install dependencies:**
+1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
-   cd naveeg
+   git clone https://github.com/jbunel-naveeg/DMS.git
+   cd DMS
+   ```
+
+2. **Install dependencies**:
+   ```bash
    npm install
    ```
 
-2. **Set up environment variables:**
+3. **Set up environment variables**:
    ```bash
    cp env.example .env.local
-   # Fill in your environment variables
+   # Edit .env.local with your values
    ```
 
-3. **Start Supabase locally:**
-   ```bash
-   npx supabase start
-   ```
-
-4. **Run database migrations:**
-   ```bash
-   npx supabase db reset
-   ```
-
-5. **Start development servers:**
+4. **Start development servers**:
    ```bash
    npm run dev
    ```
 
-This will start:
-- Marketing site: http://localhost:3000
-- Dashboard app: http://localhost:3001
-- Supabase Studio: http://localhost:54323
+5. **Access the applications**:
+   - Marketing site: http://localhost:3000
+   - Dashboard app: http://localhost:3001
 
 ## 📁 Project Structure
 
 ```
-naveeg/
+DMS/
 ├── apps/
-│   ├── marketing/          # Marketing website
-│   │   ├── src/
-│   │   │   ├── app/        # Next.js App Router pages
-│   │   │   └── components/ # Marketing-specific components
-│   │   └── package.json
-│   └── dashboard/          # User dashboard
-│       ├── src/
-│       │   ├── app/        # Dashboard pages
-│       │   ├── lib/        # Dashboard-specific utilities
-│       │   └── components/ # Dashboard components
-│       └── package.json
+│   ├── marketing/          # Marketing website (naveeg.com)
+│   └── dashboard/          # User dashboard (app.naveeg.com)
 ├── packages/
 │   ├── ui/                 # Shared UI components
-│   │   ├── src/
-│   │   │   ├── components/ # Reusable components
-│   │   │   └── lib/        # UI utilities
-│   │   └── package.json
-│   └── lib/                # Shared utilities
-│       ├── src/
-│       │   ├── supabase/   # Supabase client & RLS
-│       │   ├── stripe/     # Stripe integration
-│       │   ├── tenweb/     # 10Web API client
-│       │   ├── types/      # TypeScript types
-│       │   └── validations/ # Zod schemas
-│       └── package.json
-├── supabase/
-│   ├── migrations/         # Database migrations
-│   ├── functions/          # Edge Functions
-│   └── config.toml         # Supabase configuration
-├── package.json            # Root package.json
-├── turbo.json             # Turborepo configuration
-└── README.md
+│   └── lib/                # Shared utilities and services
+├── supabase/               # Database schema and Edge Functions
+├── n8n/                    # Automation workflows
+└── docs/                   # Documentation
 ```
 
-## 🛠️ Development
+## 🛠️ Available Scripts
 
-### Available Scripts
-
-- `npm run dev` - Start all development servers
-- `npm run build` - Build all applications
+- `npm run dev` - Start development servers
+- `npm run build` - Build all packages
 - `npm run lint` - Lint all packages
 - `npm run type-check` - Type check all packages
-- `npm run clean` - Clean all build artifacts
-
-### Working with Packages
-
-Each package can be developed independently:
-
-```bash
-# Work on UI package
-cd packages/ui
-npm run dev
-
-# Work on dashboard
-cd apps/dashboard
-npm run dev
-```
-
-## 🗄️ Database Schema
-
-The platform uses a multi-tenant architecture with the following key tables:
-
-- **`users`** - User profiles (extends Supabase Auth)
-- **`websites`** - WordPress sites created via 10Web
-- **`plans`** - Subscription plans (Trial, Starter, Pro)
-- **`entitlements`** - Feature flags per website
-- **`team_members`** - Collaboration (Admin/Editor roles)
-- **`domains`** - Custom domain management
-- **`faq_docs`** - AI chatbot knowledge base
-- **`leads`** - Contact form submissions
-- **`settings`** - Key-value configuration store
-
-## 🔐 Security
-
-- **Row Level Security (RLS)** - Multi-tenant data isolation
-- **Role-based permissions** - Admin vs Editor access control
-- **Plan-based feature gating** - Trial/Starter/Pro restrictions
-- **JWT authentication** - Supabase Auth integration
-
-## 🌍 Features
-
-### Core Features
-- ✅ User authentication (email/password + Google OAuth)
-- ✅ 7-day free trial with full Pro features
-- ✅ Automated WordPress site creation via 10Web
-- ✅ Trial subdomain setup (site.naveeg.online)
-- ✅ Stripe subscription billing (Starter €49, Pro €99)
-- ✅ Custom domain connection (Pro only)
-- ✅ Team collaboration (Pro only)
-
-### Advanced Features
-- 🔄 AI-powered FAQ chatbot
-- 🔄 Google Analytics integration
-- 🔄 n8n workflow automation
-- 🔄 Lead management system
-- 🔄 Multi-language support (i18n)
+- `npm run clean` - Clean build artifacts
+- `npm run test` - Run tests
+- `npm run deploy` - Deploy to Vercel
+- `npm run setup-production` - Set up production environment
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
+### Automatic Deployment
+```bash
+npm run setup-production
+npm run deploy
+```
 
-1. **Set up Vercel projects:**
-   - Marketing: `naveeg.com`
-   - Dashboard: `app.naveeg.com`
+### Manual Deployment
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
 
-2. **Configure environment variables** in each Vercel project
+## 🏗️ Architecture
 
-3. **Deploy:**
-   ```bash
-   npm run build
-   # Deploy via Vercel CLI or GitHub integration
-   ```
+### Frontend
+- **Marketing Site**: Next.js 14 with App Router
+- **Dashboard App**: Next.js 14 with App Router
+- **UI Library**: Custom components with Tailwind CSS
+- **State Management**: React hooks and context
 
-### Supabase
+### Backend
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth with Google OAuth
+- **Payments**: Stripe integration
+- **Hosting**: 10Web WordPress hosting
+- **AI**: OpenAI GPT integration
+- **Analytics**: Google Analytics & Search Console
 
-1. **Deploy Edge Functions:**
-   ```bash
-   npx supabase functions deploy
-   ```
+### Infrastructure
+- **Deployment**: Vercel
+- **CDN**: Vercel Edge Network
+- **Monitoring**: Vercel Analytics
+- **Automation**: N8N workflows
 
-2. **Run migrations:**
-   ```bash
-   npx supabase db push
-   ```
+## 🔧 Configuration
 
-## 📝 Environment Variables
+### Environment Variables
 
-See `env.example` for all required environment variables.
-
-Key variables:
+#### Marketing Site
 - `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
-- `STRIPE_SECRET_KEY` - Stripe API key
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
+
+#### Dashboard App
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key
+- `STRIPE_SECRET_KEY` - Stripe secret key
+- `STRIPE_PUBLISHABLE_KEY` - Stripe publishable key
+- `STRIPE_WEBHOOK_SECRET` - Stripe webhook secret
 - `TENWEB_API_KEY` - 10Web API key
 - `OPENAI_API_KEY` - OpenAI API key
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID
+- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
+- `N8N_WEBHOOK_URL` - N8N webhook URL (optional)
+- `SLACK_WEBHOOK_URL` - Slack webhook URL (optional)
+
+### Database Setup
+
+1. **Create Supabase project**
+2. **Run migrations**:
+   ```bash
+   cd supabase
+   supabase db push
+   ```
+3. **Deploy Edge Functions**:
+   ```bash
+   supabase functions deploy
+   ```
+
+## 📊 Features
+
+### Core Features
+- ✅ AI-powered WordPress site creation
+- ✅ Custom domain management
+- ✅ Team collaboration
+- ✅ Analytics integration
+- ✅ GDPR compliance
+- ✅ Multi-tenant architecture
+- ✅ Stripe payment processing
+- ✅ 10Web hosting integration
+
+### Advanced Features
+- ✅ N8N automation workflows
+- ✅ Google OAuth integration
+- ✅ OpenAI chatbot
+- ✅ FAQ management
+- ✅ Team member management
+- ✅ Feature gating system
+- ✅ Usage tracking and limits
+
+## 🔒 Security
+
+- **Authentication**: Supabase Auth with JWT tokens
+- **Authorization**: Row-Level Security (RLS) policies
+- **Data Protection**: GDPR compliant data handling
+- **HTTPS**: SSL certificates for all domains
+- **CORS**: Configured for security
+- **Rate Limiting**: API rate limiting implemented
+
+## 📈 Performance
+
+- **Static Generation**: Optimized for performance
+- **CDN**: Global content delivery
+- **Image Optimization**: Next.js image optimization
+- **Bundle Splitting**: Optimized JavaScript bundles
+- **Caching**: Strategic caching implementation
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+npm run test
+
+# Run tests for specific package
+npm run test -- --filter=@naveeg/dashboard
+```
+
+## 📚 Documentation
+
+- [Deployment Guide](./DEPLOYMENT.md)
+- [API Documentation](./docs/api.md)
+- [Database Schema](./docs/database.md)
+- [Contributing Guide](./docs/contributing.md)
 
 ## 🤝 Contributing
 
@@ -218,4 +202,22 @@ This project is proprietary software. All rights reserved.
 
 ## 🆘 Support
 
-For support, email support@naveeg.com or visit our documentation.
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check the documentation
+
+## 🔄 Changelog
+
+### v1.0.0 (2024-01-01)
+- Initial release
+- Core platform functionality
+- Marketing site
+- Dashboard application
+- Payment processing
+- Team collaboration
+- AI integration
+
+---
+
+**Naveeg** - Making WordPress site creation simple for European businesses.
