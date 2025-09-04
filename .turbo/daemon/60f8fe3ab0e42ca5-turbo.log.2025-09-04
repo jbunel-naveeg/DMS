@@ -205,3 +205,7 @@
 2025-09-04T17:45:39.528141Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
 2025-09-04T17:45:39.967629Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("node_modules/.cache/turbo/516ab5f3ef2ef459.tar.zst"), AnchoredSystemPathBuf("apps/dashboard/.turbo/turbo-build.log"), AnchoredSystemPathBuf("apps/dashboard/.next/trace"), AnchoredSystemPathBuf("node_modules/.cache/turbo/516ab5f3ef2ef459-meta.json"), AnchoredSystemPathBuf(".turbo/cookies/18.cookie")}
 2025-09-04T17:45:39.967640Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@naveeg/dashboard"), path: AnchoredSystemPathBuf("apps/dashboard") }, WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-09-04T17:47:14.967070Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".gitignore")}
+2025-09-04T17:47:14.967105Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-09-04T17:47:15.067449Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".gitignore")}
+2025-09-04T17:47:15.067458Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
