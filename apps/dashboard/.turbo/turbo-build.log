@@ -6,38 +6,268 @@
 
  [37m[1m [22m[39m Creating an optimized production build ...
  [32m[1m✓[22m[39m Compiled successfully
-[?25l [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G[?25h [37m[1m [22m[39m Linting and checking validity of types     [32m[1m✓[22m[39m Linting and checking validity of types 
-[?25l [37m[1m [22m[39m Collecting page data  [36m.[39m[2K[1G [37m[1m [22m[39m Collecting page data  [36m..[39m[2K[1G[?25h [37m[1m [22m[39m Collecting page data     [32m[1m✓[22m[39m Collecting page data 
-[?25l [37m[1m [22m[39m Generating static pages (0/19)  [36m[    ][39m[2K[1G [37m[1m [22m[39m Generating static pages (7/19)  [36m[=   ][39m[2K[1G[?25h [32m[1m✓[22m[39m Generating static pages (19/19)
-[?25l [37m[1m [22m[39m Finalizing page optimization  [36m.[39m[?25l [37m[1m [22m[39m Collecting build traces  [36m.[39m[2K[1G[?25h [37m[1m [22m[39m Collecting build traces     [32m[1m✓[22m[39m Collecting build traces 
-[2K[1G[?25h [37m[1m [22m[39m Finalizing page optimization     [32m[1m✓[22m[39m Finalizing page optimization 
+[?25l [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G[?25h [37m[1m [22m[39m Linting and checking validity of types     [32m[1m✓[22m[39m Linting and checking validity of types 
+[?25l [37m[1m [22m[39m Collecting page data  [36m.[39m[2K[1G [37m[1m [22m[39m Collecting page data  [36m..[39m[2K[1G [37m[1m [22m[39m Collecting page data  [36m...[39m[2K[1G[?25h [37m[1m [22m[39m Collecting page data     [32m[1m✓[22m[39m Collecting page data 
+[?25l [37m[1m [22m[39m Generating static pages (0/22)  [36m[    ][39mError: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 7520 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/dashboard/analytics/page.js:1:2737)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906 {
+  digest: '1223304507'
+}
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 6658 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/page.js:1:2460)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906 {
+  digest: '1145285189'
+}
 
-[4mRoute (app)[24m                              [4mSize[24m     [4mFirst Load JS[24m
-┌ ○ /                                    156 B          [37m[1m87.3 kB[22m[39m
-├ ○ /_not-found                          876 B            [37m[1m88 kB[22m[39m
-├ ○ /api/auth                            0 B                [37m[1m0 B[22m[39m
-├ ƒ /api/auth/start-trial                0 B                [37m[1m0 B[22m[39m
-├ ƒ /api/n8n/hook                        0 B                [37m[1m0 B[22m[39m
-├ ƒ /api/stripe/webhook                  0 B                [37m[1m0 B[22m[39m
-├ ƒ /api/tenweb/generate                 0 B                [37m[1m0 B[22m[39m
-├ ƒ /api/tenweb/status                   0 B                [37m[1m0 B[22m[39m
-├ ○ /dashboard                           364 B          [37m[1m87.5 kB[22m[39m
-├ ○ /dashboard/analytics                 156 B          [37m[1m87.3 kB[22m[39m
-├ ○ /dashboard/billing                   564 B          [37m[1m87.7 kB[22m[39m
-├ ○ /dashboard/domains                   157 B          [37m[1m87.3 kB[22m[39m
-├ ○ /dashboard/pages                     156 B          [37m[1m87.3 kB[22m[39m
-├ ○ /login                               43.8 kB         [37m[1m131 kB[22m[39m
-├ ○ /onboarding                          13.2 kB         [37m[1m100 kB[22m[39m
-└ ○ /pricing                             156 B          [37m[1m87.3 kB[22m[39m
-+ First Load JS shared by all            [37m[1m87.1 kB[22m[39m
-  ├ chunks/1dd3208c-0bef3885139748d4.js  53.7 kB
-  ├ chunks/528-ff38d9ea84c9c52f.js       31.6 kB
-  └ other shared chunks (total)          1.92 kB
+Error occurred prerendering page "/". Read more: https://nextjs.org/docs/messages/prerender-error
 
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 6658 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/page.js:1:2460)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906
 
-ƒ Middleware                             [37m[1m26.4 kB[22m[39m
+Error occurred prerendering page "/dashboard/analytics". Read more: https://nextjs.org/docs/messages/prerender-error
 
-○  (Static)   prerendered as static content
-ƒ  (Dynamic)  server-rendered on demand
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 7520 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/dashboard/analytics/page.js:1:2737)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906
+[2K[1G [37m[1m [22m[39m Generating static pages (10/22)  [36m[=   ][39mError: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 7456 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/auth/signin/page.js:1:2563)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906 {
+  digest: '1979445910'
+}
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 7520 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/dashboard/pages/page.js:1:2713)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906 {
+  digest: '1112985867'
+}
 
-[?25h[1G[0K⠙[1G[0K
+Error occurred prerendering page "/dashboard/pages". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 7520 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/dashboard/pages/page.js:1:2713)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 6376 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/auth/signup/page.js:1:2566)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906 {
+  digest: '3403846037'
+}
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 2218 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/auth/reset-password/page.js:1:2622)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906 {
+  digest: '3427383210'
+}
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 7520 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/dashboard/pages/page.js:1:2713)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906 {
+  digest: '1112985867'
+}
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 7520 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/dashboard/domains/page.js:1:2725)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906 {
+  digest: '463443677'
+}
+
+Error occurred prerendering page "/auth/signin". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 7456 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/auth/signin/page.js:1:2563)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906
+
+Error occurred prerendering page "/auth/reset-password". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 2218 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/auth/reset-password/page.js:1:2622)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 6664 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/dashboard/page.js:1:4703)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906 {
+  digest: '801623489'
+}
+
+Error occurred prerendering page "/dashboard/domains". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 7520 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/dashboard/domains/page.js:1:2725)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906
+
+Error occurred prerendering page "/auth/signup". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 6376 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/auth/signup/page.js:1:2566)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906
+
+Error occurred prerendering page "/dashboard/billing". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 7520 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/dashboard/pages/page.js:1:2713)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906
+
+Error occurred prerendering page "/dashboard". Read more: https://nextjs.org/docs/messages/prerender-error
+
+Error: Missing Supabase environment variables
+    at S (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:11803)
+    at new <anonymous> (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12229)
+    at 3304 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/chunks/395.js:1:12191)
+    at t (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at 6664 (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/app/dashboard/page.js:1:4703)
+    at Object.t [as require] (/Users/jonathanbunel/DMS/apps/dashboard/.next/server/webpack-runtime.js:1:128)
+    at require (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:18839)
+    at i (/Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:88296)
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98819
+    at /Users/jonathanbunel/DMS/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:98906
+[2K[1G[?25h [32m[1m✓[22m[39m Generating static pages (22/22)
+
+> Export encountered errors on following paths:
+	/auth/reset-password/page: /auth/reset-password
+	/auth/signin/page: /auth/signin
+	/auth/signup/page: /auth/signup
+	/dashboard/analytics/page: /dashboard/analytics
+	/dashboard/billing/page: /dashboard/billing
+	/dashboard/domains/page: /dashboard/domains
+	/dashboard/page: /dashboard
+	/dashboard/pages/page: /dashboard/pages
+	/page: /
+[?25h[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m Lifecycle script `build` failed with error:
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mcode[39m [33m1[39m
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mpath[39m /Users/jonathanbunel/DMS/apps/dashboard
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mworkspace[39m @naveeg/dashboard@1.0.0
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mlocation[39m /Users/jonathanbunel/DMS/apps/dashboard
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m command failed
+[1G[0K⠙[1G[0K[1mnpm[22m [31merror[39m [94mcommand[39m sh -c next build
+[1G[0K⠙[1G[0K

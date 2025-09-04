@@ -6,6 +6,7 @@ import * as LabelPrimitive from '@radix-ui/react-label';
 import * as SeparatorPrimitive from '@radix-ui/react-separator';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
+import * as react_jsx_runtime from 'react/jsx-runtime';
 
 declare function cn(...inputs: ClassValue[]): string;
 
@@ -50,4 +51,47 @@ declare const Tooltip: React.FC<TooltipPrimitive.TooltipProps>;
 declare const TooltipTrigger: React.ForwardRefExoticComponent<TooltipPrimitive.TooltipTriggerProps & React.RefAttributes<HTMLButtonElement>>;
 declare const TooltipContent: React.ForwardRefExoticComponent<Omit<TooltipPrimitive.TooltipContentProps & React.RefAttributes<HTMLDivElement>, "ref"> & React.RefAttributes<HTMLDivElement>>;
 
-export { Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Input, InputProps, Label, Separator, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, buttonVariants, cn };
+interface AuthFormProps {
+    mode: 'signin' | 'signup' | 'reset';
+    onSubmit: (data: AuthFormData) => Promise<{
+        error: any;
+    }>;
+    onGoogleSignIn?: () => Promise<{
+        error: any;
+    }>;
+    onModeChange: (mode: 'signin' | 'signup' | 'reset') => void;
+    loading?: boolean;
+    className?: string;
+}
+interface AuthFormData {
+    email: string;
+    password: string;
+    name?: string;
+}
+declare function AuthForm({ mode, onSubmit, onGoogleSignIn, onModeChange, loading, className }: AuthFormProps): react_jsx_runtime.JSX.Element;
+
+interface ProtectedRouteProps {
+    children: React.ReactNode;
+    fallback?: React.ReactNode;
+    requireAuth?: boolean;
+    className?: string;
+    user?: any;
+    loading?: boolean;
+}
+declare function ProtectedRoute({ children, fallback, requireAuth, className, user, loading }: ProtectedRouteProps): react_jsx_runtime.JSX.Element;
+
+interface UserMenuProps {
+    user: {
+        id: string;
+        email?: string;
+        name?: string;
+        avatar_url?: string;
+    };
+    onSignOut: () => void;
+    onProfileClick?: () => void;
+    onSettingsClick?: () => void;
+    className?: string;
+}
+declare function UserMenu({ user, onSignOut, onProfileClick, onSettingsClick, className }: UserMenuProps): react_jsx_runtime.JSX.Element;
+
+export { AuthForm, AuthFormData, AuthFormProps, Button, ButtonProps, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Input, InputProps, Label, ProtectedRoute, ProtectedRouteProps, Separator, Toast, ToastAction, ToastActionElement, ToastClose, ToastDescription, ToastProps, ToastProvider, ToastTitle, ToastViewport, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, UserMenu, UserMenuProps, buttonVariants, cn };
