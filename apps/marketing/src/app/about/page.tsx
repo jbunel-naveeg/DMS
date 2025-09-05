@@ -41,8 +41,8 @@ export default function AboutPage() {
             About Naveeg
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            We're on a mission to democratize web development for European businesses, 
-            making professional WordPress sites accessible to everyone.
+            We're on a mission to help small business owners succeed online without the technical headaches. 
+            Your time should be spent doing what you love – running your business.
           </p>
         </div>
       </section>
@@ -54,20 +54,16 @@ export default function AboutPage() {
             <div>
               <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Story</h2>
               <p className="text-lg text-gray-600 mb-6">
-                Naveeg was born from a simple observation: too many European businesses 
-                struggle with outdated, expensive, or overly complex website solutions. 
-                We saw the gap between what small businesses needed and what was available.
+                Naveeg was created with a simple belief: small business owners shouldn't need to be tech experts to succeed online. 
+                After working with many local businesses (hairdressers, cafés, plumbers – you name it), our founding team saw the same problem over and over: 
+                entrepreneurs spending time and money they can't spare on websites and digital marketing, or worse – neglecting it and missing out on customers.
               </p>
               <p className="text-lg text-gray-600 mb-6">
-                Founded in 2024, we set out to create a platform that combines the power 
-                of WordPress with the simplicity of modern SaaS tools. Our goal is to 
-                help European entrepreneurs focus on what they do best – running their 
-                business – while we handle the technical complexity.
+                We built Naveeg to change that. With a blend of smart technology and real-world insight, we aim to give every local business owner a stress-free path to a great online presence. 
+                Your time should be spent doing what you love – running your business – not wrestling with website builders or algorithms.
               </p>
               <p className="text-lg text-gray-600">
-                Today, we're proud to serve businesses across Europe, from solo freelancers 
-                to growing SMEs, all united by their need for a reliable, professional 
-                online presence.
+                Naveeg is here to handle the heavy lifting for you. We're your partner in navigating the online world and helping your business shine.
               </p>
             </div>
             <div className="bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg p-8">

@@ -42,7 +42,7 @@ export default function PricingPage() {
             Simple, transparent pricing
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Choose the plan that fits your needs. All plans include VAT and can be cancelled anytime.
+            Choose the plan that fits your needs. All prices include VAT and can be cancelled anytime.
           </p>
           <div className="flex items-center justify-center space-x-4">
             <span className="text-sm text-gray-500">Monthly</span>
@@ -82,7 +82,7 @@ export default function PricingPage() {
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span>14-day trial period</span>
+                  <span>7-day trial period</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
@@ -125,23 +125,23 @@ export default function PricingPage() {
               <ul className="space-y-4 mb-8">
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span>3 WordPress sites</span>
+                  <span>1 WordPress site</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span>Custom domains</span>
+                  <span>Free Naveeg subdomain</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span>Premium templates</span>
+                  <span>AI website builder</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span>Google Analytics integration</span>
+                  <span>SEO basics & mobile-friendly</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span>SEO optimization tools</span>
+                  <span>Contact form & lead collection</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
@@ -150,6 +150,10 @@ export default function PricingPage() {
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
                   <span>SSL certificates</span>
+                </li>
+                <li className="flex items-center">
+                  <X className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-400">Custom domains (Pro only)</span>
                 </li>
                 <li className="flex items-center">
                   <X className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
@@ -173,7 +177,7 @@ export default function PricingPage() {
               <ul className="space-y-4 mb-8">
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span>10 WordPress sites</span>
+                  <span>Up to 5 websites</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
@@ -181,7 +185,7 @@ export default function PricingPage() {
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span>All templates</span>
+                  <span>AI chatbot</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
@@ -189,19 +193,19 @@ export default function PricingPage() {
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span>Team collaboration (up to 5 members)</span>
+                  <span>Team collaboration</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span>E-commerce ready</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span>Automations & integrations</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
                   <span>Priority support</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span>AI chatbot integration</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span>White-label options</span>
                 </li>
               </ul>
               
@@ -241,7 +245,7 @@ export default function PricingPage() {
                 What happens after my trial ends?
               </h3>
               <p className="text-gray-600">
-                After your 14-day trial, you'll need to choose a paid plan to continue using Naveeg. 
+                After your 7-day trial, you'll need to choose a paid plan to continue using Naveeg. 
                 Your site will remain accessible, but some features may be limited until you upgrade.
               </p>
             </div>
