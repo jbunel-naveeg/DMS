@@ -81,7 +81,7 @@
   }
   
   .kicker {
-    @apply font-lato text-kicker font-regular tracking-wide uppercase text-muted;
+    @apply font-lato text-kicker font-normal tracking-wide uppercase text-muted;
   }
   
   .btn-primary {
