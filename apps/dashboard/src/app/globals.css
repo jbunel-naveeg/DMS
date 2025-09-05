@@ -8,10 +8,73 @@
   }
 }
 
-
-
+/* Naveeg Design System for Dashboard */
 @layer base {
   :root {
+    /* Brand Colors */
+    --ink: 0 0% 9%;
+    --ink-light: 0 0% 98%;
+    --surface: 0 0% 100%;
+    --accent-blue: 214 100% 50%;
+    --accent-purple: 262 83% 58%;
+    --accent-green: 142 76% 36%;
+    --accent-yellow: 45 93% 47%;
+    --accent-red: 0 84% 60%;
+    --neutral-50: 0 0% 98%;
+    --neutral-100: 0 0% 96%;
+    --neutral-200: 0 0% 90%;
+    --neutral-300: 0 0% 83%;
+    --neutral-400: 0 0% 64%;
+    --neutral-500: 0 0% 45%;
+    --neutral-600: 0 0% 32%;
+    --neutral-700: 0 0% 25%;
+    --neutral-800: 0 0% 15%;
+    --neutral-900: 0 0% 9%;
+    --muted: 0 0% 45%;
+    --icon: 0 0% 45%;
+    
+    /* Gradients */
+    --gradient-main: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+    --gradient-starter: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    --gradient-pro: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    --gradient-trial: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    --gradient-pricing: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    --gradient-background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
+    --gradient-primary-bg: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+    
+    /* Typography Scale */
+    --h1-mobile: 2.25rem;
+    --h1-desktop: 3.75rem;
+    --h2-mobile: 1.875rem;
+    --h2-desktop: 3rem;
+    --h3-mobile: 1.5rem;
+    --h3-desktop: 2.25rem;
+    --h4-mobile: 1.25rem;
+    --h4-desktop: 1.875rem;
+    --body-mobile: 1rem;
+    --body-desktop: 1.125rem;
+    --kicker: 0.875rem;
+    
+    /* Spacing */
+    --section-mobile: 3rem;
+    --section-desktop: 5rem;
+    --button-padding: 1.5rem;
+    
+    /* Border Radius */
+    --brand: 0.75rem;
+    --button: 0.5rem;
+    
+    /* Shadows */
+    --brand: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --button: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    
+    /* Max Widths */
+    --container: 1280px;
+    --content: 65ch;
+    
+    /* Legacy shadcn/ui variables for compatibility */
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
@@ -38,7 +101,15 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+  
   .dark {
+    --ink: 0 0% 98%;
+    --ink-light: 0 0% 9%;
+    --surface: 0 0% 3.9%;
+    --muted: 0 0% 63.9%;
+    --icon: 0 0% 63.9%;
+    
+    /* Legacy dark mode variables */
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
     --card: 0 0% 3.9%;
@@ -66,13 +137,57 @@
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
   }
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-lato;
+  }
+  
+  /* Naveeg Design System Typography */
+  h1 {
+    @apply font-sansation text-h1-mobile md:text-h1-desktop font-extrabold tracking-tight text-ink max-w-content;
+  }
+  
+  h2 {
+    @apply font-sansation text-h2-mobile md:text-h2-desktop font-bold tracking-tight text-ink max-w-content;
+  }
+  
+  h3 {
+    @apply font-sansation text-xl font-bold text-ink;
+  }
+  
+  h4 {
+    @apply font-sansation text-lg font-semibold text-ink;
+  }
+  
+  p {
+    @apply font-lato text-body-mobile md:text-body-desktop text-muted max-w-content;
+  }
+  
+  .kicker {
+    @apply font-lato text-kicker font-regular tracking-wide uppercase text-muted;
+  }
+  
+  .btn-primary {
+    @apply h-12 px-button-padding rounded-button font-semibold bg-ink text-ink-light hover:bg-neutral-800 transition-colors shadow-button;
+  }
+  
+  .btn-secondary {
+    @apply h-12 px-button-padding rounded-button font-semibold border-2 border-neutral-300 text-neutral-700 hover:bg-neutral-50 transition-colors;
+  }
+  
+  .card {
+    @apply bg-surface rounded-brand shadow-card p-6;
+  }
+  
+  .section-padding {
+    @apply py-section-mobile md:py-section-desktop;
+  }
+  
+  .container-custom {
+    @apply max-w-container mx-auto px-4 sm:px-6 lg:px-8;
   }
 }

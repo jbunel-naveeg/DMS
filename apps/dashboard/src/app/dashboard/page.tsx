@@ -88,15 +88,15 @@ export default function DashboardPage() {
   const suggestedPlan = PLANS.find(p => p.id === 'starter')!
 
   return (
-    <div className="px-4 py-6 sm:px-0">
+    <div className="container-custom section-padding">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="mb-2">
               Welcome back, {user?.user_metadata?.name || user?.email}!
             </h1>
-            <p className="mt-2 text-gray-600">
+            <p className="text-muted">
               Manage your websites, domains, and analytics from your dashboard.
             </p>
           </div>
@@ -106,7 +106,7 @@ export default function DashboardPage() {
 
       {/* Usage Overview */}
       <div className="mb-8">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Usage Overview</h2>
+        <h2 className="mb-4">Usage Overview</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardContent className="p-4">
@@ -187,14 +187,14 @@ export default function DashboardPage() {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
+              className="h-4 w-4 text-icon"
             >
               <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{usage.websites_count}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-ink">{usage.websites_count}</div>
+            <p className="text-xs text-muted">
               {planUsage.websites.limit === -1 ? 'Unlimited' : `of ${planUsage.websites.limit} allowed`}
             </p>
           </CardContent>
@@ -211,7 +211,7 @@ export default function DashboardPage() {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
+              className="h-4 w-4 text-icon"
             >
               <circle cx="12" cy="12" r="10" />
               <path d="M8 12h8" />
@@ -219,8 +219,8 @@ export default function DashboardPage() {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{usage.domains_count}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-ink">{usage.domains_count}</div>
+            <p className="text-xs text-muted">
               {planUsage.domains.limit === -1 ? 'Unlimited' : `of ${planUsage.domains.limit} allowed`}
             </p>
           </CardContent>
@@ -237,7 +237,7 @@ export default function DashboardPage() {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
+              className="h-4 w-4 text-icon"
             >
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
@@ -246,8 +246,8 @@ export default function DashboardPage() {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{usage.storage_used}GB</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-ink">{usage.storage_used}GB</div>
+            <p className="text-xs text-muted">
               {planUsage.storage.limit === -1 ? 'Unlimited' : `of ${planUsage.storage.limit}GB allowed`}
             </p>
           </CardContent>
@@ -257,7 +257,7 @@ export default function DashboardPage() {
       {/* Websites */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-medium text-gray-900">Your Websites</h2>
+          <h2 className="mb-0">Your Websites</h2>
           <Button onClick={handleCreateWebsite}>
             Create Website
           </Button>
@@ -291,8 +291,8 @@ export default function DashboardPage() {
                     d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                   />
                 </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No websites yet</h3>
-                <p className="mt-1 text-sm text-gray-500">
+                <h3 className="mt-2 text-sm font-medium text-ink">No websites yet</h3>
+                <p className="mt-1 text-sm text-muted">
                   Get started by creating your first website.
                 </p>
                 <div className="mt-6">
@@ -309,7 +309,7 @@ export default function DashboardPage() {
       {/* Domains */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-medium text-gray-900">Your Domains</h2>
+          <h2 className="mb-0">Your Domains</h2>
           <Button variant="outline" onClick={handleConnectDomain}>
             Connect Domain
           </Button>
@@ -343,8 +343,8 @@ export default function DashboardPage() {
                     d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"
                   />
                 </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No domains connected</h3>
-                <p className="mt-1 text-sm text-gray-500">
+                <h3 className="mt-2 text-sm font-medium text-ink">No domains connected</h3>
+                <p className="mt-1 text-sm text-muted">
                   Connect a custom domain to your website.
                 </p>
                 <div className="mt-6">
@@ -360,9 +360,9 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="mb-8">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
+        <h2 className="mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <Card className="hover:shadow-card-hover transition-all duration-200 cursor-pointer group">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium">Create Website</CardTitle>
               <CardDescription>
@@ -377,7 +377,7 @@ export default function DashboardPage() {
           </Card>
 
           <FeatureGate feature="custom_domains">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <Card className="hover:shadow-card-hover transition-all duration-200 cursor-pointer group">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">Connect Domain</CardTitle>
                 <CardDescription>
@@ -393,7 +393,7 @@ export default function DashboardPage() {
           </FeatureGate>
 
           <FeatureGate feature="basic_analytics">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <Card className="hover:shadow-card-hover transition-all duration-200 cursor-pointer group">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium">View Analytics</CardTitle>
                 <CardDescription>
@@ -408,7 +408,7 @@ export default function DashboardPage() {
             </Card>
           </FeatureGate>
 
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <Card className="hover:shadow-card-hover transition-all duration-200 cursor-pointer group">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium">Upgrade Plan</CardTitle>
               <CardDescription>
