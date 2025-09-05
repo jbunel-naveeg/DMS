@@ -57,3 +57,50 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Naveeg Design System Typography */
+@layer base {
+  h1 {
+    @apply font-sansation text-h1-mobile md:text-h1-desktop font-extrabold tracking-tight text-ink max-w-content;
+  }
+  
+  h2 {
+    @apply font-sansation text-h2-mobile md:text-h2-desktop font-bold tracking-tight text-ink max-w-content;
+  }
+  
+  h3 {
+    @apply font-sansation text-xl font-bold text-ink;
+  }
+  
+  h4 {
+    @apply font-sansation text-lg font-semibold text-ink;
+  }
+  
+  p {
+    @apply font-lato text-body-mobile md:text-body-desktop text-muted max-w-content;
+  }
+  
+  .kicker {
+    @apply font-lato text-kicker font-regular tracking-wide uppercase text-muted;
+  }
+  
+  .btn-primary {
+    @apply h-12 px-button-padding rounded-button font-semibold bg-ink text-ink-light hover:bg-neutral-800 transition-colors shadow-button;
+  }
+  
+  .btn-secondary {
+    @apply h-12 px-button-padding rounded-button font-semibold border-2 border-neutral-300 text-neutral-700 hover:bg-neutral-50 transition-colors;
+  }
+  
+  .card {
+    @apply bg-surface rounded-brand shadow-card p-6;
+  }
+  
+  .section-padding {
+    @apply py-section-mobile md:py-section-desktop;
+  }
+  
+  .container-custom {
+    @apply max-w-container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
