@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createBrowserClient } from '@naveeg/lib'
-import { stripeSubscriptionService } from '@naveeg/lib'
+import { createBrowserClient } from '@naveeg/lib/server'
+import { stripeSubscriptionService } from '@naveeg/lib/server'
 
 export async function GET() {
   try {

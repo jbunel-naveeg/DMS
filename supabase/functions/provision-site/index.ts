@@ -11,6 +11,9 @@ interface ProvisionSiteRequest {
   site_title: string
   subdomain: string
   plan_id: string
+  business_type?: string
+  business_name?: string
+  business_description?: string
 }
 
 interface TenWebResponse {
@@ -30,7 +33,15 @@ serve(async (req) => {
   }
 
   try {
-    const { user_id, site_title, subdomain, plan_id }: ProvisionSiteRequest = await req.json()
+    const { 
+      user_id, 
+      site_title, 
+      subdomain, 
+      plan_id, 
+      business_type = 'business',
+      business_name = site_title,
+      business_description = `A professional ${business_type} website`
+    }: ProvisionSiteRequest = await req.json()
 
     // Validate required fields
     if (!user_id || !site_title || !subdomain || !plan_id) {
@@ -112,25 +123,26 @@ serve(async (req) => {
       )
     }
 
-    const tenWebResponse = await fetch('https://api.10web.io/websites', {
+    const tenWebResponse = await fetch('https://my.10web.io/api/v1/hosting/website', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${tenWebApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        title: site_title,
+        site_title: site_title,
         subdomain: subdomain,
-        plan: plan_id === 'trial' ? 'free' : plan_id,
-        region: 'europe-west3'
+        admin_username: 'admin',
+        admin_password: 'TempPassword123!',
+        region: 'europe-west3-b'
       })
     })
 
-    const tenWebData: TenWebResponse = await tenWebResponse.json()
+    const tenWebData: any = await tenWebResponse.json()
 
-    if (!tenWebData.success) {
+    if (tenWebData.status !== 'ok' || !tenWebData.data) {
       return new Response(
-        JSON.stringify({ error: tenWebData.error || 'Failed to create 10Web site' }),
+        JSON.stringify({ error: tenWebData.message || 'Failed to create 10Web site' }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -143,7 +155,7 @@ serve(async (req) => {
       .from('websites')
       .insert({
         owner_id: user_id,
-        tenweb_id: tenWebData.data!.id,
+        tenweb_id: tenWebData.data.id.toString(),
         site_title,
         subdomain,
         plan_id,
@@ -162,6 +174,77 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
+    }
+
+    // Step 2: Generate sitemap using AI
+    const sitemapResponse = await fetch('https://my.10web.io/api/v1/ai/generate_sitemap', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${tenWebApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        website_id: tenWebData.data.id,
+        params: {
+          business_type: business_type,
+          business_name: business_name,
+          business_description: business_description
+        }
+      })
+    })
+
+    const sitemapData: any = await sitemapResponse.json()
+    
+    if (sitemapData.status !== 200 || !sitemapData.data) {
+      console.error('Sitemap generation failed:', sitemapData)
+      // Continue without AI generation if it fails
+    } else {
+      // Step 3: Generate website from sitemap
+      const generateResponse = await fetch('https://my.10web.io/api/v1/ai/generate_site_from_sitemap', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${tenWebApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          website_id: tenWebData.data.id,
+          unique_id: sitemapData.data.unique_id,
+          params: {
+            business_type: business_type,
+            business_name: business_name,
+            business_description: business_description,
+            pages_meta: sitemapData.data.pages_meta,
+            website_description: sitemapData.data.website_description,
+            website_keyphrase: sitemapData.data.website_keyphrase,
+            website_title: sitemapData.data.website_title,
+            website_type: sitemapData.data.website_type,
+            template_type: 'basic'
+          }
+        })
+      })
+
+      const generateData: any = await generateResponse.json()
+      
+      if (generateData.status !== 200) {
+        console.error('Site generation failed:', generateData)
+        // Continue without AI generation if it fails
+      }
+    }
+
+    // Step 4: Enable/publish the website
+    const enableResponse = await fetch(`https://my.10web.io/api/v1/hosting/websites/${tenWebData.data.id}/enable`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${tenWebApiKey}`,
+        'Content-Type': 'application/json',
+      }
+    })
+
+    const enableData: any = await enableResponse.json()
+    
+    if (enableData.status !== 'ok') {
+      console.error('Website enable failed:', enableData)
+      // Continue even if enable fails
     }
 
     // Create entitlements based on plan
@@ -200,7 +283,7 @@ serve(async (req) => {
           site_title,
           subdomain,
           plan_id,
-          tenweb_id: tenWebData.data!.id,
+          tenweb_id: tenWebData.data.id.toString(),
           tenweb_url: tenWebData.data!.url
         })
       }).catch(console.error) // Don't fail if webhook fails

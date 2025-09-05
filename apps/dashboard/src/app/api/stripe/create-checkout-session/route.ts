@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createBrowserClient } from '@naveeg/lib'
-import { stripeCheckoutService } from '@naveeg/lib'
+import { createBrowserClient } from '@naveeg/lib/server'
+import { stripeCheckoutService } from '@naveeg/lib/server'
 
 export async function POST(request: NextRequest) {
   try {

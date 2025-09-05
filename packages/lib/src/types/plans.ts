@@ -109,7 +109,7 @@ export const PLANS: Plan[] = [
     id: 'starter',
     name: 'Starter',
     description: 'Great for small businesses and freelancers',
-    price: 29,
+    price: 49,
     interval: 'month',
     features: [
       '3 Websites',
@@ -134,7 +134,7 @@ export const PLANS: Plan[] = [
     id: 'pro',
     name: 'Pro',
     description: 'Perfect for growing businesses',
-    price: 79,
+    price: 99,
     interval: 'month',
     features: [
       '10 Websites',

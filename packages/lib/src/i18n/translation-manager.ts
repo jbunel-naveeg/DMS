@@ -12,7 +12,7 @@ export class TranslationManager {
   private lastSync: Map<string, number> = new Map()
 
   constructor(supabaseUrl: string, supabaseKey: string) {
-    this.supabase = createClient(supabaseUrl, supabaseKey)
+    this.supabase = createClient(supabaseUrl || 'https://placeholder.supabase.co', supabaseKey || 'placeholder_key')
   }
 
   /**

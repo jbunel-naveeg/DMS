@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@naveeg/lib'
+import { createServerSupabaseClient } from '@naveeg/lib/server'
 
 export async function GET() {
   try {
     // Check database connection
-    const supabase = createServerClient({} as Request)
+    const supabase = createServerSupabaseClient()
     const { error } = await supabase
       .from('plans')
       .select('id')

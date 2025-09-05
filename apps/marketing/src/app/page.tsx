@@ -19,6 +19,7 @@ export default function HomePage() {
             <div className="hidden md:flex items-center space-x-8">
               <Link href="/features" className="text-gray-600 hover:text-gray-900">Features</Link>
               <Link href="/pricing" className="text-gray-600 hover:text-gray-900">Pricing</Link>
+              <Link href="/faq" className="text-gray-600 hover:text-gray-900">FAQ</Link>
               <Link href="/about" className="text-gray-600 hover:text-gray-900">About</Link>
               <Link href="/contact" className="text-gray-600 hover:text-gray-900">Contact</Link>
             </div>
@@ -190,7 +191,7 @@ export default function HomePage() {
                 </span>
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Starter</h3>
-              <p className="text-4xl font-bold text-blue-600 mb-4">€29<span className="text-lg text-gray-500">/month</span></p>
+              <p className="text-4xl font-bold text-blue-600 mb-4">€49<span className="text-lg text-gray-500">/month</span></p>
               <p className="text-gray-600 mb-6">Perfect for small businesses</p>
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center">
@@ -222,7 +223,7 @@ export default function HomePage() {
             {/* Pro Plan */}
             <div className="bg-white rounded-lg shadow-lg p-8">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
-              <p className="text-4xl font-bold text-blue-600 mb-4">€79<span className="text-lg text-gray-500">/month</span></p>
+              <p className="text-4xl font-bold text-blue-600 mb-4">€99<span className="text-lg text-gray-500">/month</span></p>
               <p className="text-gray-600 mb-6">For growing businesses</p>
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center">

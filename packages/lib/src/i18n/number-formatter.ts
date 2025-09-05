@@ -79,7 +79,6 @@ export class NumberFormatter {
    */
   formatOrdinal(number: number, options?: NumberOptions): string {
     const formatOptions: Intl.NumberFormatOptions = {
-      style: 'ordinal',
       ...options
     }
 

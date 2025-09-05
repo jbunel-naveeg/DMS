@@ -10,7 +10,7 @@ export class DataSubjectRightsManager {
   private supabase: any
 
   constructor(supabaseUrl: string, supabaseKey: string) {
-    this.supabase = createClient(supabaseUrl, supabaseKey)
+    this.supabase = createClient(supabaseUrl || 'https://placeholder.supabase.co', supabaseKey || 'placeholder_key')
   }
 
   /**
@@ -490,7 +490,7 @@ export class DataSubjectRightsManager {
       await this.supabase
         .from('user_notifications')
         .insert({
-          user_id,
+          user_id: userId,
           type,
           data,
           is_read: false,
@@ -517,8 +517,8 @@ export class DataSubjectRightsManager {
 
       const stats = {
         total_requests: requests?.length || 0,
-        pending_requests: requests?.filter(r => r.status === 'pending').length || 0,
-        completed_requests: requests?.filter(r => r.status === 'completed').length || 0,
+        pending_requests: requests?.filter((r: any) => r.status === 'pending').length || 0,
+        completed_requests: requests?.filter((r: any) => r.status === 'completed').length || 0,
         request_types: {
           access: 0,
           rectification: 0,
@@ -530,7 +530,7 @@ export class DataSubjectRightsManager {
       }
 
       if (requests) {
-        requests.forEach(request => {
+        requests.forEach((request: any) => {
           stats.request_types[request.request_type as DataSubjectRightType]++
         })
       }

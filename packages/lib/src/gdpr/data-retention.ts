@@ -10,7 +10,7 @@ export class DataRetentionManager {
   private supabase: any
 
   constructor(supabaseUrl: string, supabaseKey: string) {
-    this.supabase = createClient(supabaseUrl, supabaseKey)
+    this.supabase = createClient(supabaseUrl || 'https://placeholder.supabase.co', supabaseKey || 'placeholder_key')
   }
 
   /**
@@ -135,7 +135,7 @@ export class DataRetentionManager {
           results.deleted_records += deletedCount
           results.processed_policies++
         } catch (error) {
-          results.errors.push(`Policy ${policy.id}: ${error.message}`)
+          results.errors.push(`Policy ${policy.id}: ${error instanceof Error ? error.message : 'Unknown error'}`)
         }
       }
 
@@ -143,7 +143,7 @@ export class DataRetentionManager {
       await this.logCleanupActivity(results)
 
     } catch (error) {
-      results.errors.push(`General cleanup error: ${error.message}`)
+      results.errors.push(`General cleanup error: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
 
     return results
@@ -218,7 +218,7 @@ export class DataRetentionManager {
 
       // Group by user and keep only the latest
       const userLatestConsent = new Map()
-      oldConsents.forEach(consent => {
+      oldConsents.forEach((consent: any) => {
         if (!userLatestConsent.has(consent.user_id) || 
             new Date(consent.created_at) > new Date(userLatestConsent.get(consent.user_id).created_at)) {
           userLatestConsent.set(consent.user_id, consent)
@@ -227,8 +227,8 @@ export class DataRetentionManager {
 
       // Delete old consents (excluding the latest for each user)
       const idsToDelete = oldConsents
-        .filter(consent => consent.id !== userLatestConsent.get(consent.user_id)?.id)
-        .map(consent => consent.id)
+        .filter((consent: any) => consent.id !== userLatestConsent.get(consent.user_id)?.id)
+        .map((consent: any) => consent.id)
 
       if (idsToDelete.length > 0) {
         const { count } = await this.supabase
@@ -359,7 +359,7 @@ export class DataRetentionManager {
         total_policies: policies.length,
         active_policies: policies.filter(p => p.auto_delete).length,
         auto_delete_enabled: policies.filter(p => p.auto_delete).length,
-        data_types_covered: [...new Set(policies.map(p => p.data_type))],
+        data_types_covered: Array.from(new Set(policies.map(p => p.data_type))),
         last_cleanup: null as string | null
       }
 

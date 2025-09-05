@@ -24,7 +24,7 @@ export class GDPRService {
   private auditLogger: AuditLogger
 
   constructor(supabaseUrl: string, supabaseKey: string) {
-    this.supabase = createClient(supabaseUrl, supabaseKey)
+    this.supabase = createClient(supabaseUrl || 'https://placeholder.supabase.co', supabaseKey || 'placeholder_key')
     this.consentManager = new ConsentManager(supabaseUrl, supabaseKey)
     this.dataSubjectRightsManager = new DataSubjectRightsManager(supabaseUrl, supabaseKey)
     this.dataRetentionManager = new DataRetentionManager(supabaseUrl, supabaseKey)

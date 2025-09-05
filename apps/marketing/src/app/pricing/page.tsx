@@ -19,6 +19,7 @@ export default function PricingPage() {
             <div className="hidden md:flex items-center space-x-8">
               <Link href="/features" className="text-gray-600 hover:text-gray-900">Features</Link>
               <Link href="/pricing" className="text-blue-600 font-semibold">Pricing</Link>
+              <Link href="/faq" className="text-gray-600 hover:text-gray-900">FAQ</Link>
               <Link href="/about" className="text-gray-600 hover:text-gray-900">About</Link>
               <Link href="/contact" className="text-gray-600 hover:text-gray-900">Contact</Link>
             </div>
@@ -117,7 +118,7 @@ export default function PricingPage() {
               
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Starter</h3>
-                <p className="text-4xl font-bold text-blue-600 mb-4">€29<span className="text-lg text-gray-500">/month</span></p>
+                <p className="text-4xl font-bold text-blue-600 mb-4">€49<span className="text-lg text-gray-500">/month</span></p>
                 <p className="text-gray-600">Perfect for small businesses</p>
               </div>
               
@@ -165,7 +166,7 @@ export default function PricingPage() {
             <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
-                <p className="text-4xl font-bold text-blue-600 mb-4">€79<span className="text-lg text-gray-500">/month</span></p>
+                <p className="text-4xl font-bold text-blue-600 mb-4">€99<span className="text-lg text-gray-500">/month</span></p>
                 <p className="text-gray-600">For growing businesses</p>
               </div>
               

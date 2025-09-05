@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripeWebhookService } from '@naveeg/lib'
+import { stripeWebhookService } from '@naveeg/lib/server'
 
 export async function POST(request: NextRequest) {
   try {

@@ -37,7 +37,7 @@ export interface Translation {
   updated_at: string
 }
 
-export interface TranslationNamespace {
+export interface TranslationNamespaceData {
   name: string
   description: string
   translations: Record<string, Translation>

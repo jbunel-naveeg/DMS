@@ -13,9 +13,10 @@ import {
   Settings, 
   BarChart3,
   Languages,
-  Translate,
   Download,
-  Upload
+  Upload,
+  CheckCircle,
+  AlertCircle
 } from 'lucide-react'
 
 // Mock i18n service - in a real app, this would be properly initialized
@@ -144,7 +145,7 @@ export default function I18nPage() {
               <div className="border-b border-gray-200 dark:border-gray-700">
                 <nav className="-mb-px flex space-x-8">
                   {[
-                    { id: 'translations', label: 'Translations', icon: Translate },
+                    { id: 'translations', label: 'Translations', icon: FileText },
                     { id: 'locales', label: 'Locales', icon: Languages },
                     { id: 'statistics', label: 'Statistics', icon: BarChart3 },
                     { id: 'settings', label: 'Settings', icon: Settings }

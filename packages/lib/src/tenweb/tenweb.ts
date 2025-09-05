@@ -33,8 +33,11 @@ export interface TenWebDNSRecord {
 }
 
 export interface CreateSiteRequest {
-  name: string
+  site_title: string
   subdomain: string
+  admin_username: string
+  admin_password: string
+  region?: string
   template?: string
   description?: string
 }
@@ -53,6 +56,48 @@ export interface CreateDomainRequest {
 export interface CreateDomainResponse {
   success: boolean
   domain?: TenWebDomain
+  error?: string
+}
+
+export interface GenerateSitemapRequest {
+  website_id: number
+  business_type: string
+  business_name: string
+  business_description: string
+}
+
+export interface GenerateSitemapResponse {
+  success: boolean
+  data?: {
+    unique_id: string
+    pages_meta: any[]
+    website_description: string
+    website_keyphrase: string
+    website_title: string
+    website_type: string
+  }
+  error?: string
+}
+
+export interface GenerateSiteFromSitemapRequest {
+  website_id: number
+  unique_id: string
+  business_type: string
+  business_name: string
+  business_description: string
+  pages_meta: any[]
+  website_description: string
+  website_keyphrase: string
+  website_title: string
+  website_type: string
+  template_type?: string
+}
+
+export interface GenerateSiteFromSitemapResponse {
+  success: boolean
+  data?: {
+    url: string
+  }
   error?: string
 }
 
@@ -88,22 +133,124 @@ export class TenWebAPI {
   // Create a new WordPress site
   async createSite(request: CreateSiteRequest): Promise<CreateSiteResponse> {
     try {
-      // Simulate 10Web API call - replace with actual API integration
-      const mockSite: TenWebSite = {
-        id: `site_${Date.now()}`,
-        name: request.name,
-        url: `https://${request.subdomain}.naveeg.com`,
-        status: 'active',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      }
+      // Call the actual 10Web API
+      const response = await this.makeRequest<any>('/v1/hosting/website', 'POST', {
+        subdomain: request.subdomain,
+        region: request.region || 'europe-west3-b',
+        site_title: request.site_title,
+        admin_username: request.admin_username,
+        admin_password: request.admin_password
+      })
 
-      // In a real implementation, you would call the actual 10Web API:
-      // const response = await this.makeRequest<TenWebSite>('/sites', 'POST', request)
-      
+      if (response.status === 'ok' && response.data) {
+        const site: TenWebSite = {
+          id: response.data.id.toString(),
+          name: request.site_title,
+          url: response.data.url || `https://${request.subdomain}.naveeg.com`,
+          status: 'active',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }
+
+        return {
+          success: true,
+          site: site,
+        }
+      } else {
+        return {
+          success: false,
+          error: response.message || 'Failed to create site',
+        }
+      }
+    } catch (error) {
       return {
-        success: true,
-        site: mockSite,
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    }
+  }
+
+  // Generate sitemap using AI
+  async generateSitemap(request: GenerateSitemapRequest): Promise<GenerateSitemapResponse> {
+    try {
+      const response = await this.makeRequest<any>('/v1/ai/generate_sitemap', 'POST', {
+        website_id: request.website_id,
+        params: {
+          business_type: request.business_type,
+          business_name: request.business_name,
+          business_description: request.business_description
+        }
+      })
+
+      if (response.status === 200 && response.data) {
+        return {
+          success: true,
+          data: response.data,
+        }
+      } else {
+        return {
+          success: false,
+          error: response.msg || 'Failed to generate sitemap',
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    }
+  }
+
+  // Generate website from sitemap
+  async generateSiteFromSitemap(request: GenerateSiteFromSitemapRequest): Promise<GenerateSiteFromSitemapResponse> {
+    try {
+      const response = await this.makeRequest<any>('/v1/ai/generate_site_from_sitemap', 'POST', {
+        website_id: request.website_id,
+        unique_id: request.unique_id,
+        params: {
+          business_type: request.business_type,
+          business_name: request.business_name,
+          business_description: request.business_description,
+          pages_meta: request.pages_meta,
+          website_description: request.website_description,
+          website_keyphrase: request.website_keyphrase,
+          website_title: request.website_title,
+          website_type: request.website_type,
+          template_type: request.template_type || 'basic'
+        }
+      })
+
+      if (response.status === 200 && response.data) {
+        return {
+          success: true,
+          data: response.data,
+        }
+      } else {
+        return {
+          success: false,
+          error: response.msg || 'Failed to generate site from sitemap',
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    }
+  }
+
+  // Enable/publish website
+  async enableWebsite(websiteId: number): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await this.makeRequest<any>(`/v1/hosting/websites/${websiteId}/enable`, 'POST')
+
+      if (response.status === 'ok') {
+        return { success: true }
+      } else {
+        return {
+          success: false,
+          error: response.message || 'Failed to enable website',
+        }
       }
     } catch (error) {
       return {

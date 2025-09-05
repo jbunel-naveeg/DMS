@@ -19,9 +19,9 @@ export class StripeWebhookService {
 
   constructor(stripeSecretKey: string, supabaseUrl: string, supabaseServiceKey: string) {
     this.stripe = new Stripe(stripeSecretKey, {
-      apiVersion: '2022-11-15',
+      apiVersion: '2023-10-16',
     })
-    this.supabase = createClient(supabaseUrl, supabaseServiceKey)
+    this.supabase = createClient(supabaseUrl || 'https://placeholder.supabase.co', supabaseServiceKey || 'placeholder_key')
   }
 
   async processWebhook(

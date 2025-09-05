@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@naveeg/lib'
-import { TeamService } from '@naveeg/lib'
+import { createServerClient } from '@naveeg/lib/server'
+import { TeamService } from '@naveeg/lib/server'
 
 export async function DELETE(
   request: NextRequest,

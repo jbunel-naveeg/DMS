@@ -6,7 +6,7 @@ export function getStripe() {
     throw new Error("STRIPE_SECRET_KEY missing");
   }
   return new Stripe(key, {
-    apiVersion: "2022-11-15",
+    apiVersion: "2023-10-16",
   });
 }
 

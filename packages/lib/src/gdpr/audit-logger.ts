@@ -11,7 +11,7 @@ export class AuditLogger {
   private enabled: boolean
 
   constructor(supabaseUrl: string, supabaseKey: string, enabled: boolean = true) {
-    this.supabase = createClient(supabaseUrl, supabaseKey)
+    this.supabase = createClient(supabaseUrl || 'https://placeholder.supabase.co', supabaseKey || 'placeholder_key')
     this.enabled = enabled
   }
 
@@ -382,7 +382,7 @@ export class AuditLogger {
 
       const logsByAction: Record<string, number> = {}
       if (actionData) {
-        actionData.forEach(log => {
+        actionData.forEach((log: any) => {
           logsByAction[log.action] = (logsByAction[log.action] || 0) + 1
         })
       }
@@ -395,7 +395,7 @@ export class AuditLogger {
 
       const logsByUser: Record<string, number> = {}
       if (userData) {
-        userData.forEach(log => {
+        userData.forEach((log: any) => {
           logsByUser[log.user_id] = (logsByUser[log.user_id] || 0) + 1
         })
       }
@@ -407,7 +407,7 @@ export class AuditLogger {
 
       const logsByResourceType: Record<string, number> = {}
       if (resourceData) {
-        resourceData.forEach(log => {
+        resourceData.forEach((log: any) => {
           logsByResourceType[log.resource_type] = (logsByResourceType[log.resource_type] || 0) + 1
         })
       }

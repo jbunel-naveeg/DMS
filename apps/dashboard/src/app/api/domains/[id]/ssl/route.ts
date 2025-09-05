@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createBrowserClient } from '@naveeg/lib'
-import { tenWebAPI } from '@naveeg/lib'
+import { createServerSupabaseClient } from '@naveeg/lib/server'
+import { tenWebAPI } from '@naveeg/lib/server'
 
 export async function POST(
   request: NextRequest,
@@ -17,7 +17,7 @@ export async function POST(
     }
 
     // Get the current user
-    const supabase = createBrowserClient()
+    const supabase = createServerSupabaseClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {

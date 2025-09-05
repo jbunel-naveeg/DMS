@@ -11,7 +11,7 @@ export class ConsentManager {
   private config: ConsentBannerConfig
 
   constructor(supabaseUrl: string, supabaseKey: string, config?: Partial<ConsentBannerConfig>) {
-    this.supabase = createClient(supabaseUrl, supabaseKey)
+    this.supabase = createClient(supabaseUrl || 'https://placeholder.supabase.co', supabaseKey || 'placeholder_key')
     this.config = {
       enabled: true,
       theme: 'auto',
@@ -307,11 +307,11 @@ export class ConsentManager {
 
       if (consentData && consentData.length > 0) {
         const total = consentData.length
-        consentRates.essential = (consentData.filter(c => c.essential).length / total) * 100
-        consentRates.analytics = (consentData.filter(c => c.analytics).length / total) * 100
-        consentRates.marketing = (consentData.filter(c => c.marketing).length / total) * 100
-        consentRates.personalization = (consentData.filter(c => c.personalization).length / total) * 100
-        consentRates.third_party = (consentData.filter(c => c.third_party).length / total) * 100
+        consentRates.essential = (consentData.filter((c: any) => c.essential).length / total) * 100
+        consentRates.analytics = (consentData.filter((c: any) => c.analytics).length / total) * 100
+        consentRates.marketing = (consentData.filter((c: any) => c.marketing).length / total) * 100
+        consentRates.personalization = (consentData.filter((c: any) => c.personalization).length / total) * 100
+        consentRates.third_party = (consentData.filter((c: any) => c.third_party).length / total) * 100
       }
 
       // Get recent consents (last 30 days)

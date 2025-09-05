@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@naveeg/lib'
-import { GoogleAnalyticsService } from '@naveeg/lib'
+import { createServerClient } from '@naveeg/lib/server'
+import { GoogleAnalyticsService } from '@naveeg/lib/server'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {

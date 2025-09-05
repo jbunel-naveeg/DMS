@@ -266,13 +266,10 @@ Instructions:
 }
 
 // Create a singleton instance
-export const openAIService = new OpenAIService(process.env.OPENAI_API_KEY || '')
+export const openAIService = new OpenAIService(process.env.OPENAI_API_KEY || 'placeholder_key')
 
 // Helper function to get OpenAI service instance
 export function getOpenAIService(): OpenAIService {
-  const apiKey = process.env.OPENAI_API_KEY
-  if (!apiKey) {
-    throw new Error('OPENAI_API_KEY environment variable is required')
-  }
+  const apiKey = process.env.OPENAI_API_KEY || 'placeholder_key'
   return new OpenAIService(apiKey)
 }

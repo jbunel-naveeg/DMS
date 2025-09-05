@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@naveeg/lib'
-import { GoogleService, getScopesForServices } from '@naveeg/lib'
+import { createServerClient } from '@naveeg/lib/server'
+import { GoogleService, getScopesForServices } from '@naveeg/lib/server'
 
 export async function POST(request: NextRequest) {
   try {

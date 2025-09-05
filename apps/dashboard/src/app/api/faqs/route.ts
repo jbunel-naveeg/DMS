@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createBrowserClient } from '@naveeg/lib'
+import { createServerSupabaseClient } from '@naveeg/lib/server'
 
 export async function GET() {
   try {
     // Get the current user
-    const supabase = createBrowserClient()
+    const supabase = createServerSupabaseClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get the current user
-    const supabase = createBrowserClient()
+    const supabase = createServerSupabaseClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {

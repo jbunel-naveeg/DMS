@@ -3,7 +3,7 @@
  * Provides React hooks for internationalization functionality
  */
 
-import { useState, useEffect, useCallback, useContext, createContext } from 'react'
+import React, { useState, useEffect, useCallback, useContext, createContext } from 'react'
 import { I18nService } from './i18n-service'
 import { CurrencyFormatter } from './currency-formatter'
 import { DateFormatter } from './date-formatter'
@@ -37,10 +37,10 @@ export function I18nProvider({
     numberFormatter
   }
 
-  return (
-    <I18nContext.Provider value={value}>
-      {children}
-    </I18nContext.Provider>
+  return React.createElement(
+    I18nContext.Provider,
+    { value },
+    children
   )
 }
 
